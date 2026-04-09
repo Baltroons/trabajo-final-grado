@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+    # El motor de PHP
+    php:
+        build: .
+        volumes:
+            - .:/var/www/html
+
+    # El servidor web (Nginx)
+    nginx:
+        image: nginx:alpine
+        ports:
+            - "8000:80"
+        volumes:
+            - .:/var/www/html
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - php
+
+    # Tu base de datos (la que ya tenías)
+    database:
+        image: postgres:16-alpine
+        environment:
+            POSTGRES_PASSWORD: password
+            POSTGRES_USER: app
+            POSTGRES_DB: app
+        ports:
+            - "5432:5432"
+
+    # Tu servidor de correo (el que ya tenías)
+    mailer:
+        image: axllent/mailpit
+        ports:
+            - "8025:8025"
+            - "1025:1025"
