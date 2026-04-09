@@ -1,38 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Inicio - TareasApp{% endblock %}
+{% block title %}Inicio - BrainHub{% endblock %}
 
 {% block body %}
-    <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-emerald-500">
-
+    {# Cabecera con el mensaje que pedía la plantilla #}
+    <div class="bg-white rounded-2xl shadow-sm p-6 border-t-4 border-emerald-500 mb-8">
         <h1 class="text-3xl font-bold text-emerald-800 mb-2">{{ mensaje }}</h1>
-        <p class="text-emerald-600 mb-8 border-b pb-4">Tu entorno está funcionando, hablando con PostgreSQL y ahora... ¡se ve increíble!</p>
+        <p class="text-gray-600">Gestiona tus grupos de estudio y colabora con otros estudiantes.</p>
+    </div>
 
-        <div class="mb-4">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Mis Tareas:</h2>
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Mis Salas de Estudio:</h2>
 
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {% for tarea in tareas %}
-                    <div class="p-4 border border-emerald-100 bg-emerald-50/50 rounded-lg flex items-start space-x-3 hover:shadow-lg transition-shadow hover:border-emerald-300">
-                        <div class="bg-emerald-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0 shadow-sm">
-                            {{ tarea.getId() }}
-                        </div>
-                        <div class="text-gray-700 font-medium pt-1">
-                            {{ tarea.getNombre() }}
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="col-span-full p-4 bg-yellow-50 text-yellow-700 rounded-lg border border-yellow-200">
-                        No hay tareas guardadas todavía.
-                    </div>
-                {% endfor %}
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div class="bg-white rounded-3xl shadow-sm border border-emerald-100 p-8 mb-8 flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-emerald-900 mb-2">¡Bienvenido a BrainHub!</h1>
+                    <p class="text-gray-600">Aquí tienes tu panel personal para crear salas.</p>
+                </div>
+                {# BOTÓN PARA CREAR SALA #}
+                <a href="{{ path('app_sala_new') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-2xl shadow-lg transition-transform hover:scale-105">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                </a>
             </div>
-        </div>
+            {# CAMBIO CRÍTICO: Usamos 'sala' en 'salas' en lugar de 'tarea' en 'tareas' #}
+            {% for sala in salas %}
+                <div class="p-5 border border-emerald-100 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-[10px] font-bold px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full uppercase">
+                            {{ sala.categoria }}
+                        </span>
+                        {% if sala.creador == app.user %}
+                            <span class="text-[10px] font-bold px-2 py-1 bg-amber-100 text-amber-700 rounded-full">PROPIETARIO</span>
+                        {% endif %}
+                    </div>
 
-        <div class="mt-8 bg-emerald-50 p-4 rounded-lg text-sm text-emerald-700 border border-emerald-200 flex items-center">
-            <svg class="w-5 h-5 mr-2 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-            <strong>Tip:</strong> Pulsa F5 para ver cómo se añade otra tarea automáticamente y se coloca en la cuadrícula.
-        </div>
+                    <h3 class="font-bold text-gray-900 mb-2">{{ sala.nombre }}</h3>
+                    <p class="text-sm text-gray-500 line-clamp-2 mb-4">{{ sala.descripcion }}</p>
 
+                    <a href="{{ path('app_sala_show', {'id': sala.id}) }}" class="w-full inline-block text-center bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2 rounded-lg transition-colors">
+                        Entrar a la sala
+                    </a>
+                </div>
+            {% else %}
+                {# Si no hay salas, mostramos este mensaje #}
+                <div class="col-span-full py-12 text-center bg-emerald-50/50 rounded-2xl border-2 border-dashed border-emerald-200">
+                    <p class="text-emerald-700 font-medium">Aún no participas en ninguna sala.</p>
+                    <a href="{{ path('app_sala_index') }}" class="text-emerald-600 underline text-sm mt-2 inline-block">Explorar todas las salas</a>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

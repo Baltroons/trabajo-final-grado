@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="bg-white rounded-3xl shadow-sm border border-emerald-100 p-8 mb-8">
+        <h1 class="text-3xl font-extrabold text-emerald-900 mb-2">¡Bienvenido a BrainHub!</h1>
+        <p class="text-gray-600">Aquí tienes tu panel personal con las salas en las que participas.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {% for sala in salas %}
+
+            <div class="mt-8 p-6 bg-white rounded-2xl border border-emerald-100 shadow-sm">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">¿Quieres participar en esta sala?</h3>
+
+                {% if app.user == sala.creador %}
+                    <div class="p-4 bg-amber-50 text-amber-700 rounded-xl text-sm font-medium border border-amber-100">
+                        Eres el <strong>propietario</strong> de esta sala. Tienes control total sobre ella.
+                    </div>
+                {% elseif app.user in sala.miembros %}
+                    <div class="p-4 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium border border-emerald-100 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        Ya eres miembro de esta sala de estudio.
+                    </div>
+                {% else %}
+                    {# Formulario para unirse (usamos POST por seguridad) #}
+                    <form action="{{ path('app_sala_join', {'id': sala.id}) }}" method="POST">
+                        <button type="submit" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                            Unirme ahora
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+
+            {# Usamos la misma estructura de tarjeta que en el index de salas #}
+            <div class="bg-white rounded-2xl shadow-md border border-emerald-50 p-6 hover:-translate-y-1 transition-all">
+                <div class="flex justify-between items-start mb-4">
+                <span class="px-2 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-md uppercase">
+                    {{ sala.categoria }}
+                </span>
+                    {% if sala.creador == app.user %}
+                        <span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-bold">PROPIETARIO</span>
+                    {% endif %}
+                </div>
+
+                <h3 class="text-lg font-bold text-gray-800 mb-2">{{ sala.nombre }}</h3>
+                <p class="text-gray-500 text-sm line-clamp-2 mb-4">{{ sala.descripcion }}</p>
+
+                <a href="{{ path('app_sala_show', {'id': sala.id}) }}" class="block text-center bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2 rounded-lg transition-colors">
+                    Entrar a estudiar
+                </a>
+            </div>
+        {% else %}
+            <div class="col-span-full text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                <p class="text-gray-500">Aún no estás en ninguna sala. ¡Explora o crea una!</p>
+                <a href="{{ path('app_sala_index') }}" class="text-emerald-600 font-bold mt-2 inline-block">Ver todas las salas</a>
+            </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}

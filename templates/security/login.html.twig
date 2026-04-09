@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Iniciar sesión - Plataforma de Estudio{% endblock %}
+
+{% block body %}
+    <div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-emerald-100">
+
+            {# Encabezado #}
+            <div class="text-center">
+                <div class="mx-auto h-12 w-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+                    {# Icono de Login #}
+                    <svg class="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900">Iniciar sesión</h2>
+                <p class="mt-2 text-sm text-gray-600">
+                    Bienvenido de nuevo a tu espacio de estudio
+                </p>
+            </div>
+
+            {# Mensaje de error si la contraseña es incorrecta #}
+            {% if error %}
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4 text-red-700 text-sm rounded-r-md">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            {# Mensaje si el usuario ya está logueado #}
+            {% if app.user %}
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-4 rounded-xl text-center shadow-inner">
+                    <p class="mb-2">Ya has iniciado sesión como <br><strong class="text-emerald-900">{{ app.user.userIdentifier }}</strong>.</p>
+                    <a href="{{ path('app_logout') }}" class="inline-block mt-2 bg-white text-emerald-700 border border-emerald-300 font-bold py-1 px-4 rounded hover:bg-emerald-50 transition-colors">Cerrar sesión</a>
+                </div>
+            {% else %}
+                {# Formulario principal #}
+                <form method="post" class="mt-8 space-y-6">
+                    <div class="rounded-md shadow-sm space-y-4">
+
+                        {# Campo Username #}
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario</label>
+                            <input type="text" value="{{ last_username }}" name="_username" id="username" class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm" autocomplete="username" required autofocus placeholder="Tu nombre de usuario">
+                        </div>
+
+                        {# Campo Contraseña #}
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                            <input type="password" name="_password" id="password" class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm" autocomplete="current-password" required placeholder="Tu contraseña">
+                        </div>
+                    </div>
+
+                    {# Token de seguridad CSRF oculto (¡Vital para que funcione!) #}
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    {# Recordarme #}
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input type="checkbox" name="_remember_me" id="remember_me" class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded">
+                            <label for="remember_me" class="ml-2 block text-sm text-gray-900">
+                                Recordarme
+                            </label>
+                        </div>
+                    </div>
+
+                    {# Botón Submit #}
+                    <div>
+                        <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all shadow-md hover:shadow-lg">
+                            Entrar a mis salas
+                        </button>
+                    </div>
+
+                    {# Enlace al registro #}
+                    <div class="text-center mt-4">
+                        <p class="text-sm text-gray-600">
+                            ¿No tienes cuenta aún?
+                            <a href="{{ path('app_register') }}" class="font-medium text-emerald-600 hover:text-emerald-500">
+                                Regístrate aquí
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
