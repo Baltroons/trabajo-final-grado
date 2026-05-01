@@ -1,13 +1,117 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Sala{% endblock %}
+{% block title %}Editar Sala — BrainHub{% endblock %}
 
 {% block body %}
-    <h1>Edit Sala</h1>
+    <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 
-    {{ include('sala/_form.html.twig', {'button_label': 'Update'}) }}
+        <div class="mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Editar espacio de estudio</h1>
+            <p class="mt-2 text-sm text-gray-500">Actualiza los detalles de tu sala o corrige cualquier error en la descripción.</p>
+        </div>
 
-    <a href="{{ path('app_sala_index') }}">back to list</a>
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 flex flex-col lg:flex-row">
 
-    {{ include('sala/_delete_form.html.twig') }}
+            <div class="w-full lg:w-3/5 p-8 sm:p-10 flex flex-col">
+
+                {# 1. AÑADIMOS UN ID AL FORMULARIO Y LO CERRAMOS ANTES DE LOS BOTONES #}
+                {{ form_start(form, {'attr': {'class': 'space-y-6', 'id': 'form_editar_sala'}}) }}
+
+                <div>
+                    <label class="flex items-center text-sm font-semibold text-gray-800 mb-2">
+                        <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Nombre de la Sala / Asignatura
+                    </label>
+                    {{ form_widget(form.nombre, {
+                        'attr': {
+                            'class': 'mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-3 px-4 bg-gray-50 transition-colors'
+                        }
+                    }) }}
+                </div>
+
+                <div>
+                    <label class="flex items-center text-sm font-semibold text-gray-800 mb-2">
+                        <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        Categoría
+                    </label>
+                    {{ form_widget(form.categoria, {
+                        'attr': {
+                            'class': 'mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-3 px-4 bg-gray-50 cursor-pointer transition-colors'
+                        }
+                    }) }}
+                </div>
+
+                <div>
+                    <label class="flex items-center text-sm font-semibold text-gray-800 mb-2">
+                        <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                        Descripción corta
+                    </label>
+                    {{ form_widget(form.descripcion, {
+                        'attr': {
+                            'class': 'mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-3 px-4 bg-gray-50 transition-colors',
+                            'rows': '4'
+                        }
+                    }) }}
+                </div>
+
+                {# 2. CERRAMOS EL FORMULARIO DE EDICIÓN AQUÍ (form_end genera los tokens ocultos automáticamente) #}
+                {{ form_end(form) }}
+
+                {# 3. SECCIÓN DE BOTONES (Totalmente fuera del form_start y form_end) #}
+                <div class="pt-6 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-4 mt-8 flex-grow items-end">
+
+                    {# Botón de eliminar (Su propio formulario independiente) #}
+                    <div class="w-full sm:w-auto">
+                        {{ include('sala/_delete_form.html.twig') }}
+                    </div>
+
+                    {# Botones de Guardar y Cancelar #}
+                    <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
+                        <a href="{{ path('app_sala_index') }}" class="text-gray-500 hover:text-gray-900 font-semibold text-sm transition-colors px-4 py-2">
+                            Cancelar
+                        </a>
+
+                        {# 4. LA MAGIA: El atributo form="form_editar_sala" vincula este botón con el formulario de arriba #}
+                        <button type="submit" form="form_editar_sala" class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg hover:shadow-emerald-500/30 transform hover:-translate-y-0.5">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Guardar cambios
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="hidden lg:block w-2/5 bg-gradient-to-br from-amber-50 to-orange-100 p-8 sm:p-10 border-l border-amber-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-amber-200 opacity-40 blur-3xl"></div>
+                <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-orange-200 opacity-40 blur-3xl"></div>
+
+                <div class="relative z-10 h-full flex flex-col">
+                    <h3 class="text-xl font-bold text-amber-900 mb-6 flex items-center">
+                        <span class="bg-white p-2 rounded-lg shadow-sm mr-3">✏️</span>
+                        Editando la sala
+                    </h3>
+
+                    <ul class="space-y-5 flex-1">
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-xs mt-0.5 shadow-md">!</div>
+                            <p class="ml-3 text-sm text-amber-900 leading-relaxed">Si cambias el enfoque de la sala, asegúrate de actualizar bien la descripción para no confundir a los que ya están dentro.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-xs mt-0.5 shadow-md">!</div>
+                            <p class="ml-3 text-sm text-amber-900 leading-relaxed">Los archivos y mensajes enviados anteriormente se mantendrán intactos aunque le cambies el nombre a la sala.</p>
+                        </li>
+                    </ul>
+
+                    <div class="mt-8 p-5 bg-white/60 backdrop-blur-md rounded-2xl border border-white/80 shadow-sm">
+                        <h4 class="text-xs font-bold text-red-800 uppercase tracking-wider mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            Zona de peligro
+                        </h4>
+                        <p class="text-sm text-red-900 font-medium">Eliminar la sala es una acción irreversible. Todos los apuntes y el historial del chat desaparecerán para todos los miembros.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 {% endblock %}

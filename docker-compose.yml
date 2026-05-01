@@ -25,6 +25,8 @@ services:
             POSTGRES_DB: app
         ports:
             - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data # <--- AÑADE ESTO
 
     # Tu servidor de correo (el que ya tenías)
     mailer:
@@ -32,3 +34,6 @@ services:
         ports:
             - "8025:8025"
             - "1025:1025"
+
+volumes: # <--- Y ESTO AL FINAL DEL ARCHIVO
+    postgres_data:
