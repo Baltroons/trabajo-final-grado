@@ -17,6 +17,8 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # Le damos valores cualquiera a las variables que exige la configuración
 ENV DATABASE_URL="postgresql://db_user:db_password@127.0.0.1:5432/db_name?serverVersion=16&charset=utf8"
 ENV DEFAULT_URI="https://localhost"
+ENV MERCURE_URL="http://localhost/.well-known/mercure"
+ENV MERCURE_JWT_SECRET="brainhub_secret_32_characters_long_key"
 # ----------------------------------------------
 
 # 3. Copiamos y preparamos archivos
