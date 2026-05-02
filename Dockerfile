@@ -13,10 +13,14 @@ ENV APP_ENV=prod
 ENV APP_DEBUG=0
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# --- EL TRUCO PARA EL ERROR DE DATABASE_URL ---
-# Le damos un valor cualquiera para que Symfony no explote al compilar
+# --- EL TRUCO PARA QUE SYMFONY NO EXPLOTE AL COMPILAR ---
+# Le damos valores cualquiera a las variables que exige la configuración
 ENV DATABASE_URL="postgresql://db_user:db_password@127.0.0.1:5432/db_name?serverVersion=16&charset=utf8"
+ENV DEFAULT_URI="https://localhost"
 # ----------------------------------------------
+
+# 3. Copiamos y preparamos archivos
+# ...
 
 # 3. Copiamos y preparamos archivos
 COPY . .
