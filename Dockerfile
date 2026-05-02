@@ -1,15 +1,7 @@
-# ETAPA 1: Compilar activos (JS/CSS)
-FROM node:20-alpine AS assets_builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-# ETAPA 2: Configuración de PHP y Servidor
+# Usamos una sola etapa para evitar líos con NPM por ahora
 FROM php:8.2-fpm-alpine
 
-# Instalar extensiones necesarias para Symfony y BBDD
+# Instalar extensiones necesarias
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -25,26 +17,20 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copiar el código del proyecto
+# Copiamos todo el proyecto
 COPY . .
 
-# Copiar los activos compilados desde la etapa 1
-COPY --from=assets_builder /app/public/build ./public/build
-
-# Instalar dependencias de PHP sin scripts de desarrollo
+# Instalamos dependencias de PHP
 ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN composer install --no-dev --optimize-autoloader
 
-# Configurar permisos para Symfony
-RUN chown -R mw-data:www-data var/
+# Permisos para Symfony
+RUN chown -R www-data:www-data var/
 
-# Copiar configuraciones de Nginx y Supervisor
+# Copiar configuraciones de Nginx y Supervisor (asegúrate de tener estos archivos en tu carpeta docker/)
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-# Railway usa la variable $PORT, pero Nginx suele usar el 80.
-# Exponemos el puerto pero Railway lo mapeará solo.
 EXPOSE 80
 
-# Comando para arrancar Supervisor (que gestiona Nginx y PHP-FPM)
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
