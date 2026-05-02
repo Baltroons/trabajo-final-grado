@@ -5,76 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b23049d7-f584-41f5-9eea-c34309c3681d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Controller/ChatController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Controller/ProfileController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/_includes/_chat_messages.html.twig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/profile/edit.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/app.IXoBAA.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/app.IXoBAA.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/app.IXoBAA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/app.IXoBAA/schema/public.abK9xQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/information_schema.FNRwLQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/information_schema.FNRwLQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/pg_catalog.0S1ZNQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/pg_catalog.0S1ZNQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/laravel-idea.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/laravel-idea.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/symfony2.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/symfony2.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker/nginx.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/bundles.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/bundles.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/packages/twig.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/twig.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/reference.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/reference.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260409152739.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260409152739.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260409154251.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260409154251.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260409155645.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260409155645.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260409162941.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260409162941.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260409174044.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260409174044.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/images/brainhub.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/images/brainhub.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/los-alecos-69d7e86248e134.93468918.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/los-alecos-69d7ea6741bd40.03163181.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/los-alecos-69d7ead40f30f9.44877439.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/los-alecos-69d7ed150bd769.65164272.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/los-alecos-69d7ef46cf48c7.44417619.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/los-alecos-69d8dded18ce15.18230368.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/los-alecos-69d8fb61100b47.71481967.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/HomeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/RegistrationController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/RegistrationController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/SalaController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/SalaController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/SecurityController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/SecurityController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entity/Archivo.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Archivo.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entity/Mensaje.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Mensaje.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entity/Sala.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Sala.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entity/Tarea.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Tarea.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entity/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Form/ArchivoType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Form/ArchivoType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Form/MensajeType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Form/MensajeType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Form/RegistrationFormType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Form/RegistrationFormType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Form/SalaType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Form/SalaType.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/ArchivoRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ArchivoRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/MensajeRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/MensajeRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/SalaRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/SalaRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/TareaRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/TareaRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/UserRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/UserRepository.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Security/UserAuthenticator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Security/UserAuthenticator.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/symfony.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/registration/register.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/registration/register.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/_delete_form.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/_delete_form.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/_form.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/_form.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/edit.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/edit.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/new.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/new.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/show.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/show.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/security/login.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/security/login.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -292,7 +225,8 @@
       <workItem from="1775752232664" duration="9019000" />
       <workItem from="1776699342005" duration="8646000" />
       <workItem from="1777647501134" duration="19494000" />
-      <workItem from="1777671291065" duration="10673000" />
+      <workItem from="1777671291065" duration="11330000" />
+      <workItem from="1777683488743" duration="265000" />
     </task>
     <servers />
   </component>
