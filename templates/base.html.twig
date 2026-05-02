@@ -15,15 +15,16 @@
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         .dropdown-menu.hidden { display: none; }
 
-        /* Efecto de pulso suave para el botón de chat cuando está cerrado */
-        .chat-hint-pulse {
-            animation: pulse-green 2s infinite;
-        }
+        .chat-hint-pulse { animation: pulse-green 2s infinite; }
         @keyframes pulse-green {
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
+
+        #chat-messages-container::-webkit-scrollbar { width: 4px; }
+        #chat-messages-container::-webkit-scrollbar-track { background: transparent; }
+        #chat-messages-container::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
     </style>
 </head>
 
@@ -34,205 +35,340 @@
     <div class="w-full px-6 md:px-10">
         <div class="flex justify-between h-16 items-center">
             <a href="{{ path('app_home') }}" class="flex items-center gap-2 text-white font-bold text-xl hover:text-emerald-200 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                 <span>BrainHub</span>
             </a>
 
             <div class="flex items-center space-x-4">
                 {% if app.user %}
                     <div class="relative">
-                        <button id="userMenuBtn" class="flex items-center gap-3 bg-emerald-700/50 py-1.5 pl-4 pr-2 rounded-full border border-emerald-600/50 hover:bg-emerald-700 transition-all outline-none">
+                        <button id="userMenuBtn" aria-expanded="false" class="flex items-center gap-3 bg-emerald-700/50 py-1.5 pl-4 pr-2 rounded-full border border-emerald-600/50 hover:bg-emerald-700 transition-all outline-none">
                             <span class="text-emerald-50 text-sm font-medium">Hola, <span class="text-white font-bold">{{ app.user.username }}</span></span>
-                            <div class="h-9 w-9 bg-emerald-500 rounded-full flex items-center justify-center text-white font-black border-2 border-emerald-300 shadow-sm uppercase text-xs">
-                                {{ app.user.username|first }}
+                            <div class="h-9 w-9 bg-emerald-500 rounded-full flex items-center justify-center text-white font-black border-2 border-emerald-300 shadow-sm uppercase text-xs overflow-hidden">
+                                {% if app.user.fotoPerfil %}
+                                    <img src="{{ asset('uploads/profiles/' ~ app.user.fotoPerfil) }}" class="w-full h-full object-cover" alt="Perfil">
+                                {% else %}
+                                    {{ app.user.username|first }}
+                                {% endif %}
                             </div>
                         </button>
                         <div id="userDropdown" class="dropdown-menu hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-[100] animate-fade-in">
-                            <div class="px-4 py-3 border-b border-gray-50 mb-1">
-                                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Cuenta</p>
-                                <p class="text-sm font-bold text-gray-800 truncate">{{ app.user.email|default(app.user.username) }}</p>
-                            </div>
-                            <a href="{{ path('app_logout') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-bold">
-                                Cerrar sesión
-                            </a>
+                            <a href="{{ path('app_profile_edit') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-emerald-50 transition-colors font-medium">Mi Perfil</a>
+                            <hr class="my-1 border-gray-100">
+                            <a href="{{ path('app_logout') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-bold">Cerrar sesión</a>
                         </div>
                     </div>
                 {% else %}
-                    <a href="{{ path('app_login') }}" class="text-emerald-50 hover:text-white font-medium transition-all hover:underline underline-offset-4">Iniciar sesión</a>
-                    <a href="{{ path('app_register') }}" class="bg-emerald-500 hover:bg-emerald-400 text-white px-5 py-2 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105">Registrarse</a>
+                    <a href="{{ path('app_login') }}" class="text-emerald-50 hover:text-white font-medium">Iniciar sesión</a>
+                    <a href="{{ path('app_register') }}" class="bg-emerald-500 hover:bg-emerald-400 text-white px-5 py-2 rounded-xl font-bold shadow-lg transition-all">Registrarse</a>
                 {% endif %}
             </div>
         </div>
     </div>
 </nav>
 
-{# --- CONTENEDOR PRINCIPAL DUAL --- #}
 <div class="flex flex-grow w-full relative {% if app.user %}overflow-hidden{% endif %}">
 
-    {# 1. ÁREA DINÁMICA (Main) #}
     <main class="flex-grow w-full relative flex flex-col transition-all duration-500 ease-in-out {% if app.user %}overflow-y-auto{% endif %}">
         <div class="flex-grow">
             {% block body %}{% endblock %}
         </div>
-
         {% if app.user %}
             <footer class="w-full bg-emerald-900 text-center py-3 text-emerald-300/60 text-[10px] shrink-0 border-t border-emerald-800">
-                &copy; {{ "now"|date("Y") }} - BrainHub - Estudio Colaborativo.
+                &copy; {{ "now"|date("Y") }} - BrainHub
             </footer>
         {% endif %}
     </main>
 
-    {# 2. CHAT LATERAL GLOBAL (Inicia con w-0) #}
     {% if app.user %}
-        {# QUITAMOS 'overflow-hidden' de aquí para que el botón pueda asomar #}
-        <aside id="chatSidebar" class="relative h-full w-0 flex flex-col transition-all duration-500 ease-in-out z-40 shrink-0">
+        {# OVERLAY PARA MÓVILES (Oscurece el fondo al abrir el chat en pantallas pequeñas) #}
+        <div id="chat-mobile-overlay" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-30 lg:hidden"></div>
 
-            {# Botón de Toggle (Visible siempre) #}
-            <button id="toggleChatBtn" class="absolute left-0 top-1/2 -translate-y-1/2 transform -translate-x-full bg-emerald-600 text-white p-3 rounded-l-2xl shadow-lg hover:bg-emerald-700 transition-all z-50 flex flex-col items-center gap-2 chat-hint-pulse" title="Abrir Chat">
-                {# Icono de Chat (visible cuando está cerrado) #}
-                <svg id="chatIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                </svg>
-                {# Icono de Flecha (visible cuando está abierto, rotará) #}
-                <svg id="arrowIcon" class="w-4 h-4 transition-transform duration-500 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
-                </svg>
+        <aside id="chatSidebar" class="absolute right-0 lg:relative h-full w-0 flex flex-col transition-all duration-500 ease-in-out z-40 shrink-0 bg-white shadow-2xl border-l border-gray-100">
+            <button id="toggleChatBtn" aria-expanded="false" class="absolute left-0 top-1/2 -translate-y-1/2 transform -translate-x-full bg-emerald-600 text-white p-3 rounded-l-2xl shadow-lg hover:bg-emerald-700 transition-all z-50 flex flex-col items-center gap-2 chat-hint-pulse">
+                <div id="chat-notification-badge" class="hidden absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full border-2 border-white animate-bounce z-[60]"></div>
+                <svg id="chatIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                <svg id="arrowIcon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
                 <span id="chatLabel" class="[writing-mode:vertical-lr] rotate-180 text-[10px] font-bold tracking-widest uppercase py-1">Chat</span>
             </button>
 
-            {# NUEVO CONTENEDOR: Este div sí oculta el contenido y tiene el fondo blanco #}
-            <div class="h-full w-full bg-white shadow-2xl overflow-hidden flex flex-col transition-all duration-500">
-                {# Wrapper del contenido con ancho mínimo fijo #}
-                <div class="min-w-[20rem] md:min-w-[24rem] h-full flex flex-col border-l border-gray-100">
-
-                    <div class="p-6 border-b border-gray-50 shrink-0 flex justify-between items-center">
-                        <h2 class="text-xl font-black text-gray-900">Mensajes</h2>
-                        <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            <div class="h-full w-full bg-white flex flex-col overflow-hidden">
+                {# PESTAÑAS #}
+                <div class="flex border-b shrink-0 bg-gray-50">
+                    <div class="p-2 border-b bg-gray-50 shrink-0">
+                        <input type="text" id="sidebar-search" placeholder="Buscar sala o usuario..." class="w-full p-2 text-xs rounded-lg bg-white border border-gray-200 outline-none focus:border-emerald-500 transition-colors">
                     </div>
+                    <button onclick="switchTab('salas')" id="tab-salas" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest border-b-2 border-emerald-500 text-emerald-600">Salas</button>
+                    <button onclick="switchTab('users')" id="tab-users" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest border-b-2 border-transparent text-gray-400 hover:text-emerald-500">Privados</button>
+                </div>
 
-                    <div class="flex-grow overflow-y-auto p-6 space-y-4 bg-gray-50/50">
-                        <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                            <p class="text-sm text-emerald-800 font-medium leading-relaxed">¡Bienvenido a BrainHub! Tu chat global está activo.</p>
+                {# LISTADOS #}
+                <div id="sidebar-list-container" class="flex-grow overflow-y-auto p-2">
+                    <div id="list-salas" class="space-y-1">
+                        {% for s in app.user.salasSuscritas|merge(app.user.salasCreadas) %}
+                            <div onclick="window.switchChat('sala', {{ s.id }}, '{{ s.nombre|e('js') }}')" class="p-3 hover:bg-emerald-50 rounded-xl cursor-pointer transition-all flex items-center gap-3">
+                                <div class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center font-bold">#</div>
+                                <span class="text-sm font-bold text-gray-700">{{ s.nombre }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div id="list-users" class="hidden space-y-1">
+                        <p class="text-[10px] text-gray-400 text-center py-10 font-bold uppercase tracking-widest">Tus conversaciones privadas</p>
+                    </div>
+                </div>
+
+                {# VENTANA ACTIVA #}
+                <div id="active-chat-window" class="hidden absolute inset-0 bg-white flex flex-col z-20">
+                    <div class="p-4 border-b flex items-center gap-3 bg-white shadow-sm z-10">
+                        <button onclick="closeChat()" class="p-2 hover:bg-gray-100 rounded-full text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+                        <div>
+                            <h3 id="active-chat-title" class="font-black text-gray-800 leading-none text-sm"></h3>
+                            <span id="active-chat-subtitle" class="text-[10px] text-emerald-500 font-bold uppercase"></span>
                         </div>
                     </div>
-
-                    <div class="p-4 bg-white border-t border-gray-100 shrink-0">
-                        <input type="text" placeholder="Escribe un mensaje..." class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                    <div id="chat-messages-container" class="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-50/50"></div>
+                    <div class="p-4 border-t bg-white">
+                        <div class="relative">
+                            <input type="text" id="global-chat-input" placeholder="Escribe..." class="w-full p-3 pr-12 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                            <button id="send-chat-btn" class="absolute right-2 top-1.5 p-1.5 text-emerald-600 hover:text-emerald-800 transition-colors"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg></button>
+                        </div>
                     </div>
-
                 </div>
             </div>
-
         </aside>
-    {% endif %}
 
+        {# BURBUJA DE PERFIL #}
+        <div id="user-bubble" class="hidden fixed bg-white shadow-2xl rounded-3xl p-6 border border-gray-100 z-[100] w-72 animate-fade-in">
+            <div class="flex flex-col items-center text-center">
+                <img id="bubble-img" src="" class="w-24 h-24 rounded-full border-4 border-emerald-50 mb-4 object-cover shadow-sm" alt="Foto">
+                <h3 id="bubble-name" class="font-black text-gray-900 text-lg"></h3>
+                <p id="bubble-bio" class="text-xs text-gray-500 mb-6 italic px-2"></p>
+                <button id="bubble-msg-btn" class="w-full bg-emerald-600 text-white py-3 rounded-2xl text-sm font-black hover:bg-emerald-700 transition-all">MENSAJE DIRECTO</button>
+            </div>
+        </div>
+    {% endif %}
 </div>
 
-{# --- SCRIPTS GLOBALES --- #}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Dropdown Perfil
-        const userBtn = document.getElementById('userMenuBtn');
-        const userMenu = document.getElementById('userDropdown');
-        if (userBtn && userMenu) {
-            userBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                userMenu.classList.toggle('hidden');
-            });
-            document.addEventListener('click', () => userMenu.classList.add('hidden'));
-        }
+        {% if app.user %}
+        let chatContext = { type: 'sala', id: null, name: '' };
+        let eventSource = null;
 
-        // Lógica del Chat (Minimizar/Maximizar)
         const chatSidebar = document.getElementById('chatSidebar');
         const toggleBtn = document.getElementById('toggleChatBtn');
-        const arrowIcon = document.getElementById('arrowIcon');
-        const chatIcon = document.getElementById('chatIcon');
-        const chatLabel = document.getElementById('chatLabel');
+        const mobileOverlay = document.getElementById('chat-mobile-overlay');
+        const chatContainer = document.getElementById('chat-messages-container');
+        const chatInput = document.getElementById('global-chat-input');
+        const sendBtn = document.getElementById('send-chat-btn');
+        const activeChatWindow = document.getElementById('active-chat-window');
+        const bubble = document.getElementById('user-bubble');
 
-        if (chatSidebar && toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                const isClosed = chatSidebar.classList.contains('w-0');
+        // Cerrar conexiones antes de descargar la página para liberar memoria
+        window.addEventListener('beforeunload', () => {
+            if (eventSource) eventSource.close();
+        });
 
-                if (isClosed) {
-                    // ABRIR
-                    chatSidebar.classList.remove('w-0');
-                    chatSidebar.classList.add('w-80', 'md:w-96');
+        // --- 1. BUSCADOR DEL SIDEBAR ---
+        const searchInput = document.getElementById('sidebar-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                const salas = document.querySelectorAll('#list-salas > div');
+                salas.forEach(sala => {
+                    const nombre = sala.querySelector('span').innerText.toLowerCase();
+                    sala.style.display = nombre.includes(term) ? 'flex' : 'none';
+                });
+                const usuarios = document.querySelectorAll('#list-users > div:not(p)');
+                usuarios.forEach(usuario => {
+                    const nombre = usuario.querySelector('span').innerText.toLowerCase();
+                    usuario.style.display = nombre.includes(term) ? 'flex' : 'none';
+                });
+            });
+        }
 
-                    // Ajustes de Iconos
-                    chatIcon.classList.add('hidden');
-                    arrowIcon.classList.remove('hidden');
-                    arrowIcon.classList.remove('rotate-180');
-                    chatLabel.classList.add('hidden');
-                    toggleBtn.classList.remove('chat-hint-pulse');
-                    toggleBtn.classList.replace('bg-emerald-600', 'bg-white');
-                    toggleBtn.classList.replace('text-white', 'text-gray-400');
-                    toggleBtn.title = "Cerrar Chat";
-                } else {
-                    // CERRAR
-                    chatSidebar.classList.remove('w-80', 'md:w-96');
-                    chatSidebar.classList.add('w-0');
+        // --- 2. PESTAÑAS DEL SIDEBAR ---
+        window.switchTab = function(tab) {
+            const isS = tab === 'salas';
+            document.getElementById('list-salas').classList.toggle('hidden', !isS);
+            document.getElementById('list-users').classList.toggle('hidden', isS);
+            document.getElementById('tab-salas').className = isS ? 'flex-1 py-4 text-[10px] font-black uppercase border-b-2 border-emerald-500 text-emerald-600' : 'flex-1 py-4 text-[10px] font-black uppercase border-b-2 border-transparent text-gray-400 hover:text-emerald-500';
+            document.getElementById('tab-users').className = !isS ? 'flex-1 py-4 text-[10px] font-black uppercase border-b-2 border-emerald-500 text-emerald-600' : 'flex-1 py-4 text-[10px] font-black uppercase border-b-2 border-transparent text-gray-400 hover:text-emerald-500';
+        };
 
-                    // Ajustes de Iconos
-                    chatIcon.classList.remove('hidden');
-                    arrowIcon.classList.add('hidden');
-                    chatLabel.classList.remove('hidden');
-                    toggleBtn.classList.add('chat-hint-pulse');
-                    toggleBtn.classList.replace('bg-white', 'bg-emerald-600');
-                    toggleBtn.classList.replace('text-gray-400', 'text-white');
-                    toggleBtn.title = "Abrir Chat";
+        // --- 3. ABRIR CHAT Y CARGAR HISTORIAL ---
+        window.switchChat = function(type, id, name) {
+            chatContext = { type, id, name };
+            document.getElementById('active-chat-title').innerText = name;
+            document.getElementById('active-chat-subtitle').innerText = type === 'sala' ? 'Canal de Sala' : 'Privado';
+            activeChatWindow.classList.remove('hidden');
+
+            chatContainer.innerHTML = '<div class="flex justify-center items-center h-full"><p class="text-[10px] text-gray-400 uppercase animate-pulse">Cargando historial...</p></div>';
+
+            fetch(`/chat/history/${type}/${id}`)
+                .then(response => response.json())
+                .then(mensajes => {
+                    chatContainer.innerHTML = '';
+                    if (mensajes.length === 0) {
+                        chatContainer.innerHTML = '<p class="text-center text-[10px] text-gray-400 py-10 uppercase">No hay mensajes aún.</p>';
+                    } else {
+                        mensajes.forEach(data => {
+                            const isMe = data.autor === '{{ app.user.username|e('js') }}';
+                            renderMessageToChat(data, isMe);
+                        });
+                    }
+                    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'auto' });
+                    connectMercure();
+                })
+                .catch(err => {
+                    chatContainer.innerHTML = '<p class="text-center text-red-500 text-xs py-10">Error al cargar historial.</p>';
+                });
+
+            if (chatSidebar.classList.contains('w-0')) toggleBtn.click();
+        };
+
+        window.closeChat = function() {
+            activeChatWindow.classList.add('hidden');
+            if (eventSource) eventSource.close();
+        };
+
+        // --- 4. RENDERIZAR MENSAJES (Seguro contra XSS y con Scroll Inteligente) ---
+        function renderMessageToChat(data, isMe) {
+            const loadingTxt = chatContainer.querySelector('p.text-center');
+            if (loadingTxt) loadingTxt.remove();
+
+            // Detectamos si el usuario ya estaba abajo antes de añadir el mensaje nuevo
+            const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 100;
+
+            // Escapar texto para evitar inyecciones XSS
+            const safeAuthor = document.createTextNode(data.autor).textContent;
+            const safeContent = document.createTextNode(data.contenido).textContent;
+
+            const div = document.createElement('div');
+            div.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} animate-fade-in mb-3`;
+            div.innerHTML = `
+                <span class="text-[9px] text-gray-400 font-bold mb-1 uppercase">${safeAuthor}</span>
+                <div class="p-3 rounded-2xl text-sm ${isMe ? 'bg-emerald-600 text-white' : 'bg-white border border-gray-100 text-gray-800'} shadow-sm max-w-[85%] whitespace-pre-wrap break-words">${safeContent}</div>
+            `;
+
+            chatContainer.appendChild(div);
+
+            // Hacer scroll abajo si es nuestro mensaje o si ya estábamos abajo leyendo
+            if (isAtBottom || isMe) {
+                chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+            }
+        }
+
+        // --- 5. MERCURE (Tiempo Real) ---
+        function connectMercure() {
+            if (eventSource) eventSource.close();
+            const topic = chatContext.type === 'sala' ? `https://brainhub.com/sala/${chatContext.id}` : `https://brainhub.com/user/${chatContext.id}`;
+            const url = new URL("{{ mercure_public_url|default('http://localhost/.well-known/mercure')|raw }}");
+            url.searchParams.append('topic', topic);
+
+            eventSource = new EventSource(url);
+
+            eventSource.onmessage = event => {
+                const data = JSON.parse(event.data);
+                const isMe = data.autor === '{{ app.user.username|e('js') }}';
+
+                renderMessageToChat(data, isMe);
+
+                if (chatSidebar.classList.contains('w-0') && !isMe) {
+                    document.getElementById('chat-notification-badge').classList.remove('hidden');
                 }
+            };
+        }
+
+        // --- 6. ENVIAR MENSAJE ---
+        const sendMessage = () => {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            const formData = new FormData();
+            formData.append('mensaje', text);
+            if (chatContext.type === 'sala') formData.append('salaId', chatContext.id);
+            else formData.append('receptorId', chatContext.id);
+
+            // Reemplaza "app_chat_send" por el nombre real de tu ruta en el ChatController
+            fetch('{{ path("app_chat_send") }}', { method: 'POST', body: formData })
+                .catch(err => console.error("Error enviando mensaje", err));
+
+            chatInput.value = '';
+        };
+
+        // --- 7. BURBUJA DE PERFIL ---
+        window.showUserBubble = function(event, id, name, fotoUrl, bio) {
+            event.stopPropagation();
+            const imgElement = document.getElementById('bubble-img');
+            imgElement.src = fotoUrl && fotoUrl !== '' ? fotoUrl : `https://ui-avatars.com/api/?name=${name}&background=10b981&color=fff`;
+
+            document.getElementById('bubble-name').innerText = name;
+            document.getElementById('bubble-bio').innerText = bio || 'Estudiante enfocado en BrainHub.';
+
+            // Prevenir que la burbuja se salga de la pantalla
+            const maxLeft = Math.min(event.pageX, window.innerWidth - 300);
+            const maxTop = Math.min(event.pageY, window.innerHeight - 400);
+            bubble.style.left = `${maxLeft}px`;
+            bubble.style.top = `${maxTop}px`;
+
+            bubble.classList.remove('hidden');
+            document.getElementById('bubble-msg-btn').onclick = () => {
+                bubble.classList.add('hidden');
+                window.switchChat('user', id, name);
+            };
+        };
+
+        // --- 8. LÓGICA DE APERTURA/CIERRE DEL SIDEBAR ---
+        toggleBtn.addEventListener('click', () => {
+            const isClosed = chatSidebar.classList.contains('w-0');
+
+            // Accesibilidad
+            toggleBtn.setAttribute('aria-expanded', isClosed);
+
+            chatSidebar.classList.toggle('w-0', !isClosed);
+            chatSidebar.classList.toggle('w-80', isClosed);
+            chatSidebar.classList.toggle('md:w-96', isClosed);
+
+            // Overlay para móviles
+            if (mobileOverlay) {
+                mobileOverlay.classList.toggle('hidden', !isClosed);
+            }
+
+            if (isClosed) document.getElementById('chat-notification-badge').classList.add('hidden');
+            document.getElementById('chatIcon').classList.toggle('hidden');
+            document.getElementById('arrowIcon').classList.toggle('hidden');
+        });
+
+        // Cerrar el sidebar si se hace clic en el overlay (Móviles)
+        if (mobileOverlay) {
+            mobileOverlay.addEventListener('click', () => {
+                if (!chatSidebar.classList.contains('w-0')) toggleBtn.click();
+            });
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        document.addEventListener('click', () => bubble.classList.add('hidden'));
+        {% endif %}
+
+        // --- MENÚ DE USUARIO SUPERIOR ---
+        const userBtn = document.getElementById('userMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        if (userBtn && userDropdown) {
+            userBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isHidden = userDropdown.classList.contains('hidden');
+                userDropdown.classList.toggle('hidden');
+                userBtn.setAttribute('aria-expanded', !isHidden);
+            });
+            document.addEventListener('click', () => {
+                userDropdown.classList.add('hidden');
+                userBtn.setAttribute('aria-expanded', 'false');
             });
         }
     });
 </script>
 
-{% block javascripts %}
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 4000,
-                timerProgressBar: true,
-                customClass: { container: 'z-[9999]' },
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
-
-            {% for message in app.flashes('success') %}
-            Toast.fire({ icon: 'success', title: '{{ message|e('js') }}', customClass: { popup: 'rounded-2xl shadow-xl border border-gray-100 mt-16 mr-4' } });
-            {% endfor %}
-
-            {% for message in app.flashes('error') %}
-            Toast.fire({ icon: 'error', title: '{{ message|e('js') }}', customClass: { popup: 'rounded-2xl shadow-xl border border-gray-100 mt-16 mr-4' } });
-            {% endfor %}
-
-            // Botón eliminar sala
-            document.querySelectorAll('.form-eliminar-sala').forEach(form => {
-                const btn = form.querySelector('.btn-eliminar');
-                if(btn) {
-                    btn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        Swal.fire({
-                            title: '¿Estás seguro?',
-                            text: "Esta acción no se puede deshacer.",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#dc2626',
-                            confirmButtonText: 'Sí, eliminar',
-                            cancelButtonText: 'Cancelar',
-                            customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl px-6 py-3', cancelButton: 'rounded-xl px-6 py-3' }
-                        }).then((result) => { if (result.isConfirmed) form.submit(); });
-                    });
-                }
-            });
-        });
-    </script>
-{% endblock %}
+{% block javascripts %}{% endblock %}
 </body>
 </html>

@@ -2,21 +2,17 @@
 
 namespace App\Controller;
 
-use App\Entity\Archivo;
-use App\Entity\Mensaje;
 use App\Entity\Sala;
-use App\Form\ArchivoType;
 use App\Form\MensajeType;
 use App\Form\SalaType;
 use App\Repository\SalaRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/sala')]
 final class SalaController extends AbstractController
@@ -29,139 +25,56 @@ final class SalaController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_sala_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new-ajax', name: 'app_sala_new_ajax', methods: ['POST'])]
+    public function newAjax(Request $request, EntityManagerInterface $entityManager): Response
     {
         $sala = new Sala();
         $form = $this->createForm(SalaType::class, $sala);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Asignamos el creador (el usuario actual)
             $sala->setCreador($this->getUser());
+
             $entityManager->persist($sala);
             $entityManager->flush();
 
-            // 1. Añadimos el mensaje de éxito
-            $this->addFlash('success', '¡Sala creada con éxito! Ya puedes invitar a tus compañeros.');
-
-            // 2. Redirigimos a la sala recién creada
-            return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()], Response::HTTP_SEE_OTHER);
+            // Si la petición es AJAX (vía fetch) devolvemos JSON
+            if ($request->isXmlHttpRequest() || str_contains($request->headers->get('Accept'), 'application/json')) {
+                return new JsonResponse([
+                    'success' => true,
+                    'sala_id' => $sala->getId(),
+                    'sala_nombre' => $sala->getNombre(),
+                    'redirect_url' => $this->generateUrl('app_sala_show', ['id' => $sala->getId()])
+                ]);
+            }
         }
 
-        return $this->render('sala/new.html.twig', [
-            'sala' => $sala,
-            'form' => $form,
-        ]);
+        // Si el formulario no es válido, devolvemos los errores en JSON
+        return new JsonResponse([
+            'success' => false,
+            'message' => 'Error en la validación del formulario.'
+        ], Response::HTTP_BAD_REQUEST);
     }
 
-    #[Route('/{id}', name: 'app_sala_show', methods: ['GET', 'POST'])]
-    public function show(
-        Sala $sala,
-        Request $request,
-        EntityManagerInterface $entityManager,
-        SluggerInterface $slugger // <-- Añadido para nombres seguros
-    ): Response {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
+    #[Route('/{id}', name: 'app_sala_show', methods: ['GET'])]
+    public function show(Sala $sala): Response
+    {
+        if (!$this->getUser()) return $this->redirectToRoute('app_login');
 
-        // --- 1. GESTIÓN DE MENSAJES (FORO/CHAT) ---
-        $mensaje = new Mensaje();
-        $formMensaje = $this->createForm(MensajeType::class, $mensaje);
-        $formMensaje->handleRequest($request);
+        // Formulario vacío para el chat (el JS lo enviará al ChatController)
+        $formMensaje = $this->createForm(MensajeType::class);
 
-        if ($formMensaje->isSubmitted() && $formMensaje->isValid()) {
-            $mensaje->setAutor($user);
-            $mensaje->setSala($sala);
-            $mensaje->setFechaCreacion(new \DateTimeImmutable());
+        // Formulario de edición para el modal
+        $formEdit = $this->createForm(SalaType::class, $sala, [
+            'action' => $this->generateUrl('app_sala_edit', ['id' => $sala->getId()]),
+        ]);
 
-            // NUEVO: Capturamos el archivo que viene desde el input manual del chat
-            /** @var UploadedFile $archivoAdjunto */
-            $archivoAdjunto = $request->files->get('archivo_adjunto');
-
-            if ($archivoAdjunto) {
-                $originalFilename = pathinfo($archivoAdjunto->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename); // Limpiamos espacios y caracteres raros
-                $newFilename = $safeFilename.'-'.uniqid('', true).'.'.$archivoAdjunto->guessExtension();
-
-                try {
-                    $archivoAdjunto->move(
-                        $this->getParameter('kernel.project_dir').'/public/uploads',
-                        $newFilename
-                    );
-
-                    // Creamos la entidad Archivo para que aparezca en la pestaña Multimedia
-                    $archivoEntity = new Archivo();
-                    $archivoEntity->setNombreOriginal($archivoAdjunto->getClientOriginalName());
-                    $archivoEntity->setNombreServidor($newFilename);
-                    $archivoEntity->setTipo($archivoAdjunto->guessExtension());
-                    $archivoEntity->setSubidoPor($user);
-
-                    $sala->addArchivo($archivoEntity);
-                    $entityManager->persist($archivoEntity);
-
-                    // Añadimos una nota visual al mensaje del chat
-                    $textoActual = $mensaje->getContenido() ?? '';
-                    $mensaje->setContenido($textoActual . "\n\n📎 *[Archivo adjunto: " . $archivoAdjunto->getClientOriginalName() . "]*");
-
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'No se pudo subir el archivo adjunto.');
-                }
-            }
-
-            $entityManager->persist($mensaje);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Mensaje publicado.');
-            return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);
-        }
-
-        // --- 2. GESTIÓN DE ARCHIVOS (PESTAÑA MULTIMEDIA) ---
-        $archivoEntity = new Archivo();
-        $formArchivo = $this->createForm(ArchivoType::class, $archivoEntity);
-        $formArchivo->handleRequest($request);
-
-        if ($formArchivo->isSubmitted() && $formArchivo->isValid()) {
-            /** @var UploadedFile $file */
-            $file = $formArchivo->get('documento')->getData();
-
-            if ($file) {
-                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename); // También aplicamos Slugger aquí
-                $newFilename = $safeFilename.'-'.uniqid('', true).'.'.$file->guessExtension();
-
-                try {
-                    $file->move(
-                        $this->getParameter('kernel.project_dir').'/public/uploads',
-                        $newFilename
-                    );
-
-                    $archivoEntity->setNombreOriginal($file->getClientOriginalName());
-                    $archivoEntity->setNombreServidor($newFilename);
-                    $archivoEntity->setTipo($file->guessExtension());
-                    $archivoEntity->setSubidoPor($user);
-
-                    $sala->addArchivo($archivoEntity);
-
-                    $entityManager->persist($archivoEntity);
-                    $entityManager->flush();
-
-                    $this->addFlash('success', '¡Archivo compartido con éxito!');
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Error técnico: No se pudo guardar el archivo.');
-                }
-            }
-
-            return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);
-        }
-
-        // --- 3. RENDERIZADO FINAL ---
         return $this->render('sala/show.html.twig', [
             'sala' => $sala,
             'formMensaje' => $formMensaje->createView(),
-            'formArchivo' => $formArchivo->createView(),
-            'mensajes' => $sala->getMensajes()
+            'formEdit' => $formEdit->createView(),
+            'mensajes' => $sala->getMensajes() // El Twig usará esto para el historial
         ]);
     }
 
@@ -174,17 +87,23 @@ final class SalaController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            // IMPORTANTE: Añadir el flash para que SweetAlert lo detecte
-            $this->addFlash('success', '¡Cambios guardados correctamente!');
+            // Si la petición viene por AJAX (Fetch), respondemos con JSON
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse([
+                    'status' => 'success',
+                    'message' => '¡Sala actualizada correctamente!',
+                    'nuevoNombre' => $sala->getNombre()
+                ]);
+            }
 
-            return $this->redirectToRoute('app_sala_show', [
-                'id' => $sala->getId()
-            ], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', '¡Cambios guardados correctamente!');
+            return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);
         }
 
-        // Si el formulario no es válido, puedes añadir un flash de error para debug
         if ($form->isSubmitted() && !$form->isValid()) {
-            $this->addFlash('error', 'Hay errores en el formulario. Revisa los campos.');
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['status' => 'error', 'message' => 'Revisa los campos del formulario.'], 400);
+            }
         }
 
         return $this->render('sala/edit.html.twig', [
@@ -232,28 +151,39 @@ final class SalaController extends AbstractController
     #[Route('/sala/{id}/invitar', name: 'app_sala_invitar', methods: ['POST'])]
     public function invitar(Request $request, Sala $sala, UserRepository $userRepository, EntityManagerInterface $em): Response
     {
-        // Solo el creador puede invitar
         if ($this->getUser() !== $sala->getCreador()) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['status' => 'error', 'message' => 'No tienes permisos.'], 403);
+            }
             throw $this->createAccessDeniedException();
         }
 
-        // Recoger el email/username del formulario
         $usuarioBuscado = $request->request->get('usuario_invitado');
-
-        // Buscar al usuario en la base de datos (por email o username)
         $invitado = $userRepository->findOneBy(['email' => $usuarioBuscado]);
+
+        // Descomenta si también permites buscar por username
         // if (!$invitado) { $invitado = $userRepository->findOneBy(['username' => $usuarioBuscado]); }
 
         if ($invitado) {
             if (!$sala->getMiembros()->contains($invitado)) {
                 $sala->addMiembro($invitado);
                 $em->flush();
-                $this->addFlash('success', '¡' . $invitado->getUsername() . ' ha sido añadido a la sala!');
+
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse(['status' => 'success', 'message' => '¡' . $invitado->getUsername() . ' se unió a la sala!']);
+                }
+                $this->addFlash('success', '¡Añadido a la sala!');
             } else {
-                $this->addFlash('error', 'Este usuario ya está en la sala.');
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse(['status' => 'warning', 'message' => 'Este usuario ya está en la sala.']);
+                }
+                $this->addFlash('warning', 'Este usuario ya está en la sala.');
             }
         } else {
-            $this->addFlash('error', 'No hemos encontrado a ningún usuario con ese dato.');
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['status' => 'error', 'message' => 'Usuario no encontrado.']);
+            }
+            $this->addFlash('error', 'Usuario no encontrado.');
         }
 
         return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);

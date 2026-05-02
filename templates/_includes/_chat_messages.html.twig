@@ -1,0 +1,16 @@
+{# templates/_includes/_chat_messages.html.twig #}
+
+{% for msg in mensajes %}
+    {% set isMe = (app.user and msg.autor.username == app.user.username) %}
+
+    <div class="flex flex-col {{ isMe ? 'items-end' : 'items-start' }} mb-4 animate-fade-in">
+        <span class="text-[10px] text-gray-400 font-bold mb-1">
+            {{ msg.autor.username }} • {{ msg.fechaCreacion|date('H:i') }}
+        </span>
+        <div class="p-3 rounded-2xl text-sm {{ isMe ? 'bg-emerald-600 text-white' : 'bg-white border border-gray-100 text-gray-800' }} shadow-sm max-w-[85%] break-words">
+            {{ msg.contenido }}
+        </div>
+    </div>
+{% else %}
+    <p class="text-center text-xs text-gray-400 mt-10">No hay mensajes aún. ¡Sé el primero!</p>
+{% endfor %}

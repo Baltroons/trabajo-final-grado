@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Entity;
 
 use App\Repository\MensajeRepository;
@@ -7,14 +8,14 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MensajeRepository::class)]
+// 1. Añadimos esta anotación para que la fecha se ponga sola al guardar
+#[ORM\HasLifecycleCallbacks]
 class Mensaje
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Id] #[ORM\GeneratedValue] #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)] // Permitir null si solo hay archivo
     private ?string $contenido = null;
 
     #[ORM\Column]
@@ -25,59 +26,96 @@ class Mensaje
     private ?User $autor = null;
 
     #[ORM\ManyToOne(inversedBy: 'mensajes')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Sala $sala = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
+    // --- NUEVOS CAMPOS PARA ARCHIVOS ---
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $archivoUrl = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $archivoNombre = null;
+
+    #[ORM\PrePersist]
+    public function setFechaCreacionValue(): void {
+        if ($this->fechaCreacion === null) $this->fechaCreacion = new \DateTimeImmutable();
     }
 
-    public function getContenido(): ?string
-    {
-        return $this->contenido;
+    public function toArray(): array {
+        return [
+            'id' => $this->id,
+            'contenido' => $this->contenido,
+            'autor' => $this->autor ? $this->autor->getUsername() : 'Anónimo',
+            'fecha' => $this->fechaCreacion ? $this->fechaCreacion->format('H:i') : date('H:i'),
+            'archivoUrl' => $this->archivoUrl,
+            'archivoNombre' => $this->archivoNombre,
+        ];
     }
+
+    // --- GETTERS Y SETTERS ORIGINALES ---
+    // (Mantén los que ya tenías)
+
+    public function getId(): ?int { return $this->id; }
+
+    public function getContenido(): ?string { return $this->contenido; }
 
     public function setContenido(string $contenido): static
     {
         $this->contenido = $contenido;
-
         return $this;
     }
 
-    public function getFechaCreacion(): ?\DateTimeImmutable
-    {
-        return $this->fechaCreacion;
-    }
+    public function getFechaCreacion(): ?\DateTimeImmutable { return $this->fechaCreacion; }
 
     public function setFechaCreacion(\DateTimeImmutable $fechaCreacion): static
     {
         $this->fechaCreacion = $fechaCreacion;
-
         return $this;
     }
 
-    public function getAutor(): ?User
-    {
-        return $this->autor;
-    }
+    public function getAutor(): ?User { return $this->autor; }
 
     public function setAutor(?User $autor): static
     {
         $this->autor = $autor;
-
         return $this;
     }
 
-    public function getSala(): ?Sala
-    {
-        return $this->sala;
-    }
+    public function getSala(): ?Sala { return $this->sala; }
 
     public function setSala(?Sala $sala): static
     {
         $this->sala = $sala;
+        return $this;
+    }
+
+    public function getReceptor(): ?User
+    {
+        return $this->receptor;
+    }
+
+    public function setReceptor(?User $receptor): static
+    {
+        $this->receptor = $receptor;
 
         return $this;
     }
+
+    public function getArchivoUrl(): ?string {
+        return $this->archivoUrl;
+    }
+    public function setArchivoUrl(?string $url): self {
+        $this->archivoUrl = $url;
+
+        return $this;
+    }
+    public function getArchivoNombre(): ?string {
+        return $this->archivoNombre;
+    }
+    public function setArchivoNombre(?string $nombre): self {
+        $this->archivoNombre = $nombre;
+        return $this;
+    }
+
+
 }

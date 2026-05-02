@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Mensaje;
+use App\Entity\Sala;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +18,32 @@ class MensajeRepository extends ServiceEntityRepository
         parent::__construct($registry, Mensaje::class);
     }
 
-    //    /**
-    //     * @return Mensaje[] Returns an array of Mensaje objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Obtiene los mensajes de una sala ordenados por fecha
+     */
+    public function findBySala(Sala $sala, int $limit = 50)
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.sala = :sala')
+            ->setParameter('sala', $sala)
+            ->orderBy('m.fechaCreacion', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Mensaje
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Busca la conversación privada entre dos usuarios (tú y el receptor)
+     */
+    public function findConversacionPrivada(User $me, User $other, int $limit = 50)
+    {
+        return $this->createQueryBuilder('m')
+            ->where('(m.autor = :me AND m.receptor = :other) OR (m.autor = :other AND m.receptor = :me)')
+            ->setParameter('me', $me)
+            ->setParameter('other', $other)
+            ->orderBy('m.fechaCreacion', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

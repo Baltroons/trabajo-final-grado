@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Dashboard — BrainHub{% endblock %}
+
 {% block body %}
     {% if app.user %}
         {# =============================================================================
@@ -8,61 +10,68 @@
         <div class="p-6 md:p-10 transition-all duration-500">
             <div class="max-w-6xl mx-auto space-y-8">
 
-                {# 1. BARRA SUPERIOR (Búsqueda y Notificaciones) #}
+                {# 1. BARRA SUPERIOR #}
                 <div class="flex justify-between items-center gap-4">
-                    <div class="relative w-full max-w-md">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
+                    <form action="{{ path('app_home') }}" method="GET" class="relative w-full max-w-md">
+                        <button type="submit" class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 hover:text-emerald-600">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
-                        </span>
-                        <input type="text" placeholder="Buscar salas, apuntes..."
+                        </button>
+                        <input type="text" name="q" value="{{ app.request.query.get('q') }}" placeholder="Buscar salas..."
                                class="block w-full pl-12 pr-4 py-3 border border-gray-100 bg-white rounded-full text-sm shadow-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
-                    </div>
+                    </form>
 
-                    <button class="relative p-3 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-colors text-amber-500">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
-                        </svg>
-                        <span class="absolute top-2 right-2.5 block h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white"></span>
-                    </button>
+                    <div class="flex items-center gap-4">
+                        <span class="hidden md:inline-block text-sm font-bold text-gray-700">
+                            ¡Hola, <span class="text-emerald-700">{{ app.user.username }}</span>!
+                        </span>
+                        <button class="relative p-3 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-emerald-50 transition-colors text-gray-400 hover:text-emerald-600">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+                            </svg>
+                            {# Punto de notificación: ID 'bell-dot' para manipularlo con JS #}
+                            <span id="bell-dot" class="hidden absolute top-2 right-2.5 block h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white"></span>
+                        </button>
+                    </div>
                 </div>
 
                 {# 2. BANNER HERO #}
                 <div class="bg-[#065f46] rounded-[2.5rem] p-10 md:p-14 text-white relative overflow-hidden shadow-xl shadow-emerald-900/10">
                     <div class="relative z-10 max-w-xl">
                         <h1 class="text-4xl md:text-5xl font-black mb-4 leading-tight">¿Qué toca estudiar hoy?</h1>
-                        <p class="text-emerald-100/80 text-lg mb-8">Inicia una sala en vivo, comparte tu pantalla y resuelve dudas con tu equipo.</p>
-                        <a href="{{ path('app_sala_new') }}"
-                           class="inline-block bg-white text-[#065f46] font-bold py-4 px-10 rounded-2xl hover:bg-emerald-50 transition-all transform hover:scale-105 shadow-lg shadow-black/10">
-                            Crear Sala de Estudio
-                        </a>
+                        <p class="text-emerald-100/80 text-lg mb-8">Únete a una sala activa o crea tu propio espacio de estudio colaborativo.</p>
+                        {# CAMBIO: Ahora abre el modal en lugar de redirigir #}
+                        <button onclick="openModal()"
+                                class="inline-block bg-white text-[#065f46] font-bold py-4 px-10 rounded-2xl hover:bg-emerald-50 transition-all transform hover:scale-105 shadow-lg shadow-black/10">
+                            + Crear Sala de Estudio
+                        </button>
                     </div>
                     <div class="absolute -right-20 -bottom-20 h-64 w-64 bg-white/10 rounded-full blur-3xl"></div>
                     <div class="absolute right-0 top-0 h-full w-1/3 bg-emerald-700/20 skew-x-12 translate-x-20"></div>
                 </div>
 
-                {# 3. TARJETAS DE ESTADÍSTICAS #}
+                {# 3. TARJETAS DE ESTADÍSTICAS REALES #}
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100 hover:shadow-md transition-shadow">
-                        <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl">⏱️</div>
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100">
+                        <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl">📚</div>
                         <div>
-                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Horas</p>
-                            <p class="text-3xl font-black text-gray-800">12h</p>
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Salas Visibles</p>
+                            <p class="text-3xl font-black text-gray-800">{{ salas|length }}</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100 hover:shadow-md transition-shadow">
-                        <div class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-3xl">🔥</div>
-                        <div>
-                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Racha</p>
-                            <p class="text-3xl font-black text-gray-800">4 días</p>
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100">
+                        <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl">🎓</div>
+                        <div class="overflow-hidden">
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Perfil</p>
+                            <p class="text-2xl font-black text-gray-800 truncate">{{ app.user.username }}</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100 hover:shadow-md transition-shadow">
-                        <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-3xl">📤</div>
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100">
+                        <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-3xl">📅</div>
                         <div>
-                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Aportes</p>
-                            <p class="text-3xl font-black text-gray-800">15</p>
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Hoy es</p>
+                            <p class="text-2xl font-black text-gray-800">{{ "now"|date("d M") }}</p>
                         </div>
                     </div>
                 </div>
@@ -71,20 +80,30 @@
                 <div class="pt-4">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-black text-gray-800">Tus salas activas</h2>
-                        <button class="text-emerald-700 font-bold text-sm hover:underline">Ver todas</button>
+                        {% if app.request.query.get('q') %}
+                            <a href="{{ path('app_home') }}" class="text-red-500 font-bold text-sm hover:underline">Limpiar búsqueda</a>
+                        {% endif %}
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {% for sala in salas|default([]) %}
                             <div class="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <span class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700">
+                                        {{ sala.categoria|default('General') }}
+                                    </span>
+                                    {% if app.user == sala.creador %}
+                                        <span class="text-amber-500 text-xs font-bold">Propietario</span>
+                                    {% endif %}
+                                </div>
                                 <h3 class="text-xl font-bold text-gray-800 group-hover:text-emerald-700 transition-colors">{{ sala.nombre }}</h3>
-                                <p class="text-sm text-gray-400 mt-2">Última actividad: hace 10 min</p>
+                                <p class="text-sm text-gray-400 mt-2 line-clamp-2">{{ sala.descripcion|default('Sin descripción adicional.') }}</p>
                                 <a href="{{ path('app_sala_show', {id: sala.id}) }}" class="mt-6 block w-full text-center bg-gray-50 text-gray-900 py-3 rounded-2xl font-bold text-sm hover:bg-emerald-800 hover:text-white transition-all">
                                     Entrar a estudiar
                                 </a>
                             </div>
                         {% else %}
                             <div class="col-span-full py-12 text-center bg-white rounded-[2.5rem] border-2 border-dashed border-gray-200">
-                                <p class="text-gray-400 font-medium">No hay salas disponibles en este momento.</p>
+                                <p class="text-gray-400 font-medium">No se encontraron salas disponibles.</p>
                             </div>
                         {% endfor %}
                     </div>
@@ -92,60 +111,108 @@
             </div>
         </div>
 
-    {% else %}
         {# =============================================================================
-           VISTA PARA VISITANTES (LANDING PAGE)
+           MODAL PARA NUEVA SALA (SPA STYLE)
            ============================================================================= #}
+        <div id="modal-nueva-sala" class="hidden fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+
+                <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in-up">
+                    <div class="p-8 md:p-10">
+                        <h2 class="text-3xl font-black text-gray-900 mb-2">Crear nueva sala</h2>
+                        <p class="text-gray-500 mb-8">Define tu espacio y empieza a colaborar en tiempo real.</p>
+
+                        <form id="form-sala-ajax" action="{{ path('app_sala_new_ajax') }}" method="POST">
+                            {{ form_widget(form._token) }}
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Nombre de la Sala</label>
+                                {{ form_widget(form.nombre, {'attr': {'class': 'w-full rounded-2xl border-gray-100 bg-gray-50 py-4 px-5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all'}}) }}
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Categoría</label>
+                                    {{ form_widget(form.categoria, {'attr': {'class': 'w-full rounded-2xl border-gray-100 bg-gray-50 py-4 px-5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all'}}) }}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Descripción</label>
+                                {{ form_widget(form.descripcion, {'attr': {'class': 'w-full rounded-2xl border-gray-100 bg-gray-50 py-4 px-5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all', 'rows': '3'}}) }}
+                            </div>
+
+                            <div class="flex justify-end gap-4 pt-4">
+                                <button type="button" onclick="closeModal()" class="px-6 py-4 font-bold text-gray-400 hover:text-gray-600 transition-colors">Cancelar</button>
+                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-10 rounded-2xl shadow-lg transition-all transform hover:scale-105">
+                                    Lanzar Sala
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# =============================================================================
+           SCRIPTS DE FUNCIONALIDAD SPA Y TIEMPO REAL
+           ============================================================================= #}
+        <script>
+            // Gestión del Modal
+            function openModal() { document.getElementById('modal-nueva-sala').classList.remove('hidden'); }
+            function closeModal() { document.getElementById('modal-nueva-sala').classList.add('hidden'); }
+
+            // Envío AJAX del formulario
+            document.getElementById('form-sala-ajax').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {'X-Requested-With': 'XMLHttpRequest'}
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        // Redirigir directamente a la nueva sala
+                        window.location.href = data.redirect_url;
+                    }
+                } catch (error) {
+                    console.error('Error al crear sala:', error);
+                }
+            });
+
+            // Lógica de Notificaciones en tiempo real (Mercure)
+            // Esto asume que tienes Mercure configurado
+            {% if app.user %}
+            const eventSource = new EventSource("{{ mercure('notificaciones/user/' ~ app.user.id)|escape('js') }}");
+            eventSource.onmessage = event => {
+                const data = JSON.parse(event.data);
+                // Mostrar punto rojo en la campana
+                document.getElementById('bell-dot').classList.remove('hidden');
+                // Opcional: mostrar un aviso tipo Toast
+                console.log("Nueva notificación:", data.mensaje);
+            };
+            {% endif %}
+        </script>
+
+    {% else %}
+        {# VISTA LANDING (Mantenida igual para visitantes) #}
         <div class="relative w-full h-[calc(100vh-64px)] flex flex-col items-center justify-center overflow-hidden">
             <img src="{{ asset('images/brainhub.png') }}" class="absolute inset-0 w-full h-full object-cover" alt="Fondo BrainHub">
             <div class="absolute inset-0 bg-emerald-950/40 backdrop-blur-[2px]"></div>
-
             <div class="relative z-10 w-full h-full max-w-6xl flex flex-col items-center justify-center gap-12 px-6">
-                <div class="bg-white p-10 md:p-14 rounded-[3rem] shadow-2xl text-center max-w-xl w-full border border-white/20 animate-fade-in">
+                <div class="bg-white p-10 md:p-14 rounded-[3rem] shadow-2xl text-center max-w-xl w-full">
                     <h1 class="text-4xl md:text-5xl font-black text-gray-900 leading-tight mb-4">
                         Potencia tu mente, <br>
                         <span class="text-[#065f46]">conecta tus ideas</span>
                     </h1>
-                    <p class="text-gray-500 text-sm md:text-base mb-10 leading-relaxed px-4">
-                        Bienvenido a <span class="font-bold text-gray-800">BrainHub</span>. El espacio donde el conocimiento fluye sin límites. Organiza y colabora.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <a href="{{ path('app_register') }}" class="w-full sm:w-auto bg-[#065f46] hover:bg-[#044a37] text-white font-bold py-4 px-10 rounded-2xl transition-all shadow-lg hover:scale-105">
-                            Empezar gratis
-                        </a>
-                        <a href="{{ path('app_login') }}" class="w-full sm:w-auto bg-gray-50 hover:bg-gray-100 text-gray-900 font-bold py-4 px-10 rounded-2xl transition-all border border-gray-200 shadow-sm">
-                            Iniciar Sesión
-                        </a>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-5xl">
-                    <div class="bg-black/30 backdrop-blur-md border border-white/10 p-5 rounded-[2rem] flex items-center gap-4 text-white shadow-xl">
-                        <div class="bg-emerald-500/20 p-3 rounded-2xl text-emerald-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-sm leading-none">Recursos</h3>
-                            <p class="text-[10px] text-gray-300 mt-1">Materiales compartidos</p>
-                        </div>
-                    </div>
-                    <div class="bg-black/30 backdrop-blur-md border border-white/10 p-5 rounded-[2rem] flex items-center gap-4 text-white shadow-xl">
-                        <div class="bg-emerald-500/20 p-3 rounded-2xl text-emerald-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-sm leading-none">Chat Grupal</h3>
-                            <p class="text-[10px] text-gray-300 mt-1">Colaboración en red</p>
-                        </div>
-                    </div>
-                    <div class="bg-black/30 backdrop-blur-md border border-white/10 p-5 rounded-[2rem] flex items-center gap-4 text-white shadow-xl">
-                        <div class="bg-emerald-500/20 p-3 rounded-2xl text-emerald-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-sm leading-none">Gratis</h3>
-                            <p class="text-[10px] text-gray-300 mt-1">Sin coste alguno</p>
-                        </div>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10">
+                        <a href="{{ path('app_register') }}" class="w-full sm:w-auto bg-[#065f46] text-white font-bold py-4 px-10 rounded-2xl shadow-lg">Empezar gratis</a>
+                        <a href="{{ path('app_login') }}" class="w-full sm:w-auto bg-gray-50 text-gray-900 font-bold py-4 px-10 rounded-2xl border border-gray-200">Iniciar Sesión</a>
                     </div>
                 </div>
             </div>

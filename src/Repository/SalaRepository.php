@@ -40,4 +40,16 @@ class SalaRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    // En src/Repository/SalaRepository.php
+
+    public function findBySearchQuery(string $query): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.nombre LIKE :q')
+            ->orWhere('s.categoria LIKE :q')
+            ->setParameter('q', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
 }

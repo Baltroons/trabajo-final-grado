@@ -35,5 +35,24 @@ services:
             - "8025:8025"
             - "1025:1025"
 
-volumes: # <--- Y ESTO AL FINAL DEL ARCHIVO
+    mercure:
+        image: dunglas/mercure
+        restart: always
+        environment:
+            # La misma clave de 32 caracteres que en el .env de Symfony
+            SERVER_NAME: ":3000"
+            MERCURE_PUBLISHER_JWT_KEY: "brainhub_secret_32_characters_long_key"
+            MERCURE_SUBSCRIBER_JWT_KEY: "brainhub_secret_32_characters_long_key"
+            # --- ESTAS LÍNEAS SON LAS QUE TE FALTAN ---
+            MERCURE_EXTRA_DIRECTIVES: |
+                anonymous
+                subscriptions
+                cors_origins *
+                ui
+        ports:
+            - "3000:3000"
+
+
+
+volumes:
     postgres_data:
