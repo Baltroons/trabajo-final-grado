@@ -1,7 +1,7 @@
-# Usamos una imagen de PHP con soporte para FPM y Alpine (ligera)
-FROM php:8.2-fpm-alpine
+# CAMBIA ESTA LÍNEA (la versión 8.2 por la 8.4)
+FROM php:8.4-fpm-alpine
 
-# 1. Instalar dependencias del sistema y extensiones de PHP
+# El resto del archivo se mantiene igual
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -12,6 +12,8 @@ RUN apk add --no-cache \
     libpng-dev
 
 RUN docker-php-ext-install intl pdo pdo_pgsql pdo_mysql zip gd
+
+# ... resto del archivo ...
 
 # 2. Instalar Composer (el gestor de PHP que sí usas)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
