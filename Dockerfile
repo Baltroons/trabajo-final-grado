@@ -14,6 +14,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # ------------------------------
 
 COPY . .
+RUN rm -f .env .env.local .env.test
 
 # Ahora Composer sabrá que no debe buscar el DebugBundle al limpiar la caché
 RUN composer install --no-dev --optimize-autoloader
