@@ -122,30 +122,6 @@ class ChatController extends AbstractController
         return new JsonResponse(['status' => 'OK']);
     }
 
-    #[Route('/chat/typing/{type}/{id}', name: 'app_chat_typing', methods: ['POST'])]
-    public function typing(string $type, int $id, HubInterface $hub): JsonResponse
-    {
-        $user = $this->getUser();
-
-        if (!$user) {
-            return new JsonResponse(['error' => 'No autorizado'], 403);
-        }
-
-        // Definir a qué canal avisamos dependiendo de si es sala o privado
-        $topic = $type === 'sala' ? "https://brainhub.com/sala/{$id}" : "https://brainhub.com/user/{$id}";
-
-        // Avisar a Mercure de que alguien escribe
-        $hub->publish(new Update(
-            $topic,
-            json_encode([
-                'isTyping' => true,
-                'autor'    => $user->getUsername() // <-- CORRECCIÓN: Ahora usa el nombre de usuario
-            ])
-        ));
-
-        return new JsonResponse(['status' => 'OK']);
-    }
-
     #[Route('/chat/history/{type}/{id}', name: 'app_chat_history', methods: ['GET'])]
     public function getHistory(
         string $type,
