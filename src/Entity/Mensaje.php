@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Entity;
 
 use App\Repository\MensajeRepository;
@@ -8,7 +7,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MensajeRepository::class)]
-// 1. Añadimos esta anotación para que la fecha se ponga sola al guardar
 #[ORM\HasLifecycleCallbacks]
 class Mensaje
 {
@@ -29,6 +27,11 @@ class Mensaje
     #[ORM\JoinColumn(nullable: true)]
     private ?Sala $sala = null;
 
+    // --- FALTABA ESTA PROPIEDAD PARA LOS MENSAJES PRIVADOS ---
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $receptor = null;
+
     // --- NUEVOS CAMPOS PARA ARCHIVOS ---
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $archivoUrl = null;
@@ -38,28 +41,33 @@ class Mensaje
 
     #[ORM\PrePersist]
     public function setFechaCreacionValue(): void {
-        if ($this->fechaCreacion === null) $this->fechaCreacion = new \DateTimeImmutable();
+        if ($this->fechaCreacion === null) {
+            $this->fechaCreacion = new \DateTimeImmutable();
+        }
     }
 
+    // --- EL TO_ARRAY ACTUALIZADO PARA LAS NOTIFICACIONES ---
     public function toArray(): array {
         return [
             'id' => $this->id,
             'contenido' => $this->contenido,
             'autor' => $this->autor ? $this->autor->getUsername() : 'Anónimo',
+            'autorId' => $this->autor ? $this->autor->getId() : null,
             'fecha' => $this->fechaCreacion ? $this->fechaCreacion->format('H:i') : date('H:i'),
+            'salaId' => $this->sala ? $this->sala->getId() : null,
+            'salaNombre' => $this->sala ? $this->sala->getNombre() : null,
             'archivoUrl' => $this->archivoUrl,
             'archivoNombre' => $this->archivoNombre,
         ];
     }
 
-    // --- GETTERS Y SETTERS ORIGINALES ---
-    // (Mantén los que ya tenías)
+    // --- GETTERS Y SETTERS ---
 
     public function getId(): ?int { return $this->id; }
 
     public function getContenido(): ?string { return $this->contenido; }
 
-    public function setContenido(string $contenido): static
+    public function setContenido(?string $contenido): static
     {
         $this->contenido = $contenido;
         return $this;
@@ -97,25 +105,24 @@ class Mensaje
     public function setReceptor(?User $receptor): static
     {
         $this->receptor = $receptor;
-
         return $this;
     }
 
     public function getArchivoUrl(): ?string {
         return $this->archivoUrl;
     }
+
     public function setArchivoUrl(?string $url): self {
         $this->archivoUrl = $url;
-
         return $this;
     }
+
     public function getArchivoNombre(): ?string {
         return $this->archivoNombre;
     }
+
     public function setArchivoNombre(?string $nombre): self {
         $this->archivoNombre = $nombre;
         return $this;
     }
-
-
 }

@@ -39,6 +39,9 @@ class Sala
     #[ORM\OneToMany(targetEntity: Archivo::class, mappedBy: 'sala', orphanRemoval: true)]
     private Collection $archivos;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $token = null;
+
     public function __construct()
     {
         $this->miembros = new ArrayCollection();
@@ -154,6 +157,17 @@ class Sala
                 $archivo->setSala(null);
             }
         }
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(?string $token): static
+    {
+        $this->token = $token;
         return $this;
     }
 }

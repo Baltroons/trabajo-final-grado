@@ -1,0 +1,19 @@
+[virt-viewer]
+type=spice
+proxy=http://www.campusvdi.es:80
+host=192.168.15.103
+password=1Q35UMwh1io9tBWo813hdgvDTD9SaRvl
+tls-port=5907
+fullscreen=0
+title=daw2_bdia_u24desktop_2526 (TLS):%d - Prem SHIFT+F12 per sortir
+host-subject=CN=*.localdomain
+ca=-----BEGIN CERTIFICATE-----\nMIIDezCCAmOgAwIBAgIUKmpTQ97afsxGF3ZUVcJ0PysgOOUwDQYJKoZIhvcNAQEL\nBQAwTTELMAkGA1UEBhMCQ0ExEjAQBgNVBAcMCUJhcmNlbG9uYTEUMBIGA1UECgwL\nbG9jYWxkb21haW4xFDASBgNVBAMMC2xvY2FsZG9tYWluMB4XDTIyMDUxMDA2MzIy\nMloXDTQ5MDkyNDA2MzIyMlowTTELMAkGA1UEBhMCQ0ExEjAQBgNVBAcMCUJhcmNl\nbG9uYTEUMBIGA1UECgwLbG9jYWxkb21haW4xFDASBgNVBAMMC2xvY2FsZG9tYWlu\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2MNJ1KSjlfuGoyRrQiwS\nzt4k+XLw1xUuCK1lHoruUAvSmIPU7pa1QjPtR34HyIFBeI7djhov4IAQhNBOGmp5\n7RBytJ/4JT+G5Pi3QH8jOMru2ezlfwUvFJIvXjV4FD3Ixud2/f0n5WnkKzQiJV0x\neFRQy5IAK84X4Gf4oHAp4A4AnAPd8/Y6ied0HKxyBI8Eq7nDNSK+JMAnwsF12GIG\nL6IG48yS1JP2xq5s3fIYa3Nu5B75hzMfqaPhp3rECxby5WqoiPOpK+vSNVB+s/Kg\nDhs+ZnGEK7+6so4/OuVDu/LtfSOVNCCUtKATp84+Nu5SDH1u+a7Vz8OPkYuZvkhR\neQIDAQABo1MwUTAdBgNVHQ4EFgQUwhIGs8/zNTVLJ4J9uKZOZ7Mn19YwHwYDVR0j\nBBgwFoAUwhIGs8/zNTVLJ4J9uKZOZ7Mn19YwDwYDVR0TAQH/BAUwAwEB/zANBgkq\nhkiG9w0BAQsFAAOCAQEAomji64okE6b7b69TnZaxsfLezQDu7jMrIF1zqhPtmy13\nW4liegCEj6/1KJSgknL6pqoCyC5t/XV8wzRzMd3mD1Y8DRVi1cK4N8ItchrTqM0G\nBpmLBJ6oSEe5H9bH3ucydvxfe0tLQhkVb95Y1lVHkUZj6D04JqKAih2mIA2ykuP2\nonJZqGPUL1gmBvlyGtIsisai1auQxp9C6IcizIuflXl0zD1QHlVdcFaDIp9Lfy3e\nwuJ7/sd1rfXoRg9Y7zX4nRK6um56N1Dr0G6K9F4vU9g1DY79JbzOr4MxBz0sAJz2\nQ4zCcOnbfCN1Tu8cWz6uKCNYfsibpYpVG4WmWNB+VQ==\n-----END CERTIFICATE-----\n
+enable-smartcard=0
+enable-usb-autoshare=1
+delete-this-file=1
+usb-filter=-1,-1,-1,-1,0
+tls-ciphers=DEFAULT
+toggle-fullscreen=shift+f11
+release-cursor=shift+f12
+secure-attention=ctrl+alt+end
+secure-channels=main;inputs;cursor;playback;record;display;usbredir;smartcard

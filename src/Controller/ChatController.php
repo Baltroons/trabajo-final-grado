@@ -25,42 +25,90 @@ class ChatController extends AbstractController
         SalaRepository $salaRepo,
         SluggerInterface $slugger
     ): JsonResponse {
-        $contenido = $request->request->get('mensaje');
-        $salaId = $request->request->get('salaId');
-        $file = $request->files->get('archivo_adjunto');
+        try {
+            $contenido = $request->request->get('mensaje');
+            $salaId = $request->request->get('salaId');
+            $file = $request->files->get('archivo');
+            $user = $this->getUser();
+
+            if (!$user || !$salaId) return new JsonResponse(['error' => 'No autorizado'], 403);
+
+            $sala = $salaRepo->find($salaId);
+            if (!$sala) return new JsonResponse(['error' => 'Sala no encontrada'], 404);
+
+            $mensaje = new Mensaje();
+            $mensaje->setContenido($contenido);
+            $mensaje->setAutor($user);
+            $mensaje->setSala($sala);
+
+            // --- GESTIÓN DEL ARCHIVO ---
+            if ($file) {
+                $originalName = $file->getClientOriginalName();
+                $extension = $file->guessExtension() ?? $file->getClientOriginalExtension();
+                $newFilename = $slugger->slug(pathinfo($originalName, PATHINFO_FILENAME)).'-'.uniqid().'.'.$extension;
+
+                // IMPORTANTE: Guardamos en /public/uploads (asegúrate de que la carpeta existe)
+                $file->move($this->getParameter('kernel.project_dir').'/public/uploads', $newFilename);
+
+                // A. Datos para el chat (lo que ya tenías)
+                $mensaje->setArchivoUrl('/uploads/' . $newFilename);
+                $mensaje->setArchivoNombre($originalName);
+
+                // B. ¡NUEVO Y CRÍTICO! Creamos la entrada en la tabla ARCHIVO para la pestaña 2
+                $archivoEntidad = new \App\Entity\Archivo();
+                $archivoEntidad->setNombreOriginal($originalName);
+                $archivoEntidad->setNombreServidor($newFilename);
+                $archivoEntidad->setTipo($extension);
+                $archivoEntidad->setSala($sala);
+                $archivoEntidad->setSubidoPor($user); // Nombre exacto de tu relación en la entidad
+
+                $em->persist($archivoEntidad);
+            }
+
+            $em->persist($mensaje);
+            $em->flush();
+
+            // --- MERCURE Y RESPUESTA (Sin cambios) ---
+            $mensajeData = json_encode($mensaje->toArray());
+            $hub->publish(new Update("https://brainhub.com/sala/{$salaId}", $mensajeData));
+
+            $receptores = new \Doctrine\Common\Collections\ArrayCollection($sala->getMiembros()->toArray());
+            if ($sala->getCreador() && !$receptores->contains($sala->getCreador())) {
+                $receptores->add($sala->getCreador());
+            }
+
+            foreach ($receptores as $miembro) {
+                if ($miembro->getId() !== $user->getId()) {
+                    $hub->publish(new Update("https://brainhub.com/notifs/{$miembro->getId()}", $mensajeData));
+                }
+            }
+
+            return new JsonResponse(['status' => 'OK']);
+
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/chat/typing/{type}/{id}', name: 'app_chat_typing', methods: ['POST'])]
+    public function typing(string $type, int $id, HubInterface $hub): JsonResponse
+    {
         $user = $this->getUser();
 
-        if (!$user || !$salaId) return new JsonResponse(['error' => 'No autorizado'], 403);
-
-        $sala = $salaRepo->find($salaId);
-        if (!$sala) return new JsonResponse(['error' => 'Sala no encontrada'], 404);
-
-        $mensaje = new Mensaje();
-        $mensaje->setContenido($contenido);
-        $mensaje->setAutor($user);
-        $mensaje->setSala($sala);
-
-        // Gestión del Archivo
-        if ($file) {
-            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $newFilename = $slugger->slug($originalFilename).'-'.uniqid().'.'.$file->guessExtension();
-
-            try {
-                $file->move($this->getParameter('kernel.project_dir').'/public/uploads', $newFilename);
-                $mensaje->setArchivoUrl('/uploads/' . $newFilename);
-                $mensaje->setArchivoNombre($file->getClientOriginalName());
-            } catch (\Exception $e) {
-                return new JsonResponse(['error' => 'Error al subir archivo'], 500);
-            }
+        if (!$user) {
+            return new JsonResponse(['error' => 'No autorizado'], 403);
         }
 
-        $em->persist($mensaje);
-        $em->flush();
+        // Definir a qué canal avisamos dependiendo de si es sala o privado
+        $topic = $type === 'sala' ? "https://brainhub.com/sala/{$id}" : "https://brainhub.com/user/{$id}";
 
-        // Notificar a Mercure
+        // Avisar a Mercure de que alguien escribe
         $hub->publish(new Update(
-            "https://brainhub.com/sala/{$salaId}",
-            json_encode($mensaje->toArray())
+            $topic,
+            json_encode([
+                'isTyping' => true,
+                'autor'    => $user->getUsername() // <-- CORRECCIÓN: Ahora usa el nombre de usuario
+            ])
         ));
 
         return new JsonResponse(['status' => 'OK']);
@@ -90,10 +138,6 @@ class ChatController extends AbstractController
         } elseif ($type === 'user') {
             $receptor = $userRepo->find($id);
             if ($receptor && $user) {
-                // Aquí deberás crear un método en tu MensajeRepository que busque
-                // los mensajes donde el emisor seas tú y el receptor él, y viceversa.
-
-
                 $mensajes = $mensajeRepo->findConversacionPrivada($user, $receptor);
                 foreach ($mensajes as $m) {
                     $mensajesData[] = $m->toArray();

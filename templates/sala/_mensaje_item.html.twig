@@ -1,0 +1,60 @@
+{# templates/sala/_mensaje_item.html.twig #}
+
+{# Verificamos si el mensaje lo envió el usuario que está viendo la pantalla (ahora usamos msg.autor) #}
+{% set is_me = (app.user and app.user == msg.autor) %}
+
+<div class="flex {{ is_me ? 'justify-end' : 'justify-start' }} message-anim mb-4 w-full">
+    <div class="flex {{ is_me ? 'flex-row-reverse' : 'flex-row' }} items-end max-w-[85%] gap-2">
+
+        <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold uppercase
+                    {{ is_me ? 'bg-emerald-500 text-white' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' }}">
+            {{ msg.autor.username|slice(0, 1) }}
+        </div>
+
+        <div class="flex flex-col {{ is_me ? 'items-end' : 'items-start' }}">
+
+            <div class="text-[11px] text-gray-500 dark:text-gray-400 mb-1 px-1 font-medium">
+                {{ is_me ? 'Tú' : msg.autor.username }}
+                <span class="mx-1 opacity-50">•</span>
+                {{ msg.fechaCreacion|date('H:i') }}
+            </div>
+
+            <div class="px-4 py-2.5 rounded-2xl shadow-sm text-sm
+                        {{ is_me
+            ? 'bg-emerald-500 text-white bubble-me'
+            : 'bg-white dark:bg-[#2A3441] text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-darkBorder bubble-others'
+            }}">
+
+                <p class="whitespace-pre-wrap break-words">{{ msg.contenido }}</p>
+
+                {# Añadimos también el soporte para los archivos adjuntos dentro del mensaje #}
+                {% if msg.archivoUrl %}
+                    <div class="mt-3 pt-3 border-t {{ is_me ? 'border-emerald-400' : 'border-gray-200 dark:border-gray-700' }}">
+                        {% set ext = msg.archivoUrl|split('.')|last|lower %}
+                        {% set type = (ext in ['jpg','jpeg','png','gif','webp']) ? 'image' : (ext == 'pdf' ? 'pdf' : 'other') %}
+
+                        <div onclick="openPreview('{{ msg.archivoUrl }}', '{{ type }}')"
+                             class="js-carousel-item flex items-center gap-3 p-2 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer transition-all"
+                             data-url="{{ msg.archivoUrl }}"
+                             data-type="{{ type }}"
+                             data-name="{{ msg.archivoNombre }}"
+                             data-author="{{ msg.autor.username }}"
+                             data-date="{{ msg.fechaCreacion|date('d/m/Y H:i') }}"
+                             data-size="">
+
+                            <div class="p-2 bg-emerald-500 rounded-lg text-white shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                            </div>
+                            <div class="overflow-hidden">
+                                <p class="text-xs font-bold truncate">{{ msg.archivoNombre }}</p>
+                                <p class="text-[9px] opacity-60 font-black uppercase">Ver adjunto</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+</div>
