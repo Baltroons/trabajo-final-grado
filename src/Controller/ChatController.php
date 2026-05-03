@@ -47,20 +47,17 @@ class ChatController extends AbstractController
                 $extension = $file->guessExtension() ?? $file->getClientOriginalExtension();
                 $newFilename = $slugger->slug(pathinfo($originalName, PATHINFO_FILENAME)).'-'.uniqid().'.'.$extension;
 
-                // IMPORTANTE: Guardamos en /public/uploads (asegúrate de que la carpeta existe)
                 $file->move($this->getParameter('kernel.project_dir').'/public/uploads', $newFilename);
 
-                // A. Datos para el chat (lo que ya tenías)
                 $mensaje->setArchivoUrl('/uploads/' . $newFilename);
                 $mensaje->setArchivoNombre($originalName);
 
-                // B. ¡NUEVO Y CRÍTICO! Creamos la entrada en la tabla ARCHIVO para la pestaña 2
                 $archivoEntidad = new \App\Entity\Archivo();
                 $archivoEntidad->setNombreOriginal($originalName);
                 $archivoEntidad->setNombreServidor($newFilename);
                 $archivoEntidad->setTipo($extension);
                 $archivoEntidad->setSala($sala);
-                $archivoEntidad->setSubidoPor($user); // Nombre exacto de tu relación en la entidad
+                $archivoEntidad->setSubidoPor($user);
 
                 $em->persist($archivoEntidad);
             }
@@ -68,9 +65,15 @@ class ChatController extends AbstractController
             $em->persist($mensaje);
             $em->flush();
 
-            // --- MERCURE Y RESPUESTA (Sin cambios) ---
+            // --- MERCURE Y RESPUESTA ---
             $mensajeData = json_encode($mensaje->toArray());
-            $hub->publish(new Update("https://brainhub.com/sala/{$salaId}", $mensajeData));
+
+            // 1. Hacemos público el mensaje de la sala
+            $hub->publish(new Update(
+                "https://brainhub.com/sala/{$salaId}",
+                $mensajeData,
+                false // <-- ¡AÑADIDO! private: false
+            ));
 
             $receptores = new \Doctrine\Common\Collections\ArrayCollection($sala->getMiembros()->toArray());
             if ($sala->getCreador() && !$receptores->contains($sala->getCreador())) {
@@ -79,7 +82,12 @@ class ChatController extends AbstractController
 
             foreach ($receptores as $miembro) {
                 if ($miembro->getId() !== $user->getId()) {
-                    $hub->publish(new Update("https://brainhub.com/notifs/{$miembro->getId()}", $mensajeData));
+                    // 2. Hacemos pública la notificación personal
+                    $hub->publish(new Update(
+                        "https://brainhub.com/notifs/{$miembro->getId()}",
+                        $mensajeData,
+                        false // <-- ¡AÑADIDO! private: false
+                    ));
                 }
             }
 
@@ -88,6 +96,30 @@ class ChatController extends AbstractController
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
+    }
+
+    #[Route('/chat/typing/{type}/{id}', name: 'app_chat_typing', methods: ['POST'])]
+    public function typing(string $type, int $id, HubInterface $hub): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'No autorizado'], 403);
+        }
+
+        $topic = $type === 'sala' ? "https://brainhub.com/sala/{$id}" : "https://brainhub.com/user/{$id}";
+
+        // 3. Hacemos público el evento "escribiendo..."
+        $hub->publish(new Update(
+            $topic,
+            json_encode([
+                'isTyping' => true,
+                'autor'    => $user->getUsername()
+            ]),
+            false // <-- ¡AÑADIDO! private: false
+        ));
+
+        return new JsonResponse(['status' => 'OK']);
     }
 
     #[Route('/chat/typing/{type}/{id}', name: 'app_chat_typing', methods: ['POST'])]

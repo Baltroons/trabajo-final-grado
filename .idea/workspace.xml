@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b23049d7-f584-41f5-9eea-c34309c3681d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/show.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/show.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/ChatController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/ChatController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -234,7 +232,7 @@
       <workItem from="1777683488743" duration="3679000" />
       <workItem from="1777687403192" duration="2283000" />
       <workItem from="1777721436070" duration="30036000" />
-      <workItem from="1777759921975" duration="8810000" />
+      <workItem from="1777759921975" duration="13631000" />
     </task>
     <servers />
   </component>
