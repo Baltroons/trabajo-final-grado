@@ -11,13 +11,18 @@
       <schema-mapping>
         <introspection-scope>
           <node negative="1">
-            <node kind="database" negative="1" />
+            <node kind="database" negative="1">
+              <name qname="@" />
+              <name qname="app" />
+              <name qname="postgres" />
+            </node>
             <node kind="database" qname="@">
               <node kind="schema" qname="@" />
             </node>
-            <node kind="database">
-              <name qname="app" />
-              <name qname="postgres" />
+            <node kind="database" qname="app">
+              <node kind="schema" qname="public" negative="1" />
+            </node>
+            <node kind="database" qname="postgres">
               <node kind="schema" negative="1" />
             </node>
           </node>

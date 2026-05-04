@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Sala;
+use App\Entity\Mensaje; // <-- IMPORTANTE: Añadir la entidad Mensaje
 use App\Form\MensajeType;
 use App\Form\SalaType;
 use App\Repository\SalaRepository;
@@ -13,6 +14,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Mercure\HubInterface; // <-- IMPORTANTE: Añadir Hub de Mercure
+use Symfony\Component\Mercure\Update;       // <-- IMPORTANTE: Añadir Update de Mercure
 
 #[Route('/sala')]
 final class SalaController extends AbstractController
@@ -33,13 +36,15 @@ final class SalaController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Asignamos el creador (el usuario actual)
             $sala->setCreador($this->getUser());
+
+            if (!$sala->getToken()) {
+                $sala->setToken(bin2hex(random_bytes(15)));
+            }
 
             $entityManager->persist($sala);
             $entityManager->flush();
 
-            // Si la petición es AJAX (vía fetch) devolvemos JSON
             if ($request->isXmlHttpRequest() || str_contains($request->headers->get('Accept'), 'application/json')) {
                 return new JsonResponse([
                     'success' => true,
@@ -50,33 +55,128 @@ final class SalaController extends AbstractController
             }
         }
 
-        // Si el formulario no es válido, devolvemos los errores en JSON
         return new JsonResponse([
             'success' => false,
             'message' => 'Error en la validación del formulario.'
         ], Response::HTTP_BAD_REQUEST);
     }
 
+    #[Route('/{id}/edit-ajax', name: 'app_sala_edit_ajax', methods: ['POST'])]
+    public function editAjax(Request $request, Sala $sala, EntityManagerInterface $entityManager): JsonResponse
+    {
+        if ($this->getUser() !== $sala->getCreador()) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'No tienes permisos para editar esta sala.'
+            ], 403);
+        }
+
+        $nuevoNombre = $request->request->get('nombre');
+        $nuevaDescripcion = $request->request->get('descripcion');
+
+        if (!empty($nuevoNombre)) {
+            $sala->setNombre($nuevoNombre);
+        }
+
+        if ($nuevaDescripcion !== null) {
+            $sala->setDescripcion($nuevaDescripcion);
+        }
+
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'status' => 'success',
+            'data' => [
+                'nombre' => $sala->getNombre(),
+                'descripcion' => $sala->getDescripcion()
+            ]
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_sala_show', methods: ['GET'])]
-    public function show(Sala $sala): Response
+    public function show(Sala $sala, EntityManagerInterface $em): Response
     {
         if (!$this->getUser()) return $this->redirectToRoute('app_login');
 
-        // Formulario vacío para el chat (el JS lo enviará al ChatController)
         $formMensaje = $this->createForm(MensajeType::class);
-
-        // Formulario de edición para el modal
         $formEdit = $this->createForm(SalaType::class, $sala, [
             'action' => $this->generateUrl('app_sala_edit', ['id' => $sala->getId()]),
         ]);
+
+        if (!$sala->getToken()) {
+            $sala->setToken(bin2hex(random_bytes(15)));
+            $em->flush();
+        }
 
         return $this->render('sala/show.html.twig', [
             'sala' => $sala,
             'formMensaje' => $formMensaje->createView(),
             'formEdit' => $formEdit->createView(),
-            'mensajes' => $sala->getMensajes() // El Twig usará esto para el historial
+            'mensajes' => $sala->getMensajes()
         ]);
     }
+
+    // =========================================================================
+    // --- NUEVAS RUTAS PARA EL CHAT EN TIEMPO REAL (MERCURE) ---
+    // =========================================================================
+
+    #[Route('/{id}/post-mensaje', name: 'app_sala_post_mensaje', methods: ['POST'])]
+    public function postMensaje(Sala $sala, Request $request, EntityManagerInterface $em, HubInterface $hub): JsonResponse
+    {
+        $contenido = $request->request->get('contenido');
+
+        if (!$contenido) {
+            return new JsonResponse(['status' => 'error', 'message' => 'El mensaje no puede estar vacío'], 400);
+        }
+
+        // 1. Guardar en base de datos
+        $mensaje = new Mensaje();
+        $mensaje->setContenido($contenido);
+        $mensaje->setAutor($this->getUser());
+        $mensaje->setSala($sala);
+
+        $em->persist($mensaje);
+        $em->flush();
+
+        // 2. Renderizar el "partial" de Twig a un string de HTML
+        $html = $this->renderView('sala/_mensaje_item.html.twig', [
+            'msg' => $mensaje
+        ]);
+
+        // 3. Enviar a Mercure
+        $topic = "https://brainhub.com/sala/" . $sala->getId();
+        $update = new Update(
+            $topic,
+            json_encode([
+                'type' => 'message',
+                'html' => $html
+            ])
+        );
+
+        $hub->publish($update);
+
+        return new JsonResponse(['status' => 'success']);
+    }
+
+    #[Route('/{id}/typing', name: 'app_sala_typing', methods: ['POST'])]
+    public function typing(Sala $sala, HubInterface $hub): JsonResponse
+    {
+        // Solo necesitamos avisar al hub que alguien está escribiendo
+        $topic = "https://brainhub.com/sala/" . $sala->getId();
+        $update = new Update(
+            $topic,
+            json_encode([
+                'type' => 'typing',
+                'user' => $this->getUser()->getUserIdentifier() // Enviamos el identificador para no auto-mostrarnos el aviso
+            ])
+        );
+
+        $hub->publish($update);
+
+        return new JsonResponse(['status' => 'ok']);
+    }
+
+    // =========================================================================
 
     #[Route('/{id}/edit', name: 'app_sala_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Sala $sala, EntityManagerInterface $entityManager): Response
@@ -87,7 +187,6 @@ final class SalaController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            // Si la petición viene por AJAX (Fetch), respondemos con JSON
             if ($request->isXmlHttpRequest()) {
                 return new JsonResponse([
                     'status' => 'success',
@@ -118,34 +217,34 @@ final class SalaController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$sala->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($sala);
             $entityManager->flush();
-
-            // 3. AÑADIDO: El mensaje flash de éxito tras eliminar
             $this->addFlash('success', 'La sala ha sido eliminada definitivamente.');
         }
 
         return $this->redirectToRoute('app_sala_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}/unirse', name: 'app_sala_join', methods: ['POST'])]
-    public function join(Sala $sala, EntityManagerInterface $entityManager): Response
+    #[Route('/join/{token}', name: 'app_sala_join', methods: ['GET'])]
+    public function join(string $token, SalaRepository $salaRepo, EntityManagerInterface $em): Response
     {
-        $user = $this->getUser();
+        $sala = $salaRepo->findOneBy(['token' => $token]);
 
-        // Si no está logueado, lo mandamos a iniciar sesión
+        if (!$sala) {
+            $this->addFlash('error', 'El enlace de invitación no es válido o ha expirado.');
+            return $this->redirectToRoute('app_home');
+        }
+
+        $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        // Comprobamos que no sea el creador y que no esté ya dentro
         if ($sala->getCreador() !== $user && !$sala->getMiembros()->contains($user)) {
             $sala->addMiembro($user);
-            $entityManager->flush();
-
-            $this->addFlash('success', '¡Te has unido a la sala con éxito!');
+            $em->flush();
+            $this->addFlash('success', '¡Te has unido con éxito a ' . $sala->getNombre() . '!');
         }
 
-        // Redirigimos al Home para que vea la sala en su lista
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);
     }
 
     #[Route('/sala/{id}/invitar', name: 'app_sala_invitar', methods: ['POST'])]
@@ -160,9 +259,6 @@ final class SalaController extends AbstractController
 
         $usuarioBuscado = $request->request->get('usuario_invitado');
         $invitado = $userRepository->findOneBy(['email' => $usuarioBuscado]);
-
-        // Descomenta si también permites buscar por username
-        // if (!$invitado) { $invitado = $userRepository->findOneBy(['username' => $usuarioBuscado]); }
 
         if ($invitado) {
             if (!$sala->getMiembros()->contains($invitado)) {
@@ -190,22 +286,15 @@ final class SalaController extends AbstractController
     }
 
     #[Route('/{id}/expulsar/{user_id}', name: 'app_sala_expulsar', methods: ['POST'])]
-    public function expulsar(
-        Sala $sala,
-        int $user_id,
-        UserRepository $userRepository,
-        EntityManagerInterface $entityManager
-    ): Response {
-
+    public function expulsar(Sala $sala, int $user_id, UserRepository $userRepository, EntityManagerInterface $entityManager): Response
+    {
         $currentUser = $this->getUser();
 
-        // 1. Seguridad básica: Solo el creador de la sala puede expulsar a otros
         if ($currentUser !== $sala->getCreador()) {
             $this->addFlash('error', '¡Alto ahí! Solo el administrador de la sala puede expulsar estudiantes.');
             return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);
         }
 
-        // 2. Buscamos al estudiante en la base de datos mediante su ID
         $estudiante = $userRepository->find($user_id);
 
         if (!$estudiante) {
@@ -213,25 +302,19 @@ final class SalaController extends AbstractController
             return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);
         }
 
-        // 3. Evitar que el creador se expulse a sí mismo por error
         if ($currentUser === $estudiante) {
             $this->addFlash('warning', 'No puedes expulsarte a ti mismo de tu propia sala.');
             return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);
         }
 
-        // 4. Verificamos que el estudiante realmente pertenezca a la sala y lo eliminamos
         if ($sala->getMiembros()->contains($estudiante)) {
             $sala->removeMiembro($estudiante);
-
-            // Guardamos los cambios en la base de datos
             $entityManager->flush();
-
             $this->addFlash('success', 'El estudiante ' . $estudiante->getUsername() . ' ha sido expulsado de la sala.');
         } else {
             $this->addFlash('warning', 'Este estudiante ya no pertenece a la sala.');
         }
 
-        // 5. Redirigimos de vuelta a la vista de la sala
         return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);
     }
 }

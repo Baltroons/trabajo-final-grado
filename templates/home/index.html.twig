@@ -11,28 +11,22 @@
             <div class="max-w-6xl mx-auto space-y-8">
 
                 {# 1. BARRA SUPERIOR #}
+                {# 1. BARRA SUPERIOR #}
                 <div class="flex justify-between items-center gap-4">
-                    <form action="{{ path('app_home') }}" method="GET" class="relative w-full max-w-md">
-                        <button type="submit" class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 hover:text-emerald-600">
+                    <div class="relative w-full max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-4   flex items-center text-gray-400 dark:text-gray-500">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
-                        </button>
-                        <input type="text" name="q" value="{{ app.request.query.get('q') }}" placeholder="Buscar salas..."
-                               class="block w-full pl-12 pr-4 py-3 border border-gray-100 bg-white rounded-full text-sm shadow-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
-                    </form>
+                        </div>
+                        <input type="text" id="live-search" placeholder="Buscar salas..."
+                               class="block w-full pl-12 pr-4 py-3 border border-gray-100 dark:border-darkBorder bg-white dark:bg-darkCard dark:text-white rounded-full text-sm shadow-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                    </div>
 
                     <div class="flex items-center gap-4">
                         <span class="hidden md:inline-block text-sm font-bold text-gray-700">
                             ¡Hola, <span class="text-emerald-700">{{ app.user.username }}</span>!
                         </span>
-                        <button class="relative p-3 bg-white border border-gray-100 rounded-full shadow-sm hover:bg-emerald-50 transition-colors text-gray-400 hover:text-emerald-600">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
-                            </svg>
-                            {# Punto de notificación: ID 'bell-dot' para manipularlo con JS #}
-                            <span id="bell-dot" class="hidden absolute top-2 right-2.5 block h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white"></span>
-                        </button>
                     </div>
                 </div>
 
@@ -41,8 +35,8 @@
                     <div class="relative z-10 max-w-xl">
                         <h1 class="text-4xl md:text-5xl font-black mb-4 leading-tight">¿Qué toca estudiar hoy?</h1>
                         <p class="text-emerald-100/80 text-lg mb-8">Únete a una sala activa o crea tu propio espacio de estudio colaborativo.</p>
-                        {# CAMBIO: Ahora abre el modal en lugar de redirigir #}
-                        <button onclick="openModal()"
+
+                        <button onclick="window.openNuevaSalaModal()"
                                 class="inline-block bg-white text-[#065f46] font-bold py-4 px-10 rounded-2xl hover:bg-emerald-50 transition-all transform hover:scale-105 shadow-lg shadow-black/10">
                             + Crear Sala de Estudio
                         </button>
@@ -53,25 +47,25 @@
 
                 {# 3. TARJETAS DE ESTADÍSTICAS REALES #}
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100">
-                        <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl">📚</div>
+                    <div class="bg-white dark:bg-darkCard p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100 dark:border-darkBorder transition-colors">
+                        <div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-3xl">📚</div>
                         <div>
-                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Salas Visibles</p>
-                            <p class="text-3xl font-black text-gray-800">{{ salas|length }}</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Salas Visibles</p>
+                            <p class="text-3xl font-black text-gray-800 dark:text-white" id="total-salas-count">{{ salas|length }}</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100">
-                        <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl">🎓</div>
+                    <div class="bg-white dark:bg-darkCard p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100 dark:border-darkBorder transition-colors">
+                        <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-3xl">🎓</div>
                         <div class="overflow-hidden">
-                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Perfil</p>
-                            <p class="text-2xl font-black text-gray-800 truncate">{{ app.user.username }}</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Perfil</p>
+                            <p class="text-2xl font-black text-gray-800 dark:text-white truncate">{{ app.user.username }}</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100">
-                        <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-3xl">📅</div>
+                    <div class="bg-white dark:bg-darkCard p-6 rounded-[2rem] shadow-sm flex items-center gap-5 border border-gray-100 dark:border-darkBorder transition-colors">
+                        <div class="w-16 h-16 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-3xl">📅</div>
                         <div>
-                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Hoy es</p>
-                            <p class="text-2xl font-black text-gray-800">{{ "now"|date("d M") }}</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wider">Hoy es</p>
+                            <p class="text-2xl font-black text-gray-800 dark:text-white">{{ "now"|date("d M") }}</p>
                         </div>
                     </div>
                 </div>
@@ -79,78 +73,113 @@
                 {# 4. LISTADO DE SALAS #}
                 <div class="pt-4">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-black text-gray-800">Tus salas activas</h2>
-                        {% if app.request.query.get('q') %}
-                            <a href="{{ path('app_home') }}" class="text-red-500 font-bold text-sm hover:underline">Limpiar búsqueda</a>
-                        {% endif %}
+                        <h2 class="text-2xl font-black text-gray-800 dark:text-white">Tus salas activas</h2>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    {# Contenedor de grilla para JS #}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="salas-grid">
                         {% for sala in salas|default([]) %}
-                            <div class="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
+                            {# Agregamos la clase 'sala-card' y un data-attribute con el nombre para filtrar #}
+                            <div class="sala-card bg-white dark:bg-darkCard p-6 rounded-[2.5rem] border border-gray-100 dark:border-darkBorder shadow-sm hover:shadow-xl transition-all group" data-title="{{ sala.nombre|lower }}">
                                 <div class="flex justify-between items-start mb-4">
-                                    <span class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700">
+                                    <span class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
                                         {{ sala.categoria|default('General') }}
                                     </span>
                                     {% if app.user == sala.creador %}
                                         <span class="text-amber-500 text-xs font-bold">Propietario</span>
                                     {% endif %}
                                 </div>
-                                <h3 class="text-xl font-bold text-gray-800 group-hover:text-emerald-700 transition-colors">{{ sala.nombre }}</h3>
-                                <p class="text-sm text-gray-400 mt-2 line-clamp-2">{{ sala.descripcion|default('Sin descripción adicional.') }}</p>
-                                <a href="{{ path('app_sala_show', {id: sala.id}) }}" class="mt-6 block w-full text-center bg-gray-50 text-gray-900 py-3 rounded-2xl font-bold text-sm hover:bg-emerald-800 hover:text-white transition-all">
+                                <h3 class="text-xl font-bold text-gray-800 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{{ sala.nombre }}</h3>
+                                <p class="text-sm text-gray-400 dark:text-gray-500 mt-2 line-clamp-2">{{ sala.descripcion|default('Sin descripción adicional.') }}</p>
+                                <a href="{{ path('app_sala_show', {id: sala.id}) }}" class="mt-6 block w-full text-center bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white py-3 rounded-2xl font-bold text-sm hover:bg-emerald-800 hover:text-white dark:hover:bg-emerald-700 transition-all">
                                     Entrar a estudiar
                                 </a>
                             </div>
                         {% else %}
-                            <div class="col-span-full py-12 text-center bg-white rounded-[2.5rem] border-2 border-dashed border-gray-200">
+                            <div class="col-span-full py-12 text-center bg-white dark:bg-darkCard rounded-[2.5rem] border-2 border-dashed border-gray-200 dark:border-darkBorder" id="no-results-msg">
                                 <p class="text-gray-400 font-medium">No se encontraron salas disponibles.</p>
                             </div>
                         {% endfor %}
+                    </div>
+
+                    {# Controles de Paginación #}
+                    <div id="pagination-controls" class="flex justify-between items-center mt-8 px-2 hidden">
+                        <button id="btn-prev" class="px-5 py-2.5 bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 font-bold text-sm transition-all shadow-sm">
+                            &larr; Anterior
+                        </button>
+                        <span id="page-info" class="text-sm font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-xl">Página 1 de 1</span>
+                        <button id="btn-next" class="px-5 py-2.5 bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 font-bold text-sm transition-all shadow-sm">
+                            Siguiente &rarr;
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
         {# =============================================================================
-           MODAL PARA NUEVA SALA (SPA STYLE)
+           MODAL PARA NUEVA SALA (SPA STYLE - DARK THEME)
            ============================================================================= #}
-        <div id="modal-nueva-sala" class="hidden fixed inset-0 z-50 overflow-y-auto">
-            <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div id="modal-nueva-sala" class="hidden fixed inset-0 z-[100] overflow-y-auto flex items-center justify-center p-4 sm:p-6">
+            {# Fondo oscuro con desenfoque #}
+            <div class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm transition-opacity" onclick="window.closeNuevaSalaModal()"></div>
 
-                <div class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in-up">
-                    <div class="p-8 md:p-10">
-                        <h2 class="text-3xl font-black text-gray-900 mb-2">Crear nueva sala</h2>
-                        <p class="text-gray-500 mb-8">Define tu espacio y empieza a colaborar en tiempo real.</p>
+            {# Contenedor principal del modal #}
+            <div class="relative bg-[#1a1b26] w-full max-w-xl rounded-[2rem] shadow-2xl overflow-hidden transform transition-all animate-fade-in-up border border-gray-800">
+                <div class="p-8 md:p-10">
 
-                        <form id="form-sala-ajax" action="{{ path('app_sala_new_ajax') }}" method="POST">
-                            {{ form_widget(form._token) }}
+                    {# Cabecera #}
+                    <h2 class="text-3xl font-black text-white mb-1">Crear nueva sala</h2>
+                    <p class="text-indigo-400/80 mb-8 text-sm">Define tu espacio y empieza a colaborar en tiempo real.</p>
 
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Nombre de la Sala</label>
-                                {{ form_widget(form.nombre, {'attr': {'class': 'w-full rounded-2xl border-gray-100 bg-gray-50 py-4 px-5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all'}}) }}
-                            </div>
+                    <form id="form-sala-ajax" action="{{ path('app_sala_new_ajax') }}" method="POST" class="space-y-6">
+                        {{ form_widget(form._token) }}
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Categoría</label>
-                                    {{ form_widget(form.categoria, {'attr': {'class': 'w-full rounded-2xl border-gray-100 bg-gray-50 py-4 px-5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all'}}) }}
-                                </div>
-                            </div>
+                        {# Mensaje de error general #}
+                        <div id="sala-error-msg" class="hidden bg-red-500/10 border border-red-500/50 text-red-400 text-sm px-4 py-3 rounded-xl font-bold"></div>
 
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Descripción</label>
-                                {{ form_widget(form.descripcion, {'attr': {'class': 'w-full rounded-2xl border-gray-100 bg-gray-50 py-4 px-5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all', 'rows': '3'}}) }}
-                            </div>
+                        {# Input: Nombre de la Sala #}
+                        <div>
+                            <label class="block text-sm font-bold text-indigo-300 mb-2">Nombre de la Sala</label>
+                            {{ form_widget(form.nombre, {
+                                'attr': {
+                                    'class': 'w-full rounded-2xl border border-transparent bg-[#13141f] text-white placeholder-gray-600 py-4 px-5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all',
+                                    'placeholder': 'Ej: Matemáticas Avanzadas'
+                                }
+                            }) }}
+                        </div>
 
-                            <div class="flex justify-end gap-4 pt-4">
-                                <button type="button" onclick="closeModal()" class="px-6 py-4 font-bold text-gray-400 hover:text-gray-600 transition-colors">Cancelar</button>
-                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-10 rounded-2xl shadow-lg transition-all transform hover:scale-105">
-                                    Lanzar Sala
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        {# Input: Categoría #}
+                        <div>
+                            <label class="block text-sm font-bold text-indigo-300 mb-2">Categoría</label>
+                            {{ form_widget(form.categoria, {
+                                'attr': {
+                                    'class': 'w-full rounded-2xl border border-transparent bg-[#13141f] text-white py-4 px-5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all'
+                                }
+                            }) }}
+                        </div>
+
+                        {# Input: Descripción #}
+                        <div>
+                            <label class="block text-sm font-bold text-indigo-300 mb-2">Descripción</label>
+                            {{ form_widget(form.descripcion, {
+                                'attr': {
+                                    'class': 'w-full rounded-2xl border border-transparent bg-[#13141f] text-white placeholder-gray-600 py-4 px-5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all resize-none',
+                                    'rows': '3',
+                                    'placeholder': '¿De qué trata esta sala?'
+                                }
+                            }) }}
+                        </div>
+
+                        {# Botones de Acción #}
+                        <div class="flex items-center justify-end gap-6 pt-4">
+                            <button type="button" onclick="window.closeNuevaSalaModal()" class="text-indigo-300 font-bold hover:text-white transition-colors">
+                                Cancelar
+                            </button>
+                            <button type="submit" id="btn-submit-sala" class="bg-[#059669] hover:bg-emerald-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center gap-2">
+                                <span>Crear sala</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -159,63 +188,227 @@
            SCRIPTS DE FUNCIONALIDAD SPA Y TIEMPO REAL
            ============================================================================= #}
         <script>
-            // Gestión del Modal
-            function openModal() { document.getElementById('modal-nueva-sala').classList.remove('hidden'); }
-            function closeModal() { document.getElementById('modal-nueva-sala').classList.add('hidden'); }
+            // Nombres únicos para evitar conflictos con base.html.twig
+            window.openNuevaSalaModal = function() {
+                const modal = document.getElementById('modal-nueva-sala');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    console.error("No se encontró el modal de nueva sala");
+                }
+            };
 
-            // Envío AJAX del formulario
-            document.getElementById('form-sala-ajax').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
+            window.closeNuevaSalaModal = function() {
+                const modal = document.getElementById('modal-nueva-sala');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            };
 
-                try {
-                    const response = await fetch(this.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {'X-Requested-With': 'XMLHttpRequest'}
+            document.addEventListener('DOMContentLoaded', () => {
+                const form = document.getElementById('form-sala-ajax');
+                if (form) {
+                    form.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        const btn = document.getElementById('btn-submit-sala');
+                        const errorMsg = document.getElementById('sala-error-msg');
+
+                        btn.disabled = true;
+                        btn.innerHTML = "Creando...";
+
+                        try {
+                            const response = await fetch(this.action, {
+                                method: 'POST',
+                                body: new FormData(this),
+                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                            });
+
+                            if (response.redirected) {
+                                window.location.href = response.url;
+                                return;
+                            }
+
+                            const data = await response.json();
+                            if (data.success) window.location.href = data.redirect_url;
+                            else throw new Error(data.message || 'Error');
+
+                        } catch (error) {
+                            if(errorMsg) {
+                                errorMsg.textContent = error.message;
+                                errorMsg.classList.remove('hidden');
+                            }
+                        } finally {
+                            btn.disabled = false;
+                            btn.innerHTML = "Crear sala";
+                        }
                     });
-
-                    const data = await response.json();
-                    if (data.success) {
-                        // Redirigir directamente a la nueva sala
-                        window.location.href = data.redirect_url;
-                    }
-                } catch (error) {
-                    console.error('Error al crear sala:', error);
                 }
             });
-
-            // Lógica de Notificaciones en tiempo real (Mercure)
-            // Esto asume que tienes Mercure configurado
-            {% if app.user %}
-            const eventSource = new EventSource("{{ mercure('notificaciones/user/' ~ app.user.id)|escape('js') }}");
-            eventSource.onmessage = event => {
-                const data = JSON.parse(event.data);
-                // Mostrar punto rojo en la campana
-                document.getElementById('bell-dot').classList.remove('hidden');
-                // Opcional: mostrar un aviso tipo Toast
-                console.log("Nueva notificación:", data.mensaje);
-            };
-            {% endif %}
         </script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const searchInput = document.getElementById('live-search');
+                        const cards = Array.from(document.querySelectorAll('.sala-card'));
+                        const btnPrev = document.getElementById('btn-prev');
+                        const btnNext = document.getElementById('btn-next');
+                        const pageInfo = document.getElementById('page-info');
+                        const paginationControls = document.getElementById('pagination-controls');
+                        const totalSalasCount = document.getElementById('total-salas-count');
+
+                        let currentPage = 1;
+
+                        function renderSalas() {
+                            if (!searchInput) return;
+
+                            const query = searchInput.value.toLowerCase().trim();
+
+                            // 1. Filtrar las tarjetas por búsqueda
+                            const filteredCards = cards.filter(card => card.dataset.title.includes(query));
+
+                            // Actualizamos la tarjeta de estadística "Salas Visibles" en vivo
+                            if(totalSalasCount) totalSalasCount.textContent = filteredCards.length;
+
+                            // 2. Lógica de Paginación (3 en móviles, 6 en PC)
+                            const isMobile = window.innerWidth < 768;
+                            const itemsPerPage = isMobile ? 3 : 6;
+                            const totalPages = Math.ceil(filteredCards.length / itemsPerPage) || 1;
+
+                            if (currentPage > totalPages) currentPage = totalPages;
+
+                            const start = (currentPage - 1) * itemsPerPage;
+                            const end = start + itemsPerPage;
+
+                            // 3. Ocultar todas y mostrar solo las de esta página
+                            cards.forEach(card => card.style.display = 'none');
+                            filteredCards.slice(start, end).forEach(card => card.style.display = 'block');
+
+                            // 4. Actualizar botones e información
+                            if (filteredCards.length > 0) {
+                                paginationControls.classList.remove('hidden');
+                                pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+                                btnPrev.disabled = currentPage === 1;
+                                btnNext.disabled = currentPage === totalPages;
+                            } else {
+                                paginationControls.classList.add('hidden'); // Ocultar paginación si no hay resultados
+                            }
+                        }
+
+                        if (searchInput && cards.length > 0) {
+                            // Evento al escribir (Búsqueda instantánea)
+                            searchInput.addEventListener('input', () => {
+                                currentPage = 1; // Regresar a pag 1 al buscar
+                                renderSalas();
+                            });
+
+                            // Eventos de botones
+                            btnPrev.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderSalas(); } });
+                            btnNext.addEventListener('click', () => { if (currentPage < 99) { currentPage++; renderSalas(); } });
+
+                            // Escuchar si se cambia el tamaño de la ventana (para cambiar de 6 a 3 automático)
+                            window.addEventListener('resize', renderSalas);
+
+                            // Renderizado inicial
+                            renderSalas();
+                        }
+                    });
+                </script>
 
     {% else %}
-        {# VISTA LANDING (Mantenida igual para visitantes) #}
-        <div class="relative w-full h-[calc(100vh-64px)] flex flex-col items-center justify-center overflow-hidden">
-            <img src="{{ asset('images/brainhub.png') }}" class="absolute inset-0 w-full h-full object-cover" alt="Fondo BrainHub">
-            <div class="absolute inset-0 bg-emerald-950/40 backdrop-blur-[2px]"></div>
-            <div class="relative z-10 w-full h-full max-w-6xl flex flex-col items-center justify-center gap-12 px-6">
-                <div class="bg-white p-10 md:p-14 rounded-[3rem] shadow-2xl text-center max-w-xl w-full">
-                    <h1 class="text-4xl md:text-5xl font-black text-gray-900 leading-tight mb-4">
-                        Potencia tu mente, <br>
-                        <span class="text-[#065f46]">conecta tus ideas</span>
+        <div class="relative overflow-hidden bg-[#f3f4f6] dark:bg-darkBg">
+            {# --- DECORACIÓN DE FONDO --- #}
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
+                <div class="absolute top-[-10%] left-[-10%] w-[400px] h-[400px] bg-emerald-200/50 dark:bg-emerald-900/20 rounded-full blur-3xl opacity-60"></div>
+                <div class="absolute bottom-[10%] right-[-5%] w-[300px] h-[300px] bg-emerald-300/40 dark:bg-emerald-800/20 rounded-full blur-3xl opacity-50"></div>
+            </div>
+
+            {# --- SECCIÓN HERO --- #}
+            <section class="relative z-10 pt-16 pb-20 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 text-center lg:text-left">
+                            <span class="inline-block px-4 py-1.5 mb-6 text-xs font-black tracking-widest text-emerald-700 dark:text-emerald-400 uppercase bg-emerald-100 dark:bg-emerald-900/40 rounded-full border border-emerald-200 dark:border-emerald-800">
+                                🚀 Potencia tu aprendizaje
+                            </span>
+                    <h1 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white leading-tight mb-6">
+                        Tu cerebro, <br>
+                        <span class="text-emerald-600 dark:text-emerald-500">multiplicado por todos.</span>
                     </h1>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10">
-                        <a href="{{ path('app_register') }}" class="w-full sm:w-auto bg-[#065f46] text-white font-bold py-4 px-10 rounded-2xl shadow-lg">Empezar gratis</a>
-                        <a href="{{ path('app_login') }}" class="w-full sm:w-auto bg-gray-50 text-gray-900 font-bold py-4 px-10 rounded-2xl border border-gray-200">Iniciar Sesión</a>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                        BrainHub es el ecosistema definitivo para estudiantes. Chatea en tiempo real, comparte recursos académicos y domina tus materias en salas de estudio colaborativas.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                        <button onclick="openModal('register-modal')" class="px-8 py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-200 dark:shadow-none hover:bg-emerald-700 hover:-translate-y-1 transition-all text-center">
+                            Empezar ahora — Es gratis
+                        </button>
+                        <button onclick="openModal('login-modal')" class="px-8 py-4 bg-white dark:bg-darkCard text-gray-700 dark:text-gray-200 font-bold rounded-2xl border border-gray-200 dark:border-darkBorder hover:bg-gray-50 dark:hover:bg-gray-800 transition-all text-center">
+                            Ya tengo cuenta
+                        </button>
                     </div>
                 </div>
-            </div>
+
+                {# --- PREVIEW VISUAL --- #}
+                <div class="lg:w-1/2 relative">
+                    <div class="relative bg-white dark:bg-darkCard rounded-3xl shadow-2xl border border-gray-100 dark:border-darkBorder overflow-hidden animate-fade-in p-2">
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1471&auto=format&fit=crop"
+                             alt="Colaboración" class="rounded-2xl w-full h-auto opacity-90 dark:opacity-70">
+                        <div class="absolute bottom-6 -left-6 hidden md:flex items-center gap-3 bg-white dark:bg-darkCard p-4 rounded-2xl shadow-xl border border-emerald-50 dark:border-darkBorder">
+                            <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">#</div>
+                            <div>
+                                <p class="text-xs font-black text-gray-800 dark:text-white">Sala: Física Cuántica</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400">32 estudiantes activos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {# --- CARACTERÍSTICAS --- #}
+            <section class="relative z-10 bg-white/60 dark:bg-darkBg/60 backdrop-blur-md py-20 border-y border-gray-200 dark:border-darkBorder">
+                <div class="max-w-7xl mx-auto px-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                        <div class="flex flex-col items-center text-center p-6">
+                            <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mb-6">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Salas en tiempo real</h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Únete a canales específicos de cada materia. Pregunta, responde y comparte conocimiento al instante.</p>
+                        </div>
+                        <div class="flex flex-col items-center text-center p-6">
+                            <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Biblioteca Compartida</h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Sube PDFs, imágenes y apuntes directamente al chat. Todo el material queda organizado para tu estudio.</p>
+                        </div>
+                        <div class="flex flex-col items-center text-center p-6">
+                            <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-2xl flex items-center justify-center mb-6">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-1.17-11.961C7.59 11.55 7 12.871 7 14.352c0 1.28.318 2.484.879 3.538m3.121-8.89C11.112 8.07 12 9.091 12 10.5c0 .735-.311 1.397-.812 1.861L12 14.352m0 0h4m-4 0v4m4-10V4m0 10V4m0 10h4m-4 0a1 1 0 110-2h1a1 1 0 110 2h-1z"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Notificaciones Inteligentes</h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Mantente al día. Recibe avisos solo de las salas que te interesan y nunca pierdas un examen importante.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {# --- CTA FINAL --- #}
+            <section class="py-20 px-6">
+                <div class="max-w-4xl mx-auto bg-emerald-800 dark:bg-emerald-900 rounded-[3rem] p-12 text-center shadow-2xl relative overflow-hidden border border-emerald-700/50">
+                    <div class="absolute top-0 right-0 p-8 opacity-10">
+                        <svg class="w-32 h-32" fill="white" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2z"/></svg>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-black text-white mb-6">¿Listo para mejorar tus notas?</h2>
+                    <p class="text-emerald-100 mb-10 text-lg">Únete a la comunidad de estudiantes que ya están colaborando.</p>
+                    <button onclick="openModal('register-modal')" class="inline-block px-10 py-4 bg-white text-emerald-800 font-black rounded-2xl hover:bg-emerald-50 transition-all uppercase tracking-widest text-sm">
+                        Crear mi cuenta gratis
+                    </button>
+                </div>
+            </section>
         </div>
+
     {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
 {% endblock %}
