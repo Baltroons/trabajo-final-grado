@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b23049d7-f584-41f5-9eea-c34309c3681d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/app.IXoBAA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/app.IXoBAA/schema/public.abK9xQ.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,6 +36,10 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/.env" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/.env.dev" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/Dockerfile" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/docker-compose.yml" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/Entity/User.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
@@ -233,11 +240,15 @@
       <workItem from="1777687403192" duration="2283000" />
       <workItem from="1777721436070" duration="30036000" />
       <workItem from="1777759921975" duration="13739000" />
-      <workItem from="1777904030231" duration="141000" />
+      <workItem from="1777904030231" duration="4083000" />
+      <workItem from="1777966554177" duration="2518000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="nginx.conf" />
   </component>
 </project>

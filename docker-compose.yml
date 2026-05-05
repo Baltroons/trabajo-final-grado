@@ -4,6 +4,8 @@ services:
         build: .
         volumes:
             - .:/var/www/html
+        environment:
+            DATABASE_URL: "postgresql://app:password@database:5432/app?serverVersion=16&charset=utf8"
 
     # El servidor web (Nginx)
     nginx:
@@ -26,7 +28,7 @@ services:
         ports:
             - "5432:5432"
         volumes:
-            - postgres_data:/var/lib/postgresql/data # <--- AÑADE ESTO
+            - postgres_data:/var/lib/postgresql/data
 
     # Tu servidor de correo (el que ya tenías)
     mailer:
