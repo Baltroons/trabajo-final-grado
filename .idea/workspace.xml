@@ -5,59 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b23049d7-f584-41f5-9eea-c34309c3681d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/app.IXoBAA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/app.IXoBAA/schema/public.abK9xQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/f12360db-103c-445d-be88-5b81499e1f84/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/docker/nginx.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/supervisord.conf" beforeDir="false" afterPath="$PROJECT_DIR$/docker/supervisord.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260502022201.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260502022201.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260502122349.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260502122349.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260502142136.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260502142136.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20260502171435.php" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/Version20260502171435.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/sounds/notificacion_pop.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/public/sounds/notificacion_pop.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/Plan-de-empresa-Eduardo-Baltrons-69f544b9cb1fa.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/Plan-de-empresa-Eduardo-Baltrons-69f544b9cb1fa.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/TFG-69f54339cd1b4.pptx" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/TFG-69f54339cd1b4.pptx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/base-html-69f646ec35e55.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/base-html-69f646ec35e55.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/index-html-69f637561b0bf.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/index-html-69f637561b0bf.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/index-html-69f64a59739e5.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/index-html-69f64a59739e5.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/isard-spice-69f64e2936a29.txt" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/isard-spice-69f64e2936a29.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f5434e25d35.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f5434e25d35.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f5e280ae06b.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f5e280ae06b.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f5f47ecb8f3.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f5f47ecb8f3.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f63dbc1d13e.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f63dbc1d13e.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f64257d41e5.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f64257d41e5.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f65d0e6304d.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f65d0e6304d.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f69019af080.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f69019af080.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f690a6cc216.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f690a6cc216.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f690c020359.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f690c020359.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp1-69f690c789617.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp1-69f690c789617.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp2-69f5431b52b1c.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp2-69f5431b52b1c.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp2-69f5438d6ae66.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp2-69f5438d6ae66.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp2-69f5e20790da7.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp2-69f5e20790da7.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp2-69f5e9f41e4b5.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp2-69f5e9f41e4b5.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp2-69f5eb847614c.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp2-69f5eb847614c.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp2-69f5f22271548.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp2-69f5f22271548.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp2-69f5f27460826.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp2-69f5f27460826.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp2-69f632f78b436.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp2-69f632f78b436.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp2-69f633e5033e5.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp2-69f633e5033e5.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp3-69f54054b3660.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp3-69f54054b3660.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp3-69f5435f43590.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp3-69f5435f43590.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp3-69f545d73353a.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp3-69f545d73353a.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp3-69f5e2f75d182.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp3-69f5e2f75d182.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp3-69f64d44649c6.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp3-69f64d44649c6.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/pfp3-69f64e398935e.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/pfp3-69f64e398935e.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/uploads/show-html-69f65b2d44a28.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/uploads/show-html-69f65b2d44a28.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/ProfileController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/ProfileController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html.twig" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/profile/edit.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/profile/edit.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/_delete_form.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/_delete_form.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/_form.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/_form.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/_mensaje_item.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/_mensaje_item.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/index.html.twig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/sala/show.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/sala/show.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -310,6 +259,7 @@
       <workItem from="1777966554177" duration="2518000" />
       <workItem from="1777999251829" duration="11879000" />
       <workItem from="1778061103398" duration="54000" />
+      <workItem from="1778084645866" duration="3959000" />
     </task>
     <servers />
   </component>
