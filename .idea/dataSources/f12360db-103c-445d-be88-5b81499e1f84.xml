@@ -3,17 +3,9 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.55">
     <root id="1">
       <DateStyle>mdy</DateStyle>
-      <Grants>1||-9223372036854775808|c|G
-1||10|c|G
-1||10|C|G
-1||10|T|G
-4||-9223372036854775808|c|G
-4||10|c|G
-4||10|C|G
-4||10|T|G</Grants>
-      <IntrospectionStateNumber>751</IntrospectionStateNumber>
+      <IntrospectionStateNumber>756</IntrospectionStateNumber>
       <ServerVersion>16.13</ServerVersion>
-      <StartupTime>1777966489</StartupTime>
+      <StartupTime>1777999591</StartupTime>
       <TimeZones>true ACDT
 true ACSST
 false ACST
@@ -809,7 +801,7 @@ true posixrules
 13273||10|C|G
 13273||-9223372036854775808|U|G
 13273||10|U|G</Grants>
-      <IntrospectionStateNumber>751</IntrospectionStateNumber>
+      <IntrospectionStateNumber>756</IntrospectionStateNumber>
       <ObjectId>16384</ObjectId>
       <OwnerName>app</OwnerName>
     </database>
@@ -824,7 +816,7 @@ true posixrules
 13273||10|C|G
 13273||-9223372036854775808|U|G
 13273||10|U|G</Grants>
-      <IntrospectionStateNumber>752</IntrospectionStateNumber>
+      <IntrospectionStateNumber>757</IntrospectionStateNumber>
       <ObjectId>5</ObjectId>
       <OwnerName>app</OwnerName>
     </database>
@@ -4727,10 +4719,10 @@ true posixrules
 13621||10|t|G
 13621||10|D|G
 13621||10|w|G</Grants>
-      <LastIntrospectionL1Xid>751</LastIntrospectionL1Xid>
-      <LastIntrospectionL2Xid>751</LastIntrospectionL2Xid>
+      <LastIntrospectionL1Xid>756</LastIntrospectionL1Xid>
+      <LastIntrospectionL2Xid>756</LastIntrospectionL2Xid>
       <LastIntrospectionLevel>2</LastIntrospectionLevel>
-      <LastIntrospectionLocalTimestamp>2026-05-05.07:37:46</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2026-05-05.16:49:22</LastIntrospectionLocalTimestamp>
       <LastIntrospectionVersion>260210</LastIntrospectionVersion>
       <ObjectId>13273</ObjectId>
       <StateNumber>530</StateNumber>
@@ -4739,9 +4731,9 @@ true posixrules
     <schema id="263" parent="2" name="pg_catalog">
       <AutoIntrospectionLevel>1</AutoIntrospectionLevel>
       <Comment>system catalog schema</Comment>
-      <LastIntrospectionL1Xid>751</LastIntrospectionL1Xid>
+      <LastIntrospectionL1Xid>756</LastIntrospectionL1Xid>
       <LastIntrospectionLevel>1</LastIntrospectionLevel>
-      <LastIntrospectionLocalTimestamp>2026-05-05.07:37:46</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2026-05-05.16:49:22</LastIntrospectionLocalTimestamp>
       <LastIntrospectionVersion>260210</LastIntrospectionVersion>
       <ObjectId>11</ObjectId>
       <StateNumber>524</StateNumber>
@@ -4751,11 +4743,11 @@ true posixrules
       <AutoIntrospectionLevel>3</AutoIntrospectionLevel>
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <LastIntrospectionL1Xid>751</LastIntrospectionL1Xid>
-      <LastIntrospectionL2Xid>751</LastIntrospectionL2Xid>
-      <LastIntrospectionL3Xid>751</LastIntrospectionL3Xid>
+      <LastIntrospectionL1Xid>756</LastIntrospectionL1Xid>
+      <LastIntrospectionL2Xid>756</LastIntrospectionL2Xid>
+      <LastIntrospectionL3Xid>756</LastIntrospectionL3Xid>
       <LastIntrospectionLevel>3</LastIntrospectionLevel>
-      <LastIntrospectionLocalTimestamp>2026-05-05.07:37:46</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2026-05-05.16:49:22</LastIntrospectionLocalTimestamp>
       <LastIntrospectionVersion>260210</LastIntrospectionVersion>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
@@ -8596,10 +8588,10 @@ true posixrules
 13621||10|t|G
 13621||10|D|G
 13621||10|w|G</Grants>
-      <LastIntrospectionL1Xid>752</LastIntrospectionL1Xid>
-      <LastIntrospectionL2Xid>752</LastIntrospectionL2Xid>
+      <LastIntrospectionL1Xid>757</LastIntrospectionL1Xid>
+      <LastIntrospectionL2Xid>757</LastIntrospectionL2Xid>
       <LastIntrospectionLevel>2</LastIntrospectionLevel>
-      <LastIntrospectionLocalTimestamp>2026-05-05.07:37:48</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2026-05-05.16:49:23</LastIntrospectionLocalTimestamp>
       <LastIntrospectionVersion>260210</LastIntrospectionVersion>
       <ObjectId>13273</ObjectId>
       <StateNumber>530</StateNumber>
@@ -8608,9 +8600,9 @@ true posixrules
     <schema id="507" parent="3" name="pg_catalog">
       <AutoIntrospectionLevel>1</AutoIntrospectionLevel>
       <Comment>system catalog schema</Comment>
-      <LastIntrospectionL1Xid>752</LastIntrospectionL1Xid>
+      <LastIntrospectionL1Xid>757</LastIntrospectionL1Xid>
       <LastIntrospectionLevel>1</LastIntrospectionLevel>
-      <LastIntrospectionLocalTimestamp>2026-05-05.07:37:48</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2026-05-05.16:49:23</LastIntrospectionLocalTimestamp>
       <LastIntrospectionVersion>260210</LastIntrospectionVersion>
       <ObjectId>11</ObjectId>
       <StateNumber>524</StateNumber>
@@ -8620,11 +8612,11 @@ true posixrules
       <AutoIntrospectionLevel>3</AutoIntrospectionLevel>
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <LastIntrospectionL1Xid>752</LastIntrospectionL1Xid>
-      <LastIntrospectionL2Xid>752</LastIntrospectionL2Xid>
-      <LastIntrospectionL3Xid>752</LastIntrospectionL3Xid>
+      <LastIntrospectionL1Xid>757</LastIntrospectionL1Xid>
+      <LastIntrospectionL2Xid>757</LastIntrospectionL2Xid>
+      <LastIntrospectionL3Xid>757</LastIntrospectionL3Xid>
       <LastIntrospectionLevel>3</LastIntrospectionLevel>
-      <LastIntrospectionLocalTimestamp>2026-05-05.07:37:48</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2026-05-05.16:49:23</LastIntrospectionLocalTimestamp>
       <LastIntrospectionVersion>260210</LastIntrospectionVersion>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
@@ -31188,7 +31180,7 @@ true posixrules
       <ObjectId>16395</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
       <StartValue>1</StartValue>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <OwnerName>app</OwnerName>
     </sequence>
@@ -31197,7 +31189,7 @@ true posixrules
       <ObjectId>16405</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
       <StartValue>1</StartValue>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <OwnerName>app</OwnerName>
     </sequence>
@@ -31206,7 +31198,7 @@ true posixrules
       <ObjectId>16450</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
       <StartValue>1</StartValue>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>bigint|0s</StoredType>
       <OwnerName>app</OwnerName>
     </sequence>
@@ -31215,7 +31207,7 @@ true posixrules
       <ObjectId>16417</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
       <StartValue>1</StartValue>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <OwnerName>app</OwnerName>
     </sequence>
@@ -31224,7 +31216,7 @@ true posixrules
       <ObjectId>16433</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
       <StartValue>1</StartValue>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <OwnerName>app</OwnerName>
     </sequence>
@@ -31233,63 +31225,63 @@ true posixrules
       <ObjectId>16439</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
       <StartValue>1</StartValue>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <OwnerName>app</OwnerName>
     </sequence>
     <table id="6091" parent="264" name="archivo">
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>16396</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>app</OwnerName>
     </table>
     <table id="6092" parent="264" name="doctrine_migration_versions">
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>16389</ObjectId>
-      <StateNumber>746</StateNumber>
+      <StateNumber>751</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>app</OwnerName>
     </table>
     <table id="6093" parent="264" name="mensaje">
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>16406</ObjectId>
-      <StateNumber>748</StateNumber>
+      <StateNumber>753</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>app</OwnerName>
     </table>
     <table id="6094" parent="264" name="messenger_messages">
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>16451</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>app</OwnerName>
     </table>
     <table id="6095" parent="264" name="sala">
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>16418</ObjectId>
-      <StateNumber>750</StateNumber>
+      <StateNumber>755</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>app</OwnerName>
     </table>
     <table id="6096" parent="264" name="sala_user">
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>16426</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>app</OwnerName>
     </table>
     <table id="6097" parent="264" name="tarea">
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>16434</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>app</OwnerName>
     </table>
     <table id="6098" parent="264" name="user">
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>16440</ObjectId>
-      <StateNumber>749</StateNumber>
+      <StateNumber>754</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>app</OwnerName>
     </table>
@@ -92358,7 +92350,7 @@ true posixrules
       <GeneratedKind>identity-by-default</GeneratedKind>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <SequenceId>16395</SequenceId>
       <TypeId>23</TypeId>
@@ -92366,49 +92358,49 @@ true posixrules
     <column id="23747" parent="6091" name="nombre_original">
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23748" parent="6091" name="nombre_servidor">
       <NotNull>1</NotNull>
       <Position>3</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23749" parent="6091" name="tipo">
       <NotNull>1</NotNull>
       <Position>4</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(50)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23750" parent="6091" name="sala_id">
       <NotNull>1</NotNull>
       <Position>5</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
     <column id="23751" parent="6091" name="subido_por_id">
       <NotNull>1</NotNull>
       <Position>6</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
     <foreign-key id="23752" parent="6091" name="fk_3529b482c51cdf3f">
       <ColNames>sala_id</ColNames>
       <ObjectId>16460</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16418</RefTableId>
     </foreign-key>
     <foreign-key id="23753" parent="6091" name="fk_3529b482446c2e6">
       <ColNames>subido_por_id</ColNames>
       <ObjectId>16465</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16440</RefTableId>
     </foreign-key>
@@ -92417,46 +92409,46 @@ true posixrules
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16401</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="23755" parent="6091" name="idx_3529b482c51cdf3f">
       <ColNames>sala_id</ColNames>
       <ObjectId>16403</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="23756" parent="6091" name="idx_3529b482446c2e6">
       <ColNames>subido_por_id</ColNames>
       <ObjectId>16404</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <key id="23757" parent="6091" name="archivo_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16402</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <UnderlyingIndexId>16401</UnderlyingIndexId>
     </key>
     <column id="23758" parent="6092" name="version">
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>746</StateNumber>
+      <StateNumber>751</StateNumber>
       <StoredType>varchar(191)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23759" parent="6092" name="executed_at">
       <DefaultExpression>NULL::timestamp without time zone</DefaultExpression>
       <Position>2</Position>
-      <StateNumber>746</StateNumber>
+      <StateNumber>751</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
     <column id="23760" parent="6092" name="execution_time">
       <Position>3</Position>
-      <StateNumber>746</StateNumber>
+      <StateNumber>751</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
@@ -92465,7 +92457,7 @@ true posixrules
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16393</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>746</StateNumber>
+      <StateNumber>751</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
       <CollationNames>default</CollationNames>
@@ -92476,82 +92468,82 @@ true posixrules
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16394</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>746</StateNumber>
+      <StateNumber>751</StateNumber>
       <UnderlyingIndexId>16393</UnderlyingIndexId>
     </key>
     <column id="23763" parent="6093" name="id">
       <GeneratedKind>identity-by-default</GeneratedKind>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <SequenceId>16405</SequenceId>
       <TypeId>23</TypeId>
     </column>
     <column id="23764" parent="6093" name="contenido">
       <Position>2</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
     <column id="23765" parent="6093" name="fecha_creacion">
       <NotNull>1</NotNull>
       <Position>3</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
     <column id="23766" parent="6093" name="archivo_url">
       <DefaultExpression>NULL::character varying</DefaultExpression>
       <Position>4</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23767" parent="6093" name="archivo_nombre">
       <DefaultExpression>NULL::character varying</DefaultExpression>
       <Position>5</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23768" parent="6093" name="autor_id">
       <NotNull>1</NotNull>
       <Position>6</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
     <column id="23769" parent="6093" name="sala_id">
       <Position>7</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
     <column id="23770" parent="6093" name="receptor_id">
       <Position>8</Position>
-      <StateNumber>748</StateNumber>
+      <StateNumber>753</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
     <foreign-key id="23771" parent="6093" name="fk_9b631d0114d45bbe">
       <ColNames>autor_id</ColNames>
       <ObjectId>16470</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16440</RefTableId>
     </foreign-key>
     <foreign-key id="23772" parent="6093" name="fk_9b631d01c51cdf3f">
       <ColNames>sala_id</ColNames>
       <ObjectId>16475</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16418</RefTableId>
     </foreign-key>
     <foreign-key id="23773" parent="6093" name="fk_9b631d01386d8d01">
       <ColNames>receptor_id</ColNames>
       <ObjectId>16495</ObjectId>
-      <StateNumber>748</StateNumber>
+      <StateNumber>753</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16440</RefTableId>
     </foreign-key>
@@ -92560,40 +92552,40 @@ true posixrules
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16413</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="23775" parent="6093" name="idx_9b631d0114d45bbe">
       <ColNames>autor_id</ColNames>
       <ObjectId>16415</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="23776" parent="6093" name="idx_9b631d01c51cdf3f">
       <ColNames>sala_id</ColNames>
       <ObjectId>16416</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="23777" parent="6093" name="idx_9b631d01386d8d01">
       <ColNames>receptor_id</ColNames>
       <ObjectId>16500</ObjectId>
-      <StateNumber>748</StateNumber>
+      <StateNumber>753</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <key id="23778" parent="6093" name="mensaje_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16414</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <UnderlyingIndexId>16413</UnderlyingIndexId>
     </key>
     <column id="23779" parent="6094" name="id">
       <GeneratedKind>identity-by-default</GeneratedKind>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>bigint|0s</StoredType>
       <SequenceId>16450</SequenceId>
       <TypeId>20</TypeId>
@@ -92601,42 +92593,42 @@ true posixrules
     <column id="23780" parent="6094" name="body">
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
     <column id="23781" parent="6094" name="headers">
       <NotNull>1</NotNull>
       <Position>3</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
     <column id="23782" parent="6094" name="queue_name">
       <NotNull>1</NotNull>
       <Position>4</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(190)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23783" parent="6094" name="created_at">
       <NotNull>1</NotNull>
       <Position>5</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
     <column id="23784" parent="6094" name="available_at">
       <NotNull>1</NotNull>
       <Position>6</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
     <column id="23785" parent="6094" name="delivered_at">
       <DefaultExpression>NULL::timestamp without time zone</DefaultExpression>
       <Position>7</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
@@ -92645,7 +92637,7 @@ true posixrules
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16457</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
@@ -92655,7 +92647,7 @@ available_at
 delivered_at
 id</ColNames>
       <ObjectId>16459</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>403</AccessMethodId>
       <CollationNames>default</CollationNames>
       <CollationIds>100</CollationIds>
@@ -92665,14 +92657,14 @@ id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16458</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <UnderlyingIndexId>16457</UnderlyingIndexId>
     </key>
     <column id="23789" parent="6095" name="id">
       <GeneratedKind>identity-by-default</GeneratedKind>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <SequenceId>16417</SequenceId>
       <TypeId>23</TypeId>
@@ -92680,41 +92672,41 @@ id</ColNames>
     <column id="23790" parent="6095" name="nombre">
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23791" parent="6095" name="descripcion">
       <Position>3</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
     <column id="23792" parent="6095" name="categoria">
       <NotNull>1</NotNull>
       <Position>4</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23793" parent="6095" name="creador_id">
       <NotNull>1</NotNull>
       <Position>5</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
     <column id="23794" parent="6095" name="token">
       <DefaultExpression>NULL::character varying</DefaultExpression>
       <Position>6</Position>
-      <StateNumber>750</StateNumber>
+      <StateNumber>755</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <foreign-key id="23795" parent="6095" name="fk_e226041c62f40c3d">
       <ColNames>creador_id</ColNames>
       <ObjectId>16480</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16440</RefTableId>
     </foreign-key>
@@ -92723,34 +92715,34 @@ id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16423</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="23797" parent="6095" name="idx_e226041c62f40c3d">
       <ColNames>creador_id</ColNames>
       <ObjectId>16425</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <key id="23798" parent="6095" name="sala_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16424</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <UnderlyingIndexId>16423</UnderlyingIndexId>
     </key>
     <column id="23799" parent="6096" name="sala_id">
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
     <column id="23800" parent="6096" name="user_id">
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
@@ -92758,7 +92750,7 @@ id</ColNames>
       <ColNames>sala_id</ColNames>
       <ObjectId>16485</ObjectId>
       <OnDelete>cascade</OnDelete>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16418</RefTableId>
     </foreign-key>
@@ -92766,7 +92758,7 @@ id</ColNames>
       <ColNames>user_id</ColNames>
       <ObjectId>16490</ObjectId>
       <OnDelete>cascade</OnDelete>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>16440</RefTableId>
     </foreign-key>
@@ -92776,34 +92768,34 @@ user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16429</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="23804" parent="6096" name="idx_aa4ce0bac51cdf3f">
       <ColNames>sala_id</ColNames>
       <ObjectId>16431</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="23805" parent="6096" name="idx_aa4ce0baa76ed395">
       <ColNames>user_id</ColNames>
       <ObjectId>16432</ObjectId>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <key id="23806" parent="6096" name="sala_user_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16430</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <UnderlyingIndexId>16429</UnderlyingIndexId>
     </key>
     <column id="23807" parent="6097" name="id">
       <GeneratedKind>identity-by-default</GeneratedKind>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <SequenceId>16433</SequenceId>
       <TypeId>23</TypeId>
@@ -92811,7 +92803,7 @@ user_id</ColNames>
     <column id="23808" parent="6097" name="nombre">
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
@@ -92820,7 +92812,7 @@ user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16437</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
@@ -92828,14 +92820,14 @@ user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16438</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <UnderlyingIndexId>16437</UnderlyingIndexId>
     </key>
     <column id="23811" parent="6098" name="id">
       <GeneratedKind>identity-by-default</GeneratedKind>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>integer|0s</StoredType>
       <SequenceId>16439</SequenceId>
       <TypeId>23</TypeId>
@@ -92843,48 +92835,48 @@ user_id</ColNames>
     <column id="23812" parent="6098" name="email">
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StateNumber>749</StateNumber>
+      <StateNumber>754</StateNumber>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23813" parent="6098" name="roles">
       <NotNull>1</NotNull>
       <Position>3</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>json|0s</StoredType>
       <TypeId>114</TypeId>
     </column>
     <column id="23814" parent="6098" name="password">
       <NotNull>1</NotNull>
       <Position>4</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23815" parent="6098" name="username">
       <NotNull>1</NotNull>
       <Position>5</Position>
-      <StateNumber>749</StateNumber>
+      <StateNumber>754</StateNumber>
       <StoredType>varchar(50)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23816" parent="6098" name="foto_perfil">
       <DefaultExpression>NULL::character varying</DefaultExpression>
       <Position>6</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="23817" parent="6098" name="biografia">
       <Position>7</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
     <column id="23818" parent="6098" name="ciudad">
       <DefaultExpression>NULL::character varying</DefaultExpression>
       <Position>8</Position>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
@@ -92893,14 +92885,14 @@ user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16447</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>749</StateNumber>
+      <StateNumber>754</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="23820" parent="6098" name="uniq_identifier_email">
       <ColNames>email</ColNames>
       <ObjectId>16501</ObjectId>
-      <StateNumber>749</StateNumber>
+      <StateNumber>754</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
       <CollationNames>default</CollationNames>
@@ -92910,7 +92902,7 @@ user_id</ColNames>
     <index id="23821" parent="6098" name="uniq_8d93d649f85e0677">
       <ColNames>username</ColNames>
       <ObjectId>16516</ObjectId>
-      <StateNumber>749</StateNumber>
+      <StateNumber>754</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
       <CollationNames>default</CollationNames>
@@ -92921,7 +92913,7 @@ user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>16448</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>747</StateNumber>
+      <StateNumber>752</StateNumber>
       <UnderlyingIndexId>16447</UnderlyingIndexId>
     </key>
     <check id="23823" parent="6099" name="cardinal_number_domain_check">
