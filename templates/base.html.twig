@@ -606,7 +606,7 @@
         {% if app.user %}
         const username = '{{ app.user.username|e('js') }}';
         const userId = '{{ app.user.id }}';
-        const mercureUrl = new URL("{{ mercure_public_url|default('http://localhost/.well-known/mercure')|raw }}");
+        const mercureUrl = new URL('http://localhost:3000/.well-known/mercure');
 
         let chatContext = { type: 'sala', id: null, name: '' };
         let activeEventSource = null;
