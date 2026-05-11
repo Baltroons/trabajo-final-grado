@@ -47,7 +47,12 @@ class ChatController extends AbstractController
                 $extension = $file->guessExtension() ?? $file->getClientOriginalExtension();
                 $newFilename = $slugger->slug(pathinfo($originalName, PATHINFO_FILENAME)).'-'.uniqid().'.'.$extension;
 
-                $file->move($this->getParameter('kernel.project_dir').'/public/uploads', $newFilename);
+                $uploadDir = $this->getParameter('kernel.project_dir').'/public/uploads';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true); // Evita error 500 si no existe
+                }
+
+                $file->move($uploadDir, $newFilename);
 
                 $mensaje->setArchivoUrl('/uploads/' . $newFilename);
                 $mensaje->setArchivoNombre($originalName);
@@ -68,11 +73,11 @@ class ChatController extends AbstractController
             // --- MERCURE Y RESPUESTA ---
             $mensajeData = json_encode($mensaje->toArray());
 
-            // 1. Hacemos público el mensaje de la sala
+            // 1. Hacemos público el mensaje de la sala (CAMBIO AQUÍ: false por [])
             $hub->publish(new Update(
                 "https://brainhub.com/sala/{$salaId}",
                 $mensajeData,
-                false // <-- ¡AÑADIDO! private: false
+                false
             ));
 
             $receptores = new \Doctrine\Common\Collections\ArrayCollection($sala->getMiembros()->toArray());
@@ -82,11 +87,11 @@ class ChatController extends AbstractController
 
             foreach ($receptores as $miembro) {
                 if ($miembro->getId() !== $user->getId()) {
-                    // 2. Hacemos pública la notificación personal
+                    // 2. Hacemos pública la notificación personal (CAMBIO AQUÍ: false por [])
                     $hub->publish(new Update(
                         "https://brainhub.com/notifs/{$miembro->getId()}",
                         $mensajeData,
-                        false // <-- ¡AÑADIDO! private: false
+                        false
                     ));
                 }
             }
@@ -94,6 +99,7 @@ class ChatController extends AbstractController
             return new JsonResponse(['status' => 'OK']);
 
         } catch (\Exception $e) {
+            // Log the error to the Docker PHP logs
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
@@ -109,14 +115,14 @@ class ChatController extends AbstractController
 
         $topic = $type === 'sala' ? "https://brainhub.com/sala/{$id}" : "https://brainhub.com/user/{$id}";
 
-        // 3. Hacemos público el evento "escribiendo..."
+        // 3. Hacemos público el evento "escribiendo..." (CAMBIO AQUÍ: false por [])
         $hub->publish(new Update(
             $topic,
             json_encode([
                 'isTyping' => true,
                 'autor'    => $user->getUsername()
             ]),
-            false // <-- ¡AÑADIDO! private: false
+            false
         ));
 
         return new JsonResponse(['status' => 'OK']);
@@ -137,7 +143,6 @@ class ChatController extends AbstractController
         if ($type === 'sala') {
             $sala = $salaRepo->find($id);
             if ($sala) {
-                // Obtenemos los últimos 50 mensajes de la sala
                 $mensajes = $mensajeRepo->findBy(['sala' => $sala], ['fechaCreacion' => 'ASC'], 50);
                 foreach ($mensajes as $m) {
                     $mensajesData[] = $m->toArray();

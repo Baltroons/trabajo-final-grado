@@ -6,6 +6,11 @@ services:
             - .:/var/www/html
         environment:
             DATABASE_URL: "postgresql://app:password@database:5432/app?serverVersion=16&charset=utf8"
+            MERCURE_URL: "http://mercure:3000/.well-known/mercure"
+            MERCURE_PUBLIC_URL: "http://localhost:3000/.well-known/mercure"
+            MERCURE_JWT_SECRET: "brainhub_secret_32_characters_long_key"
+            APP_ENV: "dev"   # <--- ADD THIS LINE
+            APP_DEBUG: "1"   # <--- ADD THIS LINE
 
     # El servidor web (Nginx)
     nginx:

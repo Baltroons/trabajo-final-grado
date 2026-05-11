@@ -20,12 +20,9 @@ ENV DEFAULT_URI="https://localhost"
 
 # Variables de Mercure (Relleno para que Symfony compile)
 ENV MERCURE_URL="http://mercure/.well-known/mercure"
-ENV MERCURE_PUBLIC_URL="https://localhost/.well-known/mercure"
+ENV MERCURE_PUBLIC_URL="https://localhost:3000/.well-known/mercure"
 ENV MERCURE_JWT_SECRET="brainhub_secret_32_characters_long_key"
 # ----------------------------------------------
-
-# 3. Copiamos y preparamos archivos
-# ...
 
 # 3. Copiamos y preparamos archivos
 COPY . .

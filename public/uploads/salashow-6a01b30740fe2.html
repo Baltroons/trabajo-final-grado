@@ -16,17 +16,6 @@
         .scale-in { animation: scaleIn 0.3s ease-out; }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-        /* Animación para los puntos suspensivos de "escribiendo" */
-        @keyframes blinkDots {
-            0%, 20% { opacity: 0; transform: translateY(1px); }
-            50% { opacity: 1; transform: translateY(-1px); }
-            80%, 100% { opacity: 0; transform: translateY(1px); }
-        }
-        .typing-dots span { display: inline-block; animation: blinkDots 1.4s infinite both; font-weight: bold; }
-        .typing-dots span:nth-child(1) { animation-delay: 0s; }
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
         /* Estilo dinámico cuando se arrastra un archivo sobre el chat */
         .drag-over {
             border: 2px dashed #10b981 !important;
@@ -93,11 +82,11 @@
                 </div>
 
                 <div class="p-4 bg-white dark:bg-darkCard border-t border-gray-100 dark:border-darkBorder">
-                    {# Animación "Usuario está escribiendo..." #}
-                    <div id="typing-indicator" class="text-xs text-emerald-500 mb-2 h-4 opacity-0 transition-opacity flex items-center gap-1 ml-4">
-                        <span id="typing-username" class="font-bold">Alguien</span>
-                        <span>está escribiendo</span>
-                        <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
+
+                    {# Adaptado para usar el mismo estilo de animación base #}
+                    <div id="typing-indicator" class="hidden text-xs text-emerald-500 mb-2 flex items-center gap-2 ml-4 italic">
+                        <span id="typing-username" class="font-bold">Alguien</span> está escribiendo
+                        <svg width="16" height="16" viewBox="0 0 24 24"><circle class="typing-dot" cx="4" cy="12" r="3" fill="currentColor"/><circle class="typing-dot" cx="12" cy="12" r="3" fill="currentColor"/><circle class="typing-dot" cx="20" cy="12" r="3" fill="currentColor"/></svg>
                     </div>
 
                     <div class="flex items-end gap-3 bg-gray-100 dark:bg-darkBg p-2 rounded-[2rem]">
@@ -113,9 +102,8 @@
                 </div>
             </div>
 
-            {# PESTAÑA 2: ARCHIVOS (GALERÍA + BUSCADOR + PAGINACIÓN) #}
+            {# PESTAÑA 2: ARCHIVOS (GALERÍA INTEGRADA AL VISOR BASE) #}
             <div id="content-archivos" class="tab-content hidden">
-                {# Buscador de Archivos #}
                 <div class="mb-6 flex justify-between items-center bg-white dark:bg-darkCard p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-darkBorder">
                     <div class="flex items-center pl-4 w-full">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -123,19 +111,16 @@
                     </div>
                 </div>
 
-                {# Grid de Archivos #}
                 <div id="archivos-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-
-                    {# RECORREMOS TU COLECCIÓN USANDO LOS NOMBRES CORRECTOS #}
                     {% for archivo in sala.archivos %}
-
                         {% set ext = archivo.tipo|default(archivo.nombreServidor|split('.')|last)|lower %}
                         {% set isImg = ext in ['jpg', 'jpeg', 'png', 'webp', 'gif'] %}
-                        {% set fileUrl = asset('uploads/chat/' ~ archivo.nombreServidor) %}
+                        {% set fileUrl = asset('uploads/' ~ archivo.nombreServidor) %}
+                        {% set tipoPreview = isImg ? 'image' : (ext == 'pdf' ? 'pdf' : 'other') %}
 
                         <div class="archivo-item bg-white dark:bg-darkCard rounded-2xl border border-gray-100 dark:border-darkBorder overflow-hidden group hover:shadow-xl transition-all relative flex flex-col h-48"
                              data-nombre="{{ archivo.nombreOriginal|lower }}"
-                             data-autor="{{ archivo.subidoPor.username|lower }}"> {# Corregido: subidoPor #}
+                             data-autor="{{ archivo.subidoPor.username|lower }}">
 
                             <div class="flex-1 bg-gray-50 dark:bg-black/20 flex items-center justify-center overflow-hidden relative">
                                 {% if isImg %}
@@ -146,17 +131,18 @@
                                     </div>
                                 {% endif %}
 
-                                <a href="{{ fileUrl }}" target="_blank" download class="absolute inset-0 bg-emerald-600/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm z-10">
+                                {# SE AÑADE LA INTEGRACIÓN CON EL MODAL DEL BASE A TRAVÉS DE openPreview() #}
+                                <button onclick="window.openPreview('{{ fileUrl }}', '{{ tipoPreview }}')" class="absolute inset-0 bg-emerald-600/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm z-10 cursor-pointer border-none outline-none">
                                     <div class="flex flex-col items-center text-white">
-                                        <svg class="w-8 h-8 mb-1 transform scale-50 group-hover:scale-100 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                        <span class="text-[10px] font-bold uppercase tracking-widest">Descargar</span>
+                                        <svg class="w-8 h-8 mb-1 transform scale-50 group-hover:scale-100 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest">Ver Previa</span>
                                     </div>
-                                </a>
+                                </button>
                             </div>
 
                             <div class="p-3 bg-white dark:bg-darkCard border-t border-gray-50 dark:border-white/5 z-20">
                                 <p class="font-bold text-xs text-gray-800 dark:text-white truncate" title="{{ archivo.nombreOriginal }}">{{ archivo.nombreOriginal }}</p>
-                                <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-1">Por {{ archivo.subidoPor.username }}</p> {# Corregido: subidoPor #}
+                                <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-1">Por {{ archivo.subidoPor.username }}</p>
                             </div>
                         </div>
                     {% else %}
@@ -183,6 +169,7 @@
 
             {# PESTAÑA 3: DETALLES Y MIEMBROS #}
             <div id="content-detalles" class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {# ... Se mantiene exactamente igual, solo datos y visualización ... #}
                 <div class="lg:col-span-1 bg-white dark:bg-darkCard p-8 rounded-[2.5rem] border border-gray-100 dark:border-darkBorder h-fit">
                     <h3 class="text-xl font-bold dark:text-white mb-6">Información General</h3>
                     <div class="space-y-6">
@@ -227,12 +214,12 @@
 
     {# --- MODALES --- #}
     {% if app.user == sala.creador %}
-        <div id="edit-sala-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-darkCard w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl scale-in">
+        <div id="edit-sala-modal" class="hidden fixed inset-0 z-[500] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-darkCard w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl scale-in relative">
                 <form id="form-edit-sala-spa" action="{{ path('app_sala_edit_ajax', {id: sala.id}) }}" method="POST" class="space-y-5">
                     <h2 class="text-3xl font-black mb-2 dark:text-white">Ajustes de Sala</h2>
-                    <div><label class="block text-xs font-bold uppercase text-gray-400 mb-2 ml-1">Nombre</label><input type="text" name="sala[nombre]" value="{{ sala.nombre }}" required class="w-full bg-gray-100 dark:bg-darkBg border-none rounded-2xl px-5 py-4 dark:text-white"></div>
-                    <div><label class="block text-xs font-bold uppercase text-gray-400 mb-2 ml-1">Descripción</label><textarea name="sala[descripcion]" rows="3" class="w-full bg-gray-100 dark:bg-darkBg border-none rounded-2xl px-5 py-4 dark:text-white">{{ sala.descripcion }}</textarea></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-400 mb-2 ml-1">Nombre</label><input type="text" name="sala[nombre]" value="{{ sala.nombre }}" required class="w-full bg-gray-100 dark:bg-darkBg border-none rounded-2xl px-5 py-4 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"></div>
+                    <div><label class="block text-xs font-bold uppercase text-gray-400 mb-2 ml-1">Descripción</label><textarea name="sala[descripcion]" rows="3" class="w-full bg-gray-100 dark:bg-darkBg border-none rounded-2xl px-5 py-4 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500">{{ sala.descripcion }}</textarea></div>
                     <div class="flex gap-4 pt-4">
                         <button type="button" onclick="closeEditModal()" class="flex-1 py-4 text-gray-400 font-bold hover:bg-gray-50 dark:hover:bg-darkBg rounded-2xl">Cancelar</button>
                         <button type="submit" class="flex-[2] py-4 bg-emerald-600 text-white font-black rounded-2xl shadow-lg hover:bg-emerald-700">Guardar</button>
@@ -242,7 +229,7 @@
         </div>
     {% endif %}
 
-    <div id="invite-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="invite-modal" class="hidden fixed inset-0 z-[500] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl scale-in">
             <h2 class="text-2xl font-black mb-2 dark:text-white">Invitar Estudiantes</h2>
             <div class="relative mt-4">
@@ -279,7 +266,7 @@
             if(input) {
                 input.select();
                 navigator.clipboard.writeText(input.value);
-                Swal.fire({ icon: 'success', title: 'Enlace copiado', showConfirmButton: false, timer: 1000 });
+                Swal.fire({ icon: 'success', title: 'Enlace copiado', showConfirmButton: false, timer: 1000, toast: true, position: 'top-end' });
             }
         }
 
@@ -288,7 +275,6 @@
         // ====================================================================
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- A. ELEMENTOS DEL CHAT ---
             const muro = document.getElementById('muro-mensajes-foro');
             const chatInput = document.getElementById('chat-input');
             const btnEnviarChat = document.getElementById('btn-enviar-chat');
@@ -302,7 +288,6 @@
             const previewSize = document.getElementById('chat-file-size');
             const fileClear = document.getElementById('chat-file-clear');
 
-            // --- B. LÓGICA DE PREVIEW LOCAL (Cajita antes de enviar el mensaje) ---
             if(fileInput && previewContainer) {
                 fileInput.addEventListener('change', (e) => {
                     const file = e.target.files[0];
@@ -328,7 +313,6 @@
                 });
             }
 
-            // --- C. DRAG & DROP ---
             const dropZone = document.getElementById('content-muro');
             if(dropZone && fileInput) {
                 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -348,12 +332,11 @@
                 }, false);
             }
 
-            // --- D. LÓGICA DE PAGINACIÓN DE LA GALERÍA DE ARCHIVOS (PESTAÑA 2) ---
             const allArchivos = Array.from(document.querySelectorAll('.archivo-item'));
             const searchArchivosInput = document.getElementById('search-archivos');
 
             if (allArchivos.length > 0) {
-                const ITEMS_PER_PAGE = 8; // Muestra 8 archivos por página
+                const ITEMS_PER_PAGE = 8;
                 let currentArchivosPage = 1;
                 let filteredArchivos = [...allArchivos];
 
@@ -390,39 +373,39 @@
                 document.getElementById('btn-next-archivos')?.addEventListener('click', () => { if (currentArchivosPage < Math.ceil(filteredArchivos.length / ITEMS_PER_PAGE)) { currentArchivosPage++; renderArchivos(); } });
             }
 
-            // --- E. CHAT EN TIEMPO REAL ---
             if(muro && chatInput && btnEnviarChat) {
 
                 function appendMessage(data) {
                     const isMe = data.autor === "{{ app.user.username }}";
                     const alignClass = isMe ? 'justify-end' : 'justify-start';
-                    const bubbleClass = isMe ? 'bg-emerald-600 text-white bubble-me' : 'bg-white border border-gray-100 bubble-others text-gray-800';
+                    const bubbleClass = isMe ? 'bg-emerald-600 text-white bubble-me' : 'bg-white border border-gray-100 bubble-others text-gray-800 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700';
 
                     let archivoHtml = '';
                     if (data.archivoUrl) {
                         const url = data.archivoUrl;
                         const ext = url.split('.').pop().toLowerCase();
                         const isImg = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext);
+                        const isPdf = ext === 'pdf';
                         const name = url.split('/').pop();
+                        const tipoPreview = isImg ? 'image' : (isPdf ? 'pdf' : 'other');
 
+                        // INTEGRACIÓN BASE: Llamamos al window.openPreview() centralizado para todo tipo de archivo visualizable
                         if (isImg) {
                             archivoHtml = `
-                        <div class="mt-2 rounded-lg overflow-hidden border border-black/10 bg-white/10">
-                            <a href="${url}" target="_blank">
-                                <img src="${url}" class="max-w-full h-auto max-h-64 object-cover hover:opacity-90 transition transform duration-300">
-                            </a>
+                        <div class="mt-2 rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-white/10 cursor-pointer" onclick="window.openPreview('${url}', 'image')">
+                            <img src="${url}" class="max-w-full h-auto max-h-64 object-cover hover:opacity-90 hover:scale-105 transition transform duration-300">
                         </div>`;
                         } else {
                             archivoHtml = `
-                        <a href="${url}" target="_blank" download class="mt-2 flex items-center gap-3 p-2 border ${isMe ? 'border-emerald-400 bg-emerald-700/50' : 'border-gray-200 bg-black/5'} hover:opacity-80 transition-colors rounded-lg">
-                            <div class="bg-blue-500 p-2 rounded text-white shadow-sm">
+                        <button onclick="${isPdf || ext === 'other' ? `window.openPreview('${url}', '${tipoPreview}')` : `window.open('${url}', '_blank')`}" class="mt-2 flex items-center gap-3 p-2 border ${isMe ? 'border-emerald-400 bg-emerald-700/50' : 'border-gray-200 dark:border-gray-600 bg-black/5 dark:bg-black/20'} hover:opacity-80 transition-colors rounded-lg text-left w-full cursor-pointer outline-none">
+                            <div class="bg-blue-500 p-2 rounded text-white shadow-sm shrink-0">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             </div>
                             <div class="flex flex-col truncate">
                                 <span class="text-xs font-bold truncate max-w-[150px]">${name}</span>
-                                <span class="text-[9px] uppercase tracking-wider opacity-70">Descargar / Abrir</span>
+                                <span class="text-[9px] uppercase tracking-wider opacity-70">Ver archivo</span>
                             </div>
-                        </a>`;
+                        </button>`;
                         }
                     }
 
@@ -432,7 +415,7 @@
             <div class="flex ${alignClass} message-anim mb-4">
                 <div class="max-w-[85%] md:max-w-[70%]">
                     <div class="flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}">
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400">${data.autor}</span>
+                        <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">${data.autor}</span>
                     </div>
                     <div class="px-5 py-3 rounded-[1.5rem] shadow-sm ${bubbleClass} text-sm break-words">
                         ${contenidoTexto}
@@ -445,7 +428,6 @@
                     muro.scrollTo({ top: muro.scrollHeight, behavior: 'smooth' });
                 }
 
-                // Historial
                 fetch("{{ path('app_chat_history', {type: 'sala', id: sala.id}) }}")
                     .then(r => r.json())
                     .then(mensajes => {
@@ -453,7 +435,6 @@
                         muro.scrollTop = muro.scrollHeight;
                     });
 
-                // Enviar Mensaje
                 const enviarMensaje = () => {
                     const texto = chatInput.value.trim();
                     if (!texto && (!fileInput || !fileInput.files[0])) return;
@@ -467,7 +448,6 @@
                     if(fileInput) fileInput.value = '';
                     if(previewContainer) previewContainer.classList.add('hidden');
 
-                    // Enviamos mediante fetch; el mensaje lo pintará Mercure
                     fetch("{{ path('app_chat_send') }}", { method: 'POST', body: formData })
                         .catch(e => console.error("Error al enviar mensaje", e));
                 };
@@ -480,13 +460,11 @@
                     }
                 });
 
-                // Escribiendo...
                 let typingTimer;
                 chatInput.addEventListener('input', () => {
                     fetch("{{ path('app_chat_typing', {'type': 'sala', 'id': sala.id}) }}", { method: 'POST' }).catch(() => {});
                 });
 
-                // === CONEXIÓN MERCURE FORO ===
                 if(typeof EventSource !== 'undefined') {
                     const topic = "https://brainhub.com/sala/{{ sala.id }}";
                     const mercureUrlBase = "{{ mercure_public_url|default('http://localhost/.well-known/mercure')|raw }}";
@@ -509,9 +487,11 @@
 
                         if (data.isTyping && data.autor !== "{{ app.user.username }}") {
                             if(typingUsername) typingUsername.textContent = data.autor;
-                            if(typingIndicator) typingIndicator.style.opacity = "1";
-                            clearTimeout(typingTimer);
-                            typingTimer = setTimeout(() => { if(typingIndicator) typingIndicator.style.opacity = "0" }, 2500);
+                            if(typingIndicator) {
+                                typingIndicator.classList.remove('hidden');
+                                clearTimeout(typingTimer);
+                                typingTimer = setTimeout(() => typingIndicator.classList.add('hidden'), 2500);
+                            }
                         }
                     };
 
@@ -519,7 +499,6 @@
                 }
             }
 
-            // --- F. EDICIÓN SPA ---
             const formEdit = document.getElementById('form-edit-sala-spa');
             if (formEdit) {
                 formEdit.addEventListener('submit', function(e) {
@@ -539,4 +518,8 @@
             }
         });
     </script>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
 {% endblock %}
