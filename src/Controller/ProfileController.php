@@ -43,8 +43,9 @@ class ProfileController extends AbstractController
             }
 
             $em->flush();
-            $this->addFlash('success', '¡Perfil actualizado!');
-            return $this->redirectToRoute('app_home');
+
+            $this->addFlash('success', '¡Perfil actualizado correctamente!');
+            return $this->redirectToRoute('app_profile_edit');
         }
 
         return $this->render('profile/edit.html.twig', ['user' => $user]);

@@ -3,7 +3,7 @@
 {% block title %}Editar Perfil{% endblock %}
 
 {% block body %}
-    {# Contenedor principal — usa el mismo fondo que la base #}
+    {# Contenedor principal #}
     <div class="min-h-screen bg-[#f3f4f6] dark:bg-darkBg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
 
         <div class="max-w-xl w-full space-y-8 bg-white dark:bg-darkCard p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-darkBorder animate-fade-in">
@@ -17,83 +17,96 @@
                 </p>
             </div>
 
-            {# Manejo de mensajes Flash adaptado a dark mode #}
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <div class="p-4 rounded-xl mb-4 {{ label == 'error'
-                ? 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800/50'
-                : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50' }}">
-                    <p class="text-sm font-medium">{{ message }}</p>
-                </div>
-            {% endfor %}
-        {% endfor %}
+            {# --- SE HA ELIMINADO EL BLOQUE DE FLASHES EN HTML --- #}
 
-        <form action="{{ path('app_profile_edit') }}" method="POST" enctype="multipart/form-data" class="mt-8 space-y-6">
+            <form action="{{ path('app_profile_edit') }}" method="POST" enctype="multipart/form-data" class="mt-8 space-y-6">
 
-            {# Foto de Perfil Actual #}
-            <div class="flex flex-col items-center mb-6">
-                <div class="relative h-32 w-32 mb-2 group">
-                    {% if user.fotoPerfil %}
-                        <img src="{{ asset('uploads/profiles/' ~ user.fotoPerfil) }}" alt="Avatar"
-                             class="h-32 w-32 rounded-full object-cover border-4 border-emerald-300 dark:border-emerald-700 shadow-sm group-hover:shadow-md transition-shadow">
-                    {% else %}
-                        <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" alt="Avatar"
-                             class="h-32 w-32 rounded-full border-4 border-emerald-300 dark:border-emerald-700 shadow-sm group-hover:shadow-md transition-shadow">
-                    {% endif %}
-                    {# Indicador visual para cambiar foto #}
-                        <div class="absolute inset-0 rounded-full bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                {# Foto de Perfil Actual (Clickeable y con Zoom) #}
+                <div class="flex flex-col items-center mb-6">
+
+                    <label for="foto_perfil" class="relative h-36 w-36 mb-2 group cursor-pointer inline-block transition-transform duration-300 hover:scale-110">
+                        {% if user.fotoPerfil %}
+                            <img id="img-preview" src="{{ asset('uploads/profiles/' ~ user.fotoPerfil) }}" alt="Avatar"
+                                 class="h-full w-full rounded-full object-cover border-4 border-emerald-300 dark:border-emerald-700 shadow-sm">
+                        {% else %}
+                            <img id="img-preview" src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" alt="Avatar"
+                                 class="h-full w-full rounded-full border-4 border-emerald-300 dark:border-emerald-700 shadow-sm">
+                        {% endif %}
+
+                        {# Indicador visual al pasar el ratón #}
+                        <div class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                            <div class="text-center text-white">
+                                <svg class="w-8 h-8 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span class="text-[10px] font-bold uppercase tracking-wider">Cambiar</span>
+                            </div>
                         </div>
-                    </div>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 font-medium mt-1">Pasa el cursor para previsualizar</p>
+                    </label>
+
+                    <p class="text-xs text-gray-400 dark:text-gray-500 font-medium mt-1">Haz clic en la foto para cambiarla</p>
                 </div>
 
                 {# Campos del formulario #}
-                    <div class="space-y-4">
-                        <div>
-                            <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre de Usuario</label>
-                            <input type="text" name="username" id="username" value="{{ user.username }}" required
-                                   class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-darkBg border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-500 dark:focus:border-emerald-600 text-sm text-gray-900 dark:text-gray-100 outline-none transition-all">
-                        </div>
-
-                        <div>
-                            <label for="ciudad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ciudad</label>
-                            <input type="text" name="ciudad" id="ciudad" value="{{ user.ciudad }}"
-                                   class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-darkBg border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-500 dark:focus:border-emerald-600 text-sm text-gray-900 dark:text-gray-100 outline-none transition-all">
-                        </div>
-
-                        <div>
-                            <label for="biografia" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Biografía</label>
-                            <textarea name="biografia" id="biografia" rows="4"
-                                      class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-darkBg border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-500 dark:focus:border-emerald-600 text-sm text-gray-900 dark:text-gray-100 outline-none transition-all resize-none">{{ user.biografia }}</textarea>
-                        </div>
-
-                        <div>
-                            <label for="foto_perfil" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cambiar foto de perfil</label>
-                            <input type="file" name="foto_perfil" id="foto_perfil" accept="image/*"
-                                   class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
-                                  file:mr-4 file:py-2 file:px-4
-                                  file:rounded-xl file:border-0
-                                  file:text-sm file:font-semibold
-                                  file:bg-emerald-50 dark:file:bg-emerald-900/40 file:text-emerald-700 dark:file:text-emerald-400
-                                  hover:file:bg-emerald-100 dark:hover:file:bg-emerald-900/60 transition-colors
-                                  file:cursor-pointer">
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Formatos permitidos: JPG, PNG, WEBP.</p>
-                        </div>
+                <div class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre de Usuario</label>
+                        <input type="text" name="username" id="username" value="{{ user.username }}" required
+                               class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-darkBg border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-500 dark:focus:border-emerald-600 text-sm text-gray-900 dark:text-gray-100 outline-none transition-all">
                     </div>
 
-                    {# Botones de acción #}
-                    <div class="flex flex-col gap-3 pt-4">
-                        <button type="submit"
-                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-emerald-700 hover:bg-emerald-600 dark:bg-emerald-800 dark:hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-offset-darkCard transition-all shadow-lg shadow-emerald-900/20">
-                            Guardar Cambios
-                        </button>
-                        <a href="{{ path('app_home') }}"
-                           class="w-full flex justify-center py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-darkBg hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-offset-darkCard transition-all">
-                            Cancelar
-                        </a>
+                    <div>
+                        <label for="ciudad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ciudad</label>
+                        <input type="text" name="ciudad" id="ciudad" value="{{ user.ciudad }}"
+                               class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-darkBg border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-500 dark:focus:border-emerald-600 text-sm text-gray-900 dark:text-gray-100 outline-none transition-all">
                     </div>
+
+                    <div>
+                        <label for="biografia" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Biografía</label>
+                        <textarea name="biografia" id="biografia" rows="4"
+                                  class="mt-1 block w-full px-4 py-3 bg-gray-50 dark:bg-darkBg border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-500 dark:focus:border-emerald-600 text-sm text-gray-900 dark:text-gray-100 outline-none transition-all resize-none">{{ user.biografia }}</textarea>
+                    </div>
+
+                    {# Input file oculto #}
+                    <div class="hidden">
+                        <input type="file" name="foto_perfil" id="foto_perfil" accept="image/*">
+                    </div>
+                </div>
+
+                {# Botones de acción #}
+                <div class="flex flex-col gap-3 pt-4">
+                    <button type="submit"
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-emerald-700 hover:bg-emerald-600 dark:bg-emerald-800 dark:hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-offset-darkCard transition-all shadow-lg shadow-emerald-900/20">
+                        Guardar Cambios
+                    </button>
+                    <a href="{{ path('app_home') }}"
+                       class="w-full flex justify-center py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-darkBg hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-offset-darkCard transition-all">
+                        Cancelar
+                    </a>
+                </div>
             </form>
         </div>
     </div>
+
+    {# SCRIPT UNIFICADO: PREVISUALIZACIÓN + SWEETALERT CON FLASHES #}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ====================================================================
+            // 1. PREVISUALIZACIÓN DE IMAGEN EN TIEMPO REAL
+            // ====================================================================
+            const inputFoto = document.getElementById('foto_perfil');
+            const imagenPreview = document.getElementById('img-preview');
+
+            if(inputFoto && imagenPreview) {
+                inputFoto.addEventListener('change', function(e) {
+                    const archivo = e.target.files[0];
+                    if(archivo && archivo.type.startsWith('image/')) {
+                        const lector = new FileReader();
+                        lector.onload = function(evento) {
+                            imagenPreview.src = evento.target.result;
+                        };
+                        lector.readAsDataURL(archivo);
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}

@@ -15,19 +15,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Mercure\HubInterface; // <-- IMPORTANTE: Añadir Hub de Mercure
-use Symfony\Component\Mercure\Update;       // <-- IMPORTANTE: Añadir Update de Mercure
+use Symfony\Component\Mercure\Update;
 
 #[Route('/sala')]
 final class SalaController extends AbstractController
 {
-    #[Route(name: 'app_sala_index', methods: ['GET'])]
-    public function index(SalaRepository $salaRepository): Response
-    {
-        return $this->render('home/index.html.twig', [
-            'salas' => $salaRepository->findAll(),
-        ]);
-    }
-
     #[Route('/new-ajax', name: 'app_sala_new_ajax', methods: ['POST'])]
     public function newAjax(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -220,7 +212,7 @@ final class SalaController extends AbstractController
             $this->addFlash('success', 'La sala ha sido eliminada definitivamente.');
         }
 
-        return $this->redirectToRoute('app_sala_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/join/{token}', name: 'app_sala_join', methods: ['GET'])]
@@ -235,7 +227,7 @@ final class SalaController extends AbstractController
 
         $user = $this->getUser();
         if (!$user) {
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_home');
         }
 
         if ($sala->getCreador() !== $user && !$sala->getMiembros()->contains($user)) {
@@ -316,5 +308,24 @@ final class SalaController extends AbstractController
         }
 
         return $this->redirectToRoute('app_sala_show', ['id' => $sala->getId()]);
+    }
+
+    #[Route('/sala/{id}/salir', name: 'app_sala_salir', methods: ['POST'])]
+    public function salir(Sala $sala, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+        // Verificar que el usuario no es el creador (el creador no puede "salirse", debe borrar la sala)
+        if ($sala->getCreador() === $user) {
+            $this->addFlash('error', 'El creador no puede salir de la sala. Debes eliminarla.');
+            return $this->redirectToRoute('app_home');
+        }
+
+        // Remover al usuario de los miembros
+        $sala->removeMiembro($user);
+        $em->flush();
+
+        $this->addFlash('success', 'Has salido de la sala correctamente.');
+        return $this->redirectToRoute('app_home');
     }
 }

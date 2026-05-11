@@ -1,525 +1,647 @@
-{% extends 'base.html.twig' %}
+    {% extends 'base.html.twig' %}
 
-{% block body %}
-    <style>
-        @keyframes messageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .message-anim { animation: messageIn 0.2s ease-out forwards; }
+    {% block body %}
+        <style>
+            @keyframes messageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .message-anim { animation: messageIn 0.2s ease-out forwards; }
 
-        #muro-mensajes-foro::-webkit-scrollbar { width: 6px; }
-        #muro-mensajes-foro::-webkit-scrollbar-track { background: transparent; }
-        #muro-mensajes-foro::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
+            #muro-mensajes-foro::-webkit-scrollbar { width: 6px; }
+            #muro-mensajes-foro::-webkit-scrollbar-track { background: transparent; }
+            #muro-mensajes-foro::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
 
-        .bubble-me { border-bottom-right-radius: 4px; }
-        .bubble-others { border-bottom-left-radius: 4px; }
+            .bubble-me { border-bottom-right-radius: 4px; }
+            .bubble-others { border-bottom-left-radius: 4px; }
 
-        .tab-active { border-bottom: 3px solid #10b981; color: #10b981; font-weight: 700; }
-        .scale-in { animation: scaleIn 0.3s ease-out; }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+            .tab-active { border-bottom: 3px solid #10b981; color: #10b981; font-weight: 700; }
+            .scale-in { animation: scaleIn 0.3s ease-out; }
+            @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-        /* Estilo dinámico cuando se arrastra un archivo sobre el chat */
-        .drag-over {
-            border: 2px dashed #10b981 !important;
-            background-color: rgba(16, 185, 129, 0.05) !important;
-            transition: all 0.2s ease;
-        }
-    </style>
+            /* Estilo dinámico cuando se arrastra un archivo sobre el chat */
+            .drag-over {
+                border: 2px dashed #10b981 !important;
+                background-color: rgba(16, 185, 129, 0.05) !important;
+                transition: all 0.2s ease;
+            }
+        </style>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        {# --- ENCABEZADO (HERO) --- #}
-        <div class="bg-gradient-to-r from-emerald-900 to-teal-800 rounded-[2.5rem] shadow-xl p-8 md:p-10 mb-8 text-white relative overflow-hidden">
-            <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div>
-                    <span class="px-4 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-widest mb-3 inline-block">
-                        {{ sala.categoria }}
-                    </span>
-                    <h1 id="sala-nombre-display" class="text-4xl md:text-5xl font-black mb-3">{{ sala.nombre }}</h1>
-                    <p id="sala-descripcion-display" class="text-emerald-100 max-w-2xl text-lg opacity-90">{{ sala.descripcion }}</p>
-                </div>
-
-                <div class="flex gap-3">
-                    {% if app.user == sala.creador %}
-                        <button onclick="openEditModal()" class="bg-white/10 hover:bg-white/20 p-4 rounded-2xl backdrop-blur-md transition-all group" title="Editar Sala">
-                            <svg class="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </button>
-                    {% endif %}
-                    <button onclick="openInviteModal()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-4 rounded-2xl font-bold shadow-lg transition-all flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Invitar
-                    </button>
-                </div>
-            </div>
-            <div class="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
-        </div>
-
-        {# --- NAVEGACIÓN POR PESTAÑAS --- #}
-        <div class="flex gap-8 border-b border-gray-200 dark:border-darkBorder mb-8 px-4">
-            <button onclick="openTab('muro')" id="tab-muro" class="tab-active pb-4 text-sm uppercase tracking-wider transition-all">Muro del Foro</button>
-            <button onclick="openTab('archivos')" id="tab-archivos" class="pb-4 text-sm uppercase tracking-wider text-gray-400 hover:text-emerald-500 transition-all">Archivos Compartidos</button>
-            <button onclick="openTab('detalles')" id="tab-detalles" class="pb-4 text-sm uppercase tracking-wider text-gray-400 hover:text-emerald-500 transition-all">Detalles y Miembros</button>
-        </div>
-
-        {# --- CONTENIDO --- #}
-        <div class="w-full">
-
-            {# PESTAÑA 1: MURO (CHAT TIEMPO REAL) #}
-            <div id="content-muro" class="tab-content flex flex-col h-[700px] bg-white dark:bg-darkCard rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-darkBorder overflow-hidden relative">
-
-                <div id="muro-mensajes-foro" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/30 dark:bg-darkBg/10">
-                    {# Se carga dinámicamente #}
-                </div>
-
-                {# Contenedor Preview del Archivo a enviar (Flotante) #}
-                <div id="chat-file-preview-container" class="hidden absolute bottom-24 left-6 bg-white dark:bg-darkCard p-2 rounded-2xl shadow-xl border border-gray-200 dark:border-darkBorder flex items-center gap-3 z-20 scale-in">
-                    <div id="chat-file-preview" class="w-14 h-14 rounded-xl bg-gray-100 dark:bg-darkBg flex items-center justify-center overflow-hidden"></div>
-                    <div class="flex flex-col max-w-[150px]">
-                        <span id="chat-file-name" class="text-xs font-bold text-gray-700 dark:text-gray-200 truncate"></span>
-                        <span id="chat-file-size" class="text-[10px] text-gray-400"></span>
-                    </div>
-                    <button id="chat-file-clear" class="ml-2 p-1.5 bg-red-50 dark:bg-red-900/30 text-red-500 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-
-                <div class="p-4 bg-white dark:bg-darkCard border-t border-gray-100 dark:border-darkBorder">
-
-                    {# Adaptado para usar el mismo estilo de animación base #}
-                    <div id="typing-indicator" class="hidden text-xs text-emerald-500 mb-2 flex items-center gap-2 ml-4 italic">
-                        <span id="typing-username" class="font-bold">Alguien</span> está escribiendo
-                        <svg width="16" height="16" viewBox="0 0 24 24"><circle class="typing-dot" cx="4" cy="12" r="3" fill="currentColor"/><circle class="typing-dot" cx="12" cy="12" r="3" fill="currentColor"/><circle class="typing-dot" cx="20" cy="12" r="3" fill="currentColor"/></svg>
+            {# --- ENCABEZADO (HERO) --- #}
+            <div class="bg-gradient-to-r from-emerald-900 to-teal-800 rounded-[2.5rem] shadow-xl p-8 md:p-10 mb-8 text-white relative overflow-hidden">
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div>
+                        <span class="px-4 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-widest mb-3 inline-block">
+                            {{ sala.categoria }}
+                        </span>
+                        <h1 id="sala-nombre-display" class="text-4xl md:text-5xl font-black mb-3">{{ sala.nombre }}</h1>
+                        <p id="sala-descripcion-display" class="text-emerald-100 max-w-2xl text-lg opacity-90">{{ sala.descripcion }}</p>
                     </div>
 
-                    <div class="flex items-end gap-3 bg-gray-100 dark:bg-darkBg p-2 rounded-[2rem]">
-                        <label class="p-3 cursor-pointer text-gray-400 hover:text-emerald-600 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                            <input type="file" id="chat-file" class="hidden">
-                        </label>
-                        <textarea id="chat-input" rows="1" placeholder="Escribe un mensaje en el foro... (Enter para enviar)" class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-3 dark:text-white resize-none"></textarea>
-                        <button id="btn-enviar-chat" class="p-3 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 shadow-lg transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {# PESTAÑA 2: ARCHIVOS (GALERÍA INTEGRADA AL VISOR BASE) #}
-            <div id="content-archivos" class="tab-content hidden">
-                <div class="mb-6 flex justify-between items-center bg-white dark:bg-darkCard p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-darkBorder">
-                    <div class="flex items-center pl-4 w-full">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <input type="text" id="search-archivos" placeholder="Filtrar archivos por nombre o usuario..." class="w-full bg-transparent border-none focus:ring-0 text-sm py-2 dark:text-white ml-2 outline-none">
-                    </div>
-                </div>
-
-                <div id="archivos-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                    {% for archivo in sala.archivos %}
-                        {% set ext = archivo.tipo|default(archivo.nombreServidor|split('.')|last)|lower %}
-                        {% set isImg = ext in ['jpg', 'jpeg', 'png', 'webp', 'gif'] %}
-                        {% set fileUrl = asset('uploads/' ~ archivo.nombreServidor) %}
-                        {% set tipoPreview = isImg ? 'image' : (ext == 'pdf' ? 'pdf' : 'other') %}
-
-                        <div class="archivo-item bg-white dark:bg-darkCard rounded-2xl border border-gray-100 dark:border-darkBorder overflow-hidden group hover:shadow-xl transition-all relative flex flex-col h-48"
-                             data-nombre="{{ archivo.nombreOriginal|lower }}"
-                             data-autor="{{ archivo.subidoPor.username|lower }}">
-
-                            <div class="flex-1 bg-gray-50 dark:bg-black/20 flex items-center justify-center overflow-hidden relative">
-                                {% if isImg %}
-                                    <img src="{{ fileUrl }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                                {% else %}
-                                    <div class="w-16 h-16 {% if ext == 'pdf' %}bg-red-100 text-red-600{% else %}bg-blue-100 text-blue-600{% endif %} rounded-2xl flex items-center justify-center font-black uppercase text-xl shadow-inner">
-                                        {{ ext }}
-                                    </div>
-                                {% endif %}
-
-                                {# SE AÑADE LA INTEGRACIÓN CON EL MODAL DEL BASE A TRAVÉS DE openPreview() #}
-                                <button onclick="window.openPreview('{{ fileUrl }}', '{{ tipoPreview }}')" class="absolute inset-0 bg-emerald-600/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm z-10 cursor-pointer border-none outline-none">
-                                    <div class="flex flex-col items-center text-white">
-                                        <svg class="w-8 h-8 mb-1 transform scale-50 group-hover:scale-100 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        <span class="text-[10px] font-bold uppercase tracking-widest">Ver Previa</span>
-                                    </div>
+                    <div class="flex gap-3">
+                        {% if app.user == sala.creador %}
+                            <button onclick="openEditModal()" class="bg-white/10 hover:bg-white/20 p-4 rounded-2xl backdrop-blur-md transition-all group" title="Editar Sala">
+                                <svg class="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            </button>
+                        {% else %}
+                            {# BOTÓN PARA QUE LOS MIEMBROS PUEDAN SALIR #}
+                            <form class="js-leave-form" action="{{ path('app_sala_salir', {'id': sala.id}) }}" method="POST">
+                                <button type="submit" class="bg-red-500/20 hover:bg-red-500/40 text-red-200 p-4 rounded-2xl backdrop-blur-md transition-all group" title="Salir de la Sala">
+                                    <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                 </button>
-                            </div>
+                            </form>
+                        {% endif %}
 
-                            <div class="p-3 bg-white dark:bg-darkCard border-t border-gray-50 dark:border-white/5 z-20">
-                                <p class="font-bold text-xs text-gray-800 dark:text-white truncate" title="{{ archivo.nombreOriginal }}">{{ archivo.nombreOriginal }}</p>
-                                <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-1">Por {{ archivo.subidoPor.username }}</p>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="col-span-full py-20 flex flex-col items-center justify-center text-gray-400" id="no-archivos-inicial">
-                            <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/></svg>
-                            <p>Esta sala aún no tiene archivos compartidos.</p>
-                        </div>
-                    {% endfor %}
-
-                    <div class="col-span-full py-20 text-center text-gray-400 hidden" id="no-archivos-busqueda">No se encontraron archivos con ese filtro.</div>
+                        <button onclick="openInviteModal()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-4 rounded-2xl font-bold shadow-lg transition-all flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Invitar
+                        </button>
+                    </div>
                 </div>
-
-                {# Paginación #}
-                <div id="archivos-pagination" class="mt-8 flex justify-center items-center gap-4 hidden">
-                    <button id="btn-prev-archivos" class="p-2 rounded-xl bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder text-gray-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 disabled:opacity-50 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    </button>
-                    <span id="archivos-page-info" class="text-sm font-bold text-gray-700 dark:text-gray-300">1 / 1</span>
-                    <button id="btn-next-archivos" class="p-2 rounded-xl bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder text-gray-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 disabled:opacity-50 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </button>
-                </div>
+                <div class="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
             </div>
 
-            {# PESTAÑA 3: DETALLES Y MIEMBROS #}
-            <div id="content-detalles" class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {# ... Se mantiene exactamente igual, solo datos y visualización ... #}
-                <div class="lg:col-span-1 bg-white dark:bg-darkCard p-8 rounded-[2.5rem] border border-gray-100 dark:border-darkBorder h-fit">
-                    <h3 class="text-xl font-bold dark:text-white mb-6">Información General</h3>
-                    <div class="space-y-6">
-                        <div><label class="text-[10px] uppercase font-black text-emerald-600 tracking-widest">Descripción</label><p class="text-gray-600 dark:text-gray-300 mt-1">{{ sala.descripcion }}</p></div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="text-[10px] uppercase font-black text-emerald-600 tracking-widest">Categoría</label><p class="dark:text-white">{{ sala.categoria }}</p></div>
-                            <div><label class="text-[10px] uppercase font-black text-emerald-600 tracking-widest">Creador</label><p class="dark:text-white">{{ sala.creador.username }}</p></div>
+            {# --- NAVEGACIÓN POR PESTAÑAS --- #}
+            <div class="flex gap-8 border-b border-gray-200 dark:border-darkBorder mb-8 px-4">
+                <button onclick="openTab('muro')" id="tab-muro" class="tab-active pb-4 text-sm uppercase tracking-wider transition-all">Muro del Foro</button>
+                <button onclick="openTab('archivos')" id="tab-archivos" class="pb-4 text-sm uppercase tracking-wider text-gray-400 hover:text-emerald-500 transition-all">Archivos Compartidos</button>
+                <button onclick="openTab('detalles')" id="tab-detalles" class="pb-4 text-sm uppercase tracking-wider text-gray-400 hover:text-emerald-500 transition-all">Detalles y Miembros</button>
+            </div>
+
+            {# --- CONTENIDO --- #}
+            <div class="w-full">
+
+                {# PESTAÑA 1: MURO (CHAT TIEMPO REAL) #}
+                <div id="content-muro" class="tab-content flex flex-col h-[700px] bg-white dark:bg-darkCard rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-darkBorder overflow-hidden relative">
+
+                    <div id="muro-mensajes-foro" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/30 dark:bg-darkBg/10">
+                        {# Se carga dinámicamente #}
+                    </div>
+
+                    {# Contenedor Preview del Archivo a enviar (Flotante) #}
+                    <div id="chat-file-preview-container" class="hidden absolute bottom-24 left-6 bg-white dark:bg-darkCard p-2 rounded-2xl shadow-xl border border-gray-200 dark:border-darkBorder flex items-center gap-3 z-20 scale-in">
+                        <div id="chat-file-preview" class="w-14 h-14 rounded-xl bg-gray-100 dark:bg-darkBg flex items-center justify-center overflow-hidden"></div>
+                        <div class="flex flex-col max-w-[150px]">
+                            <span id="chat-file-name" class="text-xs font-bold text-gray-700 dark:text-gray-200 truncate"></span>
+                            <span id="chat-file-size" class="text-[10px] text-gray-400"></span>
+                        </div>
+                        <button id="chat-file-clear" class="ml-2 p-1.5 bg-red-50 dark:bg-red-900/30 text-red-500 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="p-4 bg-white dark:bg-darkCard border-t border-gray-100 dark:border-darkBorder">
+
+                        {# Adaptado para usar el mismo estilo de animación base #}
+                        <div id="typing-indicator" class="hidden text-xs text-emerald-500 mb-2 flex items-center gap-2 ml-4 italic">
+                            <span id="typing-username" class="font-bold">Alguien</span> está escribiendo
+                            <svg width="16" height="16" viewBox="0 0 24 24"><circle class="typing-dot" cx="4" cy="12" r="3" fill="currentColor"/><circle class="typing-dot" cx="12" cy="12" r="3" fill="currentColor"/><circle class="typing-dot" cx="20" cy="12" r="3" fill="currentColor"/></svg>
+                        </div>
+
+                        <div class="flex items-end gap-3 bg-gray-100 dark:bg-darkBg p-2 rounded-[2rem]">
+                            <label class="p-3 cursor-pointer text-gray-400 hover:text-emerald-600 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                <input type="file" id="chat-file" class="hidden">
+                            </label>
+                            <textarea id="chat-input" rows="1" placeholder="Escribe un mensaje en el foro... (Enter para enviar)" class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-3 dark:text-white resize-none"></textarea>
+                            <button id="btn-enviar-chat" class="p-3 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 shadow-lg transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:col-span-2 bg-white dark:bg-darkCard p-8 rounded-[2.5rem] border border-gray-100 dark:border-darkBorder">
-                    <h3 class="text-xl font-bold dark:text-white mb-6 flex items-center justify-between">
-                        Miembros de la comunidad
-                        <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs">{{ sala.miembros|length + 1 }}</span>
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="flex items-center gap-4 p-4 bg-amber-50/50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-900/30">
-                            <div class="w-12 h-12 bg-amber-400 text-white rounded-xl flex items-center justify-center font-black">★</div>
-                            <div><p class="font-bold dark:text-white">{{ sala.creador.username }}</p><p class="text-xs text-amber-600 uppercase font-bold">Líder de Sala</p></div>
+                {# PESTAÑA 2: ARCHIVOS (GALERÍA INTEGRADA AL VISOR BASE) #}
+                <div id="content-archivos" class="tab-content hidden">
+                    <div class="mb-6 flex justify-between items-center bg-white dark:bg-darkCard p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-darkBorder">
+                        <div class="flex items-center pl-4 w-full">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <input type="text" id="search-archivos" placeholder="Filtrar archivos por nombre o usuario..." class="w-full bg-transparent border-none focus:ring-0 text-sm py-2 dark:text-white ml-2 outline-none">
                         </div>
-                        {% for miembro in sala.miembros %}
-                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-darkBg rounded-2xl border border-transparent hover:border-emerald-500/30 transition-all">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-bold">{{ miembro.username|first|upper }}</div>
-                                    <p class="font-bold dark:text-gray-200">{{ miembro.username }}</p>
+                    </div>
+
+                    <div id="archivos-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                        {% for archivo in sala.archivos %}
+                            {% set ext = archivo.tipo|default(archivo.nombreServidor|split('.')|last)|lower %}
+                            {% set isImg = ext in ['jpg', 'jpeg', 'png', 'webp', 'gif'] %}
+                            {% set fileUrl = asset('uploads/' ~ archivo.nombreServidor) %}
+                            {% set tipoPreview = isImg ? 'image' : (ext == 'pdf' ? 'pdf' : 'other') %}
+
+                            <div class="archivo-item bg-white dark:bg-darkCard rounded-2xl border border-gray-100 dark:border-darkBorder overflow-hidden group hover:shadow-xl transition-all relative flex flex-col h-48"
+                                 data-nombre="{{ archivo.nombreOriginal|lower }}"
+                                 data-autor="{{ archivo.subidoPor.username|lower }}">
+
+                                <div class="flex-1 bg-gray-50 dark:bg-black/20 flex items-center justify-center overflow-hidden relative">
+                                    {% if isImg %}
+                                        <img src="{{ fileUrl }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                                    {% else %}
+                                        <div class="w-16 h-16 {% if ext == 'pdf' %}bg-red-100 text-red-600{% else %}bg-blue-100 text-blue-600{% endif %} rounded-2xl flex items-center justify-center font-black uppercase text-xl shadow-inner">
+                                            {{ ext }}
+                                        </div>
+                                    {% endif %}
+
+                                    {# SE AÑADE LA INTEGRACIÓN CON EL MODAL DEL BASE A TRAVÉS DE openPreview() #}
+                                    <button onclick="window.openPreview('{{ fileUrl }}', '{{ tipoPreview }}', '{{ archivo.nombreOriginal|e('js') }}', '{{ archivo.subidoPor.username|e('js') }}')" class="absolute inset-0 bg-emerald-600/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm z-10 cursor-pointer border-none outline-none">
+                                        <div class="flex flex-col items-center text-white">
+                                            <svg class="w-8 h-8 mb-1 transform scale-50 group-hover:scale-100 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span class="text-[10px] font-bold uppercase tracking-widest">Ver Previa</span>
+                                        </div>
+                                    </button>
                                 </div>
-                                {% if app.user == sala.creador %}
-                                    <form action="{{ path('app_sala_expulsar', {'id': sala.id, 'user_id': miembro.id}) }}" method="POST" onsubmit="return confirm('¿Expulsar a {{ miembro.username }}?')">
-                                        <button class="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        </button>
-                                    </form>
-                                {% endif %}
+
+                                <div class="p-3 bg-white dark:bg-darkCard border-t border-gray-50 dark:border-white/5 z-20">
+                                    <p class="font-bold text-xs text-gray-800 dark:text-white truncate" title="{{ archivo.nombreOriginal }}">{{ archivo.nombreOriginal }}</p>
+                                    <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-1">Por {{ archivo.subidoPor.username }}</p>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col-span-full py-20 flex flex-col items-center justify-center text-gray-400" id="no-archivos-inicial">
+                                <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/></svg>
+                                <p>Esta sala aún no tiene archivos compartidos.</p>
                             </div>
                         {% endfor %}
+
+                        <div class="col-span-full py-20 text-center text-gray-400 hidden" id="no-archivos-busqueda">No se encontraron archivos con ese filtro.</div>
+                    </div>
+
+                    {# Paginación #}
+                    <div id="archivos-pagination" class="mt-8 flex justify-center items-center gap-4 hidden">
+                        <button id="btn-prev-archivos" class="p-2 rounded-xl bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder text-gray-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 disabled:opacity-50 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <span id="archivos-page-info" class="text-sm font-bold text-gray-700 dark:text-gray-300">1 / 1</span>
+                        <button id="btn-next-archivos" class="p-2 rounded-xl bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder text-gray-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 disabled:opacity-50 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                {# PESTAÑA 3: DETALLES Y MIEMBROS #}
+                <div id="content-detalles" class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-white dark:bg-darkCard p-8 rounded-[2.5rem] border border-gray-100 dark:border-darkBorder h-fit">
+                        <h3 class="text-xl font-bold dark:text-white mb-6">Información General</h3>
+                        <div class="space-y-6">
+                            <div><label class="text-[10px] uppercase font-black text-emerald-600 tracking-widest">Descripción</label><p class="text-gray-600 dark:text-gray-300 mt-1">{{ sala.descripcion }}</p></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-[10px] uppercase font-black text-emerald-600 tracking-widest">Categoría</label><p class="dark:text-white">{{ sala.categoria }}</p></div>
+                                <div><label class="text-[10px] uppercase font-black text-emerald-600 tracking-widest">Creador</label><p class="dark:text-white">{{ sala.creador.username }}</p></div>
+                            </div>
+                        </div>
+
+                        {# --- NUEVO: BOTÓN PARA ELIMINAR SALA (SOLO CREADOR) --- #}
+                        {% if app.user == sala.creador %}
+                            <div class="mt-8 pt-6 border-t border-gray-200 dark:border-darkBorder">
+                                <form class="js-delete-form" action="{{ path('app_sala_delete', {'id': sala.id}) }}" method="POST">
+                                    {# El token CSRF es obligatorio porque tu controlador lo comprueba #}
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sala.id) }}">
+                                    <button type="submit" class="w-full flex items-center justify-center gap-2 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 font-bold py-3 px-4 rounded-2xl transition-colors border border-red-200 dark:border-red-800">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        Eliminar esta Sala
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white dark:bg-darkCard p-8 rounded-[2.5rem] border border-gray-100 dark:border-darkBorder">
+                        <h3 class="text-xl font-bold dark:text-white mb-6 flex items-center justify-between">
+                            Miembros de la comunidad
+                            <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs">{{ sala.miembros|length + 1 }}</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex items-center gap-4 p-4 bg-amber-50/50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-900/30">
+                                <div class="w-12 h-12 bg-amber-400 text-white rounded-xl flex items-center justify-center font-black">★</div>
+                                <div><p class="font-bold dark:text-white">{{ sala.creador.username }}</p><p class="text-xs text-amber-600 uppercase font-bold">Líder de Sala</p></div>
+                            </div>
+                            {% for miembro in sala.miembros %}
+                                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-darkBg rounded-2xl border border-transparent hover:border-emerald-500/30 transition-all">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-bold">{{ miembro.username|first|upper }}</div>
+                                        <p class="font-bold dark:text-gray-200">
+                                            {{ miembro.username }}
+                                            {# Pequeña etiqueta para identificarte en la lista #}
+                                            {% if miembro == app.user %}<span class="text-[10px] text-emerald-500 font-normal ml-1">(Tú)</span>{% endif %}
+                                        </p>
+                                    </div>
+
+                                    {# LÓGICA DE BOTONES #}
+                                    {% if app.user == sala.creador %}
+                                        {# El creador ve el botón de expulsar #}
+                                        <form class="js-kick-form" action="{{ path('app_sala_expulsar', {'id': sala.id, 'user_id': miembro.id}) }}" method="POST" data-username="{{ miembro.username }}">
+                                            <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Expulsar">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </form>
+                                    {% elseif miembro == app.user %}
+                                        {# Si eres miembro y es TU fila, botón para salir #}
+                                        <form class="js-leave-form" action="{{ path('app_sala_salir', {'id': sala.id}) }}" method="POST">
+                                            <button type="submit" class="p-2 text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1" title="Salir de la sala">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    {# --- MODALES --- #}
-    {% if app.user == sala.creador %}
-        <div id="edit-sala-modal" class="hidden fixed inset-0 z-[500] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-darkCard w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl scale-in relative">
-                <form id="form-edit-sala-spa" action="{{ path('app_sala_edit_ajax', {id: sala.id}) }}" method="POST" class="space-y-5">
-                    <h2 class="text-3xl font-black mb-2 dark:text-white">Ajustes de Sala</h2>
-                    <div><label class="block text-xs font-bold uppercase text-gray-400 mb-2 ml-1">Nombre</label><input type="text" name="sala[nombre]" value="{{ sala.nombre }}" required class="w-full bg-gray-100 dark:bg-darkBg border-none rounded-2xl px-5 py-4 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"></div>
-                    <div><label class="block text-xs font-bold uppercase text-gray-400 mb-2 ml-1">Descripción</label><textarea name="sala[descripcion]" rows="3" class="w-full bg-gray-100 dark:bg-darkBg border-none rounded-2xl px-5 py-4 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500">{{ sala.descripcion }}</textarea></div>
-                    <div class="flex gap-4 pt-4">
-                        <button type="button" onclick="closeEditModal()" class="flex-1 py-4 text-gray-400 font-bold hover:bg-gray-50 dark:hover:bg-darkBg rounded-2xl">Cancelar</button>
-                        <button type="submit" class="flex-[2] py-4 bg-emerald-600 text-white font-black rounded-2xl shadow-lg hover:bg-emerald-700">Guardar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    {% endif %}
-
-    <div id="invite-modal" class="hidden fixed inset-0 z-[500] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl scale-in">
-            <h2 class="text-2xl font-black mb-2 dark:text-white">Invitar Estudiantes</h2>
-            <div class="relative mt-4">
-                <input type="text" id="invite-link-input" readonly value="{{ sala.token ? url('app_sala_join', {'token': sala.token}) : 'Token pendiente...' }}" class="w-full bg-gray-50 dark:bg-darkBg border border-gray-100 dark:border-darkBorder rounded-xl px-4 py-3 text-sm dark:text-gray-300">
-                <button onclick="copyInviteLink()" class="absolute right-2 top-2 bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-700">Copiar</button>
-            </div>
-            <button onclick="closeInviteModal()" class="w-full mt-6 py-3 text-gray-400 font-bold hover:text-gray-600">Cerrar</button>
-        </div>
-    </div>
-
-    <script>
-        // ====================================================================
-        // 1. FUNCIONES GLOBALES PARA HTML (Pestañas y Modales)
-        // ====================================================================
-        function openTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('button[id^="tab-"]').forEach(b => {
-                b.classList.remove('tab-active'); b.classList.add('text-gray-400');
-            });
-            document.getElementById('content-' + tabName)?.classList.remove('hidden');
-            const activeBtn = document.getElementById('tab-' + tabName);
-            if(activeBtn) {
-                activeBtn.classList.add('tab-active');
-                activeBtn.classList.remove('text-gray-400');
-            }
-        }
-
-        function openEditModal() { document.getElementById('edit-sala-modal')?.classList.remove('hidden'); }
-        function closeEditModal() { document.getElementById('edit-sala-modal')?.classList.add('hidden'); }
-        function openInviteModal() { document.getElementById('invite-modal')?.classList.remove('hidden'); }
-        function closeInviteModal() { document.getElementById('invite-modal')?.classList.add('hidden'); }
-        function copyInviteLink() {
-            const input = document.getElementById('invite-link-input');
-            if(input) {
-                input.select();
-                navigator.clipboard.writeText(input.value);
-                Swal.fire({ icon: 'success', title: 'Enlace copiado', showConfirmButton: false, timer: 1000, toast: true, position: 'top-end' });
-            }
-        }
-
-        // ====================================================================
-        // 2. LÓGICA PRINCIPAL DEL FORO Y LA GALERÍA
-        // ====================================================================
-        document.addEventListener('DOMContentLoaded', () => {
-
-            const muro = document.getElementById('muro-mensajes-foro');
-            const chatInput = document.getElementById('chat-input');
-            const btnEnviarChat = document.getElementById('btn-enviar-chat');
-            const fileInput = document.getElementById('chat-file');
-            const typingIndicator = document.getElementById('typing-indicator');
-            const typingUsername = document.getElementById('typing-username');
-
-            const previewContainer = document.getElementById('chat-file-preview-container');
-            const previewImg = document.getElementById('chat-file-preview');
-            const previewName = document.getElementById('chat-file-name');
-            const previewSize = document.getElementById('chat-file-size');
-            const fileClear = document.getElementById('chat-file-clear');
-
-            if(fileInput && previewContainer) {
-                fileInput.addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        previewContainer.classList.remove('hidden');
-                        previewName.textContent = file.name;
-                        previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
-
-                        if (file.type.startsWith('image/')) {
-                            const reader = new FileReader();
-                            reader.onload = (evt) => previewImg.innerHTML = `<img src="${evt.target.result}" class="w-full h-full object-cover rounded-md">`;
-                            reader.readAsDataURL(file);
-                        } else {
-                            const ext = file.name.split('.').pop().toUpperCase();
-                            previewImg.innerHTML = `<div class="text-emerald-600 font-black text-sm">${ext}</div>`;
-                        }
-                    }
-                });
-
-                fileClear?.addEventListener('click', () => {
-                    fileInput.value = '';
-                    previewContainer.classList.add('hidden');
-                });
-            }
-
-            const dropZone = document.getElementById('content-muro');
-            if(dropZone && fileInput) {
-                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                    dropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
-                    document.body.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
-                });
-                ['dragenter', 'dragover'].forEach(eventName => dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false));
-                ['dragleave', 'drop'].forEach(eventName => dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false));
-                dropZone.addEventListener('drop', (e) => {
-                    const files = e.dataTransfer.files;
-                    if (files && files.length > 0) {
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(files[0]);
-                        fileInput.files = dataTransfer.files;
-                        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                }, false);
-            }
-
-            const allArchivos = Array.from(document.querySelectorAll('.archivo-item'));
-            const searchArchivosInput = document.getElementById('search-archivos');
-
-            if (allArchivos.length > 0) {
-                const ITEMS_PER_PAGE = 8;
-                let currentArchivosPage = 1;
-                let filteredArchivos = [...allArchivos];
-
-                function renderArchivos() {
-                    const totalPages = Math.ceil(filteredArchivos.length / ITEMS_PER_PAGE) || 1;
-                    const start = (currentArchivosPage - 1) * ITEMS_PER_PAGE;
-                    const end = start + ITEMS_PER_PAGE;
-
-                    allArchivos.forEach(el => el.style.display = 'none');
-                    filteredArchivos.slice(start, end).forEach(el => el.style.display = 'flex');
-
-                    const pageInfo = document.getElementById('archivos-page-info');
-                    if(pageInfo) pageInfo.textContent = `${currentArchivosPage} / ${totalPages}`;
-
-                    const btnPrev = document.getElementById('btn-prev-archivos');
-                    const btnNext = document.getElementById('btn-next-archivos');
-                    if(btnPrev) btnPrev.disabled = currentArchivosPage === 1;
-                    if(btnNext) btnNext.disabled = currentArchivosPage === totalPages;
-
-                    document.getElementById('archivos-pagination')?.classList.toggle('hidden', filteredArchivos.length <= ITEMS_PER_PAGE);
-                    document.getElementById('no-archivos-busqueda')?.classList.toggle('hidden', filteredArchivos.length > 0);
-                }
-
-                renderArchivos();
-
-                searchArchivosInput?.addEventListener('input', (e) => {
-                    const term = e.target.value.toLowerCase();
-                    filteredArchivos = allArchivos.filter(item => item.dataset.nombre.includes(term) || item.dataset.autor.includes(term));
-                    currentArchivosPage = 1;
-                    renderArchivos();
-                });
-
-                document.getElementById('btn-prev-archivos')?.addEventListener('click', () => { if (currentArchivosPage > 1) { currentArchivosPage--; renderArchivos(); } });
-                document.getElementById('btn-next-archivos')?.addEventListener('click', () => { if (currentArchivosPage < Math.ceil(filteredArchivos.length / ITEMS_PER_PAGE)) { currentArchivosPage++; renderArchivos(); } });
-            }
-
-            if(muro && chatInput && btnEnviarChat) {
-
-                function appendMessage(data) {
-                    const isMe = data.autor === "{{ app.user.username }}";
-                    const alignClass = isMe ? 'justify-end' : 'justify-start';
-                    const bubbleClass = isMe ? 'bg-emerald-600 text-white bubble-me' : 'bg-white border border-gray-100 bubble-others text-gray-800 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700';
-
-                    let archivoHtml = '';
-                    if (data.archivoUrl) {
-                        const url = data.archivoUrl;
-                        const ext = url.split('.').pop().toLowerCase();
-                        const isImg = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext);
-                        const isPdf = ext === 'pdf';
-                        const name = url.split('/').pop();
-                        const tipoPreview = isImg ? 'image' : (isPdf ? 'pdf' : 'other');
-
-                        // INTEGRACIÓN BASE: Llamamos al window.openPreview() centralizado para todo tipo de archivo visualizable
-                        if (isImg) {
-                            archivoHtml = `
-                        <div class="mt-2 rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-white/10 cursor-pointer" onclick="window.openPreview('${url}', 'image')">
-                            <img src="${url}" class="max-w-full h-auto max-h-64 object-cover hover:opacity-90 hover:scale-105 transition transform duration-300">
-                        </div>`;
-                        } else {
-                            archivoHtml = `
-                        <button onclick="${isPdf || ext === 'other' ? `window.openPreview('${url}', '${tipoPreview}')` : `window.open('${url}', '_blank')`}" class="mt-2 flex items-center gap-3 p-2 border ${isMe ? 'border-emerald-400 bg-emerald-700/50' : 'border-gray-200 dark:border-gray-600 bg-black/5 dark:bg-black/20'} hover:opacity-80 transition-colors rounded-lg text-left w-full cursor-pointer outline-none">
-                            <div class="bg-blue-500 p-2 rounded text-white shadow-sm shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            </div>
-                            <div class="flex flex-col truncate">
-                                <span class="text-xs font-bold truncate max-w-[150px]">${name}</span>
-                                <span class="text-[9px] uppercase tracking-wider opacity-70">Ver archivo</span>
-                            </div>
-                        </button>`;
-                        }
-                    }
-
-                    const contenidoTexto = data.contenido || data.mensaje || '';
-
-                    const html = `
-            <div class="flex ${alignClass} message-anim mb-4">
-                <div class="max-w-[85%] md:max-w-[70%]">
-                    <div class="flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}">
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">${data.autor}</span>
-                    </div>
-                    <div class="px-5 py-3 rounded-[1.5rem] shadow-sm ${bubbleClass} text-sm break-words">
-                        ${contenidoTexto}
-                        ${archivoHtml}
-                    </div>
+        {# --- MODALES --- #}
+        {% if app.user == sala.creador %}
+            <div id="edit-sala-modal" class="hidden fixed inset-0 z-[500] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-darkCard w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl scale-in relative">
+                    <form id="form-edit-sala-spa" action="{{ path('app_sala_edit_ajax', {id: sala.id}) }}" method="POST" class="space-y-5">
+                        <h2 class="text-3xl font-black mb-2 dark:text-white">Ajustes de Sala</h2>
+                        <div><label class="block text-xs font-bold uppercase text-gray-400 mb-2 ml-1">Nombre</label><input type="text" name="sala[nombre]" value="{{ sala.nombre }}" required class="w-full bg-gray-100 dark:bg-darkBg border-none rounded-2xl px-5 py-4 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"></div>
+                        <div><label class="block text-xs font-bold uppercase text-gray-400 mb-2 ml-1">Descripción</label><textarea name="sala[descripcion]" rows="3" class="w-full bg-gray-100 dark:bg-darkBg border-none rounded-2xl px-5 py-4 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500">{{ sala.descripcion }}</textarea></div>
+                        <div class="flex gap-4 pt-4">
+                            <button type="button" onclick="closeEditModal()" class="flex-1 py-4 text-gray-400 font-bold hover:bg-gray-50 dark:hover:bg-darkBg rounded-2xl">Cancelar</button>
+                            <button type="submit" class="flex-[2] py-4 bg-emerald-600 text-white font-black rounded-2xl shadow-lg hover:bg-emerald-700">Guardar</button>
+                        </div>
+                    </form>
                 </div>
-            </div>`;
+            </div>
+        {% endif %}
 
-                    muro.insertAdjacentHTML('beforeend', html);
-                    muro.scrollTo({ top: muro.scrollHeight, behavior: 'smooth' });
+        <div id="invite-modal" class="hidden fixed inset-0 z-[500] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl scale-in">
+                <h2 class="text-2xl font-black mb-2 dark:text-white">Invitar Estudiantes</h2>
+                <div class="relative mt-4">
+                    <input type="text" id="invite-link-input" readonly value="{{ sala.token ? url('app_sala_join', {'token': sala.token}) : 'Token pendiente...' }}" class="w-full bg-gray-50 dark:bg-darkBg border border-gray-100 dark:border-darkBorder rounded-xl px-4 py-3 text-sm dark:text-gray-300">
+                    <button onclick="copyInviteLink()" class="absolute right-2 top-2 bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-700">Copiar</button>
+                </div>
+                <button onclick="closeInviteModal()" class="w-full mt-6 py-3 text-gray-400 font-bold hover:text-gray-600">Cerrar</button>
+            </div>
+        </div>
+
+        <script>
+            // ====================================================================
+            // 1. FUNCIONES GLOBALES PARA HTML (Pestañas y Modales)
+            // ====================================================================
+            function openTab(tabName) {
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                document.querySelectorAll('button[id^="tab-"]').forEach(b => {
+                    b.classList.remove('tab-active'); b.classList.add('text-gray-400');
+                });
+                document.getElementById('content-' + tabName)?.classList.remove('hidden');
+                const activeBtn = document.getElementById('tab-' + tabName);
+                if(activeBtn) {
+                    activeBtn.classList.add('tab-active');
+                    activeBtn.classList.remove('text-gray-400');
                 }
+            }
 
-                fetch("{{ path('app_chat_history', {type: 'sala', id: sala.id}) }}")
-                    .then(r => r.json())
-                    .then(mensajes => {
-                        mensajes.forEach(m => appendMessage(m));
-                        muro.scrollTop = muro.scrollHeight;
+            function openEditModal() { document.getElementById('edit-sala-modal')?.classList.remove('hidden'); }
+            function closeEditModal() { document.getElementById('edit-sala-modal')?.classList.add('hidden'); }
+            function openInviteModal() { document.getElementById('invite-modal')?.classList.remove('hidden'); }
+            function closeInviteModal() { document.getElementById('invite-modal')?.classList.add('hidden'); }
+            function copyInviteLink() {
+                const input = document.getElementById('invite-link-input');
+                if(input) {
+                    input.select();
+                    navigator.clipboard.writeText(input.value);
+                    Swal.fire({ icon: 'success', title: 'Enlace copiado', showConfirmButton: false, timer: 1000, toast: true, position: 'top-end' });
+                }
+            }
+
+            // ====================================================================
+            // 2. LÓGICA PRINCIPAL DEL FORO Y LA GALERÍA
+            // ====================================================================
+            document.addEventListener('DOMContentLoaded', () => {
+
+                const muro = document.getElementById('muro-mensajes-foro');
+                const chatInput = document.getElementById('chat-input');
+                const btnEnviarChat = document.getElementById('btn-enviar-chat');
+                const fileInput = document.getElementById('chat-file');
+                const typingIndicator = document.getElementById('typing-indicator');
+                const typingUsername = document.getElementById('typing-username');
+
+                const previewContainer = document.getElementById('chat-file-preview-container');
+                const previewImg = document.getElementById('chat-file-preview');
+                const previewName = document.getElementById('chat-file-name');
+                const previewSize = document.getElementById('chat-file-size');
+                const fileClear = document.getElementById('chat-file-clear');
+
+                if(fileInput && previewContainer) {
+                    fileInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            previewContainer.classList.remove('hidden');
+                            previewName.textContent = file.name;
+                            previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+                            if (file.type.startsWith('image/')) {
+                                const reader = new FileReader();
+                                reader.onload = (evt) => previewImg.innerHTML = `<img src="${evt.target.result}" class="w-full h-full object-cover rounded-md">`;
+                                reader.readAsDataURL(file);
+                            } else {
+                                const ext = file.name.split('.').pop().toUpperCase();
+                                previewImg.innerHTML = `<div class="text-emerald-600 font-black text-sm">${ext}</div>`;
+                            }
+                        }
                     });
 
-                const enviarMensaje = () => {
-                    const texto = chatInput.value.trim();
-                    if (!texto && (!fileInput || !fileInput.files[0])) return;
+                    fileClear?.addEventListener('click', () => {
+                        fileInput.value = '';
+                        previewContainer.classList.add('hidden');
+                    });
+                }
 
-                    const formData = new FormData();
-                    formData.append('mensaje', texto);
-                    formData.append('salaId', "{{ sala.id }}");
-                    if (fileInput && fileInput.files[0]) formData.append('archivo', fileInput.files[0]);
-
-                    chatInput.value = '';
-                    if(fileInput) fileInput.value = '';
-                    if(previewContainer) previewContainer.classList.add('hidden');
-
-                    fetch("{{ path('app_chat_send') }}", { method: 'POST', body: formData })
-                        .catch(e => console.error("Error al enviar mensaje", e));
-                };
-
-                btnEnviarChat.addEventListener('click', enviarMensaje);
-                chatInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        enviarMensaje();
-                    }
-                });
-
-                let typingTimer;
-                chatInput.addEventListener('input', () => {
-                    fetch("{{ path('app_chat_typing', {'type': 'sala', 'id': sala.id}) }}", { method: 'POST' }).catch(() => {});
-                });
-
-                if(typeof EventSource !== 'undefined') {
-                    const topic = "https://brainhub.com/sala/{{ sala.id }}";
-                    const mercureUrlBase = "{{ mercure_public_url|default('http://localhost/.well-known/mercure')|raw }}";
-                    const url = new URL(mercureUrlBase);
-                    url.searchParams.append('topic', topic);
-
-                    const foroEventSource = new EventSource(url);
-
-                    foroEventSource.onmessage = (e) => {
-                        const data = JSON.parse(e.data);
-                        const tieneContenido = data.mensaje || data.contenido || data.archivoUrl;
-
-                        if (tieneContenido) {
-                            appendMessage({
-                                autor: data.autor,
-                                contenido: data.mensaje || data.contenido,
-                                archivoUrl: data.archivoUrl
-                            });
+                const dropZone = document.getElementById('content-muro');
+                if(dropZone && fileInput) {
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                        dropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+                        document.body.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+                    });
+                    ['dragenter', 'dragover'].forEach(eventName => dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false));
+                    ['dragleave', 'drop'].forEach(eventName => dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false));
+                    dropZone.addEventListener('drop', (e) => {
+                        const files = e.dataTransfer.files;
+                        if (files && files.length > 0) {
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(files[0]);
+                            fileInput.files = dataTransfer.files;
+                            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
                         }
+                    }, false);
+                }
 
-                        if (data.isTyping && data.autor !== "{{ app.user.username }}") {
-                            if(typingUsername) typingUsername.textContent = data.autor;
-                            if(typingIndicator) {
-                                typingIndicator.classList.remove('hidden');
-                                clearTimeout(typingTimer);
-                                typingTimer = setTimeout(() => typingIndicator.classList.add('hidden'), 2500);
+                const allArchivos = Array.from(document.querySelectorAll('.archivo-item'));
+                const searchArchivosInput = document.getElementById('search-archivos');
+
+                if (allArchivos.length > 0) {
+                    const ITEMS_PER_PAGE = 8;
+                    let currentArchivosPage = 1;
+                    let filteredArchivos = [...allArchivos];
+
+                    function renderArchivos() {
+                        const totalPages = Math.ceil(filteredArchivos.length / ITEMS_PER_PAGE) || 1;
+                        const start = (currentArchivosPage - 1) * ITEMS_PER_PAGE;
+                        const end = start + ITEMS_PER_PAGE;
+
+                        allArchivos.forEach(el => el.style.display = 'none');
+                        filteredArchivos.slice(start, end).forEach(el => el.style.display = 'flex');
+
+                        const pageInfo = document.getElementById('archivos-page-info');
+                        if(pageInfo) pageInfo.textContent = `${currentArchivosPage} / ${totalPages}`;
+
+                        const btnPrev = document.getElementById('btn-prev-archivos');
+                        const btnNext = document.getElementById('btn-next-archivos');
+                        if(btnPrev) btnPrev.disabled = currentArchivosPage === 1;
+                        if(btnNext) btnNext.disabled = currentArchivosPage === totalPages;
+
+                        document.getElementById('archivos-pagination')?.classList.toggle('hidden', filteredArchivos.length <= ITEMS_PER_PAGE);
+                        document.getElementById('no-archivos-busqueda')?.classList.toggle('hidden', filteredArchivos.length > 0);
+                    }
+
+                    renderArchivos();
+
+                    searchArchivosInput?.addEventListener('input', (e) => {
+                        const term = e.target.value.toLowerCase();
+                        filteredArchivos = allArchivos.filter(item => item.dataset.nombre.includes(term) || item.dataset.autor.includes(term));
+                        currentArchivosPage = 1;
+                        renderArchivos();
+                    });
+
+                    document.getElementById('btn-prev-archivos')?.addEventListener('click', () => { if (currentArchivosPage > 1) { currentArchivosPage--; renderArchivos(); } });
+                    document.getElementById('btn-next-archivos')?.addEventListener('click', () => { if (currentArchivosPage < Math.ceil(filteredArchivos.length / ITEMS_PER_PAGE)) { currentArchivosPage++; renderArchivos(); } });
+                }
+
+                if(muro && chatInput && btnEnviarChat) {
+
+                    function appendMessage(data) {
+                        const isMe = data.autor === "{{ app.user.username }}";
+                        const alignClass = isMe ? 'justify-end' : 'justify-start';
+                        const bubbleClass = isMe ? 'bg-emerald-600 text-white bubble-me' : 'bg-white border border-gray-100 bubble-others text-gray-800 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700';
+
+                        let archivoHtml = '';
+                        if (data.archivoUrl) {
+                            const url = data.archivoUrl;
+                            const ext = url.split('.').pop().toLowerCase();
+                            const isImg = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext);
+                            const isPdf = ext === 'pdf';
+
+                            let fileType = 'other';
+                            if (isImg) fileType = 'image';
+                            else if (isPdf) fileType = 'pdf';
+
+                            // Copiamos la misma lógica exacta del chat lateral: pre-registramos al cargar
+                            const fileIndex = window.registerFileInCarousel ? window.registerFileInCarousel(url, fileType, data.archivoNombre || url.split('/').pop(), data.autor || 'Sistema', data.fechaCreacion || '', data.archivoTamano || null) : -1;
+
+                            if (isImg) {
+                                archivoHtml = `
+                        <div class="mt-2 rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-white/10 cursor-pointer" onclick="openCarousel(${fileIndex})">
+                            <img src="${url}" class="max-w-full h-auto max-h-64 object-cover hover:opacity-90 hover:scale-105 transition transform duration-300">
+                        </div>`;
+                            } else if (isPdf) {
+                                archivoHtml = `
+                        <div class="mt-2 flex items-center gap-3 p-3 rounded-xl cursor-pointer border ${isMe ? 'bg-emerald-700/50 border-emerald-400' : 'bg-gray-100 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600'} hover:opacity-80 transition-all" onclick="openCarousel(${fileIndex})">
+                                <div class="bg-red-500 p-2 rounded-lg text-white">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6l-4-4H9z"/><path d="M10 14h4a1 1 0 011 1v3a1 1 0 11-2 0v-1h-1v1a1 1 0 01-1-1z"/></svg>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="text-[11px] font-bold truncate">${data.archivoNombre || 'Ver PDF'}</p>
+                                    <p class="text-[9px] opacity-70 uppercase font-black tracking-tighter">Documento PDF • Click para ver</p>
+                                </div>
+                            </div>`;
+                            } else {
+                                archivoHtml = `
+                            <a href="${url}" download class="mt-2 flex items-center gap-3 p-3 rounded-xl border ${isMe ? 'bg-emerald-700/50 border-emerald-400' : 'bg-gray-100 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600'} hover:bg-opacity-80 transition-all">
+                                <div class="bg-blue-500 p-2 rounded-lg text-white">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                </div>
+                                <span class="text-[11px] font-bold truncate">${data.archivoNombre || 'Archivo'}</span>
+                            </a>`;
                             }
                         }
+
+                        const contenidoTexto = data.contenido || data.mensaje || '';
+
+                        const html = `
+                <div class="flex ${alignClass} message-anim mb-4">
+                    <div class="max-w-[85%] md:max-w-[70%]">
+                        <div class="flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}">
+                            <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">${data.autor}</span>
+                        </div>
+                        <div class="px-5 py-3 rounded-[1.5rem] shadow-sm ${bubbleClass} text-sm break-words">
+                            ${contenidoTexto}
+                            ${archivoHtml}
+                        </div>
+                    </div>
+                </div>`;
+
+                        muro.insertAdjacentHTML('beforeend', html);
+                        muro.scrollTo({ top: muro.scrollHeight, behavior: 'smooth' });
+                    }
+
+                    fetch("{{ path('app_chat_history', {type: 'sala', id: sala.id}) }}")
+                        .then(r => r.json())
+                        .then(mensajes => {
+                            mensajes.forEach(m => appendMessage(m));
+                            muro.scrollTop = muro.scrollHeight;
+                        });
+
+                    const enviarMensaje = () => {
+                        const texto = chatInput.value.trim();
+                        if (!texto && (!fileInput || !fileInput.files[0])) return;
+
+                        const formData = new FormData();
+                        formData.append('mensaje', texto);
+                        formData.append('salaId', "{{ sala.id }}");
+                        if (fileInput && fileInput.files[0]) formData.append('archivo', fileInput.files[0]);
+
+                        chatInput.value = '';
+                        if(fileInput) fileInput.value = '';
+                        if(previewContainer) previewContainer.classList.add('hidden');
+
+                        fetch("{{ path('app_chat_send') }}", { method: 'POST', body: formData })
+                            .catch(e => console.error("Error al enviar mensaje", e));
                     };
 
-                    window.addEventListener('beforeunload', () => foroEventSource.close());
-                }
-            }
+                    btnEnviarChat.addEventListener('click', enviarMensaje);
+                    chatInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            enviarMensaje();
+                        }
+                    });
 
-            const formEdit = document.getElementById('form-edit-sala-spa');
-            if (formEdit) {
-                formEdit.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    fetch(this.action, { method: 'POST', body: new FormData(this), headers: {'X-Requested-With': 'XMLHttpRequest'} })
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.status === 'success') {
-                                const titulo = document.getElementById('sala-nombre-display');
-                                const desc = document.getElementById('sala-descripcion-display');
-                                if(titulo) titulo.textContent = data.data.nombre;
-                                if(desc) desc.textContent = data.data.descripcion;
-                                closeEditModal();
+                    let typingTimer;
+                    chatInput.addEventListener('input', () => {
+                        fetch("{{ path('app_chat_typing', {'type': 'sala', 'id': sala.id}) }}", { method: 'POST' }).catch(() => {});
+                    });
+
+                    if(typeof EventSource !== 'undefined') {
+                        const topic = "https://brainhub.com/sala/{{ sala.id }}";
+                        const url = new URL('/.well-known/mercure', window.location.origin);
+                        url.searchParams.append('topic', topic);
+
+                        const foroEventSource = new EventSource(url);
+
+                        foroEventSource.onmessage = (e) => {
+                            const data = JSON.parse(e.data);
+                            const tieneContenido = data.mensaje || data.contenido || data.archivoUrl;
+
+                            if (tieneContenido) {
+                                appendMessage({
+                                    autor: data.autor,
+                                    contenido: data.mensaje || data.contenido,
+                                    archivoUrl: data.archivoUrl
+                                });
                             }
-                        });
-                });
-            }
-        });
-    </script>
-{% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-{% endblock %}
+                            if (data.isTyping && data.autor !== "{{ app.user.username }}") {
+                                if(typingUsername) typingUsername.textContent = data.autor;
+                                if(typingIndicator) {
+                                    typingIndicator.classList.remove('hidden');
+                                    clearTimeout(typingTimer);
+                                    typingTimer = setTimeout(() => typingIndicator.classList.add('hidden'), 2500);
+                                }
+                            }
+                        };
+
+                        window.addEventListener('beforeunload', () => foroEventSource.close());
+                    }
+                }
+
+                const formEdit = document.getElementById('form-edit-sala-spa');
+                if (formEdit) {
+                    formEdit.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        fetch(this.action, { method: 'POST', body: new FormData(this), headers: {'X-Requested-With': 'XMLHttpRequest'} })
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    const titulo = document.getElementById('sala-nombre-display');
+                                    const desc = document.getElementById('sala-descripcion-display');
+                                    if(titulo) titulo.textContent = data.data.nombre;
+                                    if(desc) desc.textContent = data.data.descripcion;
+                                    closeEditModal();
+                                }
+                            });
+                    });
+                }
+                // ====================================================================
+                // 3. INTERCEPCIÓN DE FORMULARIOS CON SWEETALERT2
+                // ====================================================================
+
+                // Delegación de eventos para interceptar los formularios
+                document.addEventListener('submit', async function(e) {
+                    const form = e.target;
+
+                    // --- SALIR DE LA SALA ---
+                    if (form.classList.contains('js-leave-form')) {
+                        e.preventDefault(); // Detenemos el envío normal
+
+                        const result = await Swal.fire({
+                            title: '¿Salir de la sala?',
+                            text: "Perderás el acceso al muro y a los archivos compartidos.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#10b981', // Emerald
+                            cancelButtonColor: '#6b7280', // Gray
+                            confirmButtonText: 'Sí, salir',
+                            cancelButtonText: 'Cancelar',
+                            background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
+                            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937'
+                        });
+
+                        if (result.isConfirmed) {
+                            form.submit(); // Si confirma, enviamos el formulario
+                        }
+                    }
+
+                    // --- EXPULSAR A UN MIEMBRO (CORREGIDO: True -> true) ---
+                    if (form.classList.contains('js-kick-form')) {
+                        e.preventDefault(); // Detenemos el envío normal
+
+                        const username = form.dataset.username || 'este usuario';
+
+                        const result = await Swal.fire({
+                            title: `¿Expulsar a ${username}?`,
+                            text: "Este usuario perderá el acceso a la sala inmediatamente.",
+                            icon: 'warning', // Cambiado a warning, visualmente es mejor para confirmaciones
+                            showCancelButton: true, // <--- AQUÍ ESTABA EL ERROR (True -> true)
+                            confirmButtonColor: '#ef4444', // Red
+                            cancelButtonColor: '#6b7280', // Gray
+                            confirmButtonText: 'Sí, expulsar',
+                            cancelButtonText: 'Cancelar',
+                            background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
+                            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937'
+                        });
+
+                        if (result.isConfirmed) {
+                            form.submit(); // Si confirma, enviamos el formulario
+                        }
+                    }
+
+                    // --- ELIMINAR LA SALA COMPLETA ---
+                    if (form.classList.contains('js-delete-form')) {
+                        e.preventDefault(); // Detenemos el envío normal
+
+                        const result = await Swal.fire({
+                            title: '¿Eliminar esta sala permanentemente?',
+                            text: "¡Esta acción no se puede deshacer! Se borrarán todos los mensajes y archivos compartidos.",
+                            icon: 'error',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444', // Red
+                            cancelButtonColor: '#6b7280', // Gray
+                            confirmButtonText: 'Sí, eliminar',
+                            cancelButtonText: 'Cancelar',
+                            background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
+                            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937'
+                        });
+
+                        if (result.isConfirmed) {
+                            form.submit(); // Si confirma, enviamos el formulario
+                        }
+                    }
+                });
+            });
+        </script>
+    {% endblock %}
+
+    {% block javascripts %}
+        {{ parent() }}
+    {% endblock %}

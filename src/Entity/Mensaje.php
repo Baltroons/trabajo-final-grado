@@ -48,16 +48,22 @@ class Mensaje
 
     // --- EL TO_ARRAY ACTUALIZADO PARA LAS NOTIFICACIONES ---
     public function toArray(): array {
+        // 1. Calculate file size dynamically from the server (Docker-safe path)
+        $filePath = $this->archivoUrl ? dirname(__DIR__, 2) . '/public' . $this->archivoUrl : null;
+        $fileSize = ($filePath && file_exists($filePath)) ? filesize($filePath) : null;
+
         return [
             'id' => $this->id,
             'contenido' => $this->contenido,
             'autor' => $this->autor ? $this->autor->getUsername() : 'Anónimo',
             'autorId' => $this->autor ? $this->autor->getId() : null,
             'fecha' => $this->fechaCreacion ? $this->fechaCreacion->format('H:i') : date('H:i'),
+            'fechaCreacion' => $this->fechaCreacion ? $this->fechaCreacion->format('d/m/Y H:i') : null, // <-- ADDED FULL DATE
             'salaId' => $this->sala ? $this->sala->getId() : null,
             'salaNombre' => $this->sala ? $this->sala->getNombre() : null,
             'archivoUrl' => $this->archivoUrl,
             'archivoNombre' => $this->archivoNombre,
+            'archivoTamano' => $fileSize, // <-- ADDED FILE SIZE IN BYTES
         ];
     }
 
