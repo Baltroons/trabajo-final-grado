@@ -23,103 +23,99 @@ class ChatController extends AbstractController
         HubInterface $hub,
         EntityManagerInterface $em,
         SalaRepository $salaRepo,
+        UserRepository $userRepo, // Añade este repositorio
         SluggerInterface $slugger
     ): JsonResponse {
         try {
             $contenido = $request->request->get('mensaje');
             $salaId = $request->request->get('salaId');
+            $receptorId = $request->request->get('receptorId'); // NUEVO
             $file = $request->files->get('archivo');
             $user = $this->getUser();
 
-            if (!$user || !$salaId) return new JsonResponse(['error' => 'No autorizado'], 403);
-
-            $sala = $salaRepo->find($salaId);
-            if (!$sala) return new JsonResponse(['error' => 'Sala no encontrada'], 404);
+            if (!$user || (!$salaId && !$receptorId)) return new JsonResponse(['error' => 'No autorizado'], 403);
 
             $mensaje = new Mensaje();
             $mensaje->setContenido($contenido);
             $mensaje->setAutor($user);
-            $mensaje->setSala($sala);
 
-            // --- GESTIÓN DEL ARCHIVO ---
-            $archivoTamano = null; // Inicializamos la variable
+            $sala = null;
+            $receptor = null;
+
+            if ($salaId) {
+                $sala = $salaRepo->find($salaId);
+                if (!$sala) return new JsonResponse(['error' => 'Sala no encontrada'], 404);
+                $mensaje->setSala($sala);
+            } elseif ($receptorId) {
+                $receptor = $userRepo->find($receptorId);
+                if (!$receptor) return new JsonResponse(['error' => 'Usuario no encontrado'], 404);
+                $mensaje->setReceptor($receptor);
+            }
+
+            // --- GESTIÓN DEL ARCHIVO (igual que antes) ---
+            $archivoTamano = null;
             if ($file) {
                 $originalName = $file->getClientOriginalName();
                 $extension = $file->guessExtension() ?? $file->getClientOriginalExtension();
                 $newFilename = $slugger->slug(pathinfo($originalName, PATHINFO_FILENAME)).'-'.uniqid().'.'.$extension;
-
-                // Obtenemos el tamaño antes de moverlo
                 $archivoTamano = $file->getSize();
-
                 $uploadDir = $this->getParameter('kernel.project_dir').'/public/uploads';
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0755, true);
-                }
-
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
                 $file->move($uploadDir, $newFilename);
-
                 $mensaje->setArchivoUrl('/uploads/' . $newFilename);
                 $mensaje->setArchivoNombre($originalName);
 
-                $archivoEntidad = new \App\Entity\Archivo();
-                $archivoEntidad->setNombreOriginal($originalName);
-                $archivoEntidad->setNombreServidor($newFilename);
-                $archivoEntidad->setTipo($extension);
-                $archivoEntidad->setSala($sala);
-                $archivoEntidad->setSubidoPor($user);
-
-                // Guardamos el tamaño en la entidad Archivo (Asegúrate de tener este setter en tu Entidad)
-                if(method_exists($archivoEntidad, 'setTamano')) {
-                    $archivoEntidad->setTamano($archivoTamano);
+                if ($sala) { // Solo guardamos el archivo en la galería si es de una sala
+                    $archivoEntidad = new \App\Entity\Archivo();
+                    $archivoEntidad->setNombreOriginal($originalName);
+                    $archivoEntidad->setNombreServidor($newFilename);
+                    $archivoEntidad->setTipo($extension);
+                    $archivoEntidad->setSala($sala);
+                    $archivoEntidad->setSubidoPor($user);
+                    if(method_exists($archivoEntidad, 'setTamano')) $archivoEntidad->setTamano($archivoTamano);
+                    $em->persist($archivoEntidad);
                 }
-
-                $em->persist($archivoEntidad);
             }
 
             $em->persist($mensaje);
-            $em->flush(); // Hacemos flush aquí para que Doctrine genere la fecha de creación automáticamente
+            $em->flush();
 
             // --- MERCURE Y RESPUESTA ---
-            // Construimos el array manualmente asegurando que los datos que el JS necesita estén presentes
-            $fechaCreacion = $mensaje->getFechaCreacion() ? $mensaje->getFechaCreacion()->format('d/m/Y H:i') : (new \DateTime())->format('d/m/Y H:i');
+            $timezone = new \DateTimeZone('Europe/Madrid');
+            $fechaCreacion = $mensaje->getFechaCreacion() ? $mensaje->getFechaCreacion()->format('d/m/Y H:i') : (new \DateTime('now', $timezone))->format('d/m/Y H:i');
 
             $mensajeData = json_encode([
                 'id'             => $mensaje->getId(),
                 'autor'          => $user->getUsername(),
+                'autorId'        => $user->getId(),
+                'autorFoto'      => $user->getFotoPerfil(),
                 'contenido'      => $contenido,
                 'archivoUrl'     => $mensaje->getArchivoUrl(),
                 'archivoNombre'  => $mensaje->getArchivoNombre(),
                 'archivoTamano'  => $archivoTamano,
                 'fechaCreacion'  => $fechaCreacion,
                 'salaId'         => $salaId,
-                'salaNombre'     => $sala->getNombre()
+                'salaNombre'     => $sala ? $sala->getNombre() : null,
+                'remitenteId'    => $receptorId ? $user->getId() : null // Para saber quién lo envía en el privado
             ]);
 
-            // 1. Publicamos en el topic de la sala
-            $hub->publish(new Update(
-                "https://brainhub.com/sala/{$salaId}",
-                $mensajeData,
-                false
-            ));
-
-            // 2. Notificación personal a los miembros
-            $receptores = new \Doctrine\Common\Collections\ArrayCollection($sala->getMiembros()->toArray());
-            if ($sala->getCreador() && !$receptores->contains($sala->getCreador())) {
-                $receptores->add($sala->getCreador());
-            }
-
-            foreach ($receptores as $miembro) {
-                if ($miembro->getId() !== $user->getId()) {
-                    $hub->publish(new Update(
-                        "https://brainhub.com/notifs/{$miembro->getId()}",
-                        $mensajeData,
-                        false
-                    ));
+            if ($sala) {
+                $hub->publish(new Update("https://brainhub.com/sala/{$salaId}", $mensajeData, false));
+                $receptores = new \Doctrine\Common\Collections\ArrayCollection($sala->getMiembros()->toArray());
+                if ($sala->getCreador() && !$receptores->contains($sala->getCreador())) $receptores->add($sala->getCreador());
+                foreach ($receptores as $miembro) {
+                    if ($miembro->getId() !== $user->getId()) {
+                        $hub->publish(new Update("https://brainhub.com/notifs/{$miembro->getId()}", $mensajeData, false));
+                    }
                 }
+            } elseif ($receptor) {
+                // Mensaje privado: notificamos al receptor y a nosotros mismos
+                $hub->publish(new Update("https://brainhub.com/user/{$receptor->getId()}", $mensajeData, false));
+                $hub->publish(new Update("https://brainhub.com/user/{$user->getId()}", $mensajeData, false));
+                $hub->publish(new Update("https://brainhub.com/notifs/{$receptor->getId()}", $mensajeData, false));
             }
 
             return new JsonResponse(['status' => 'OK']);
-
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
@@ -179,5 +175,41 @@ class ChatController extends AbstractController
         }
 
         return $this->json($mensajesData);
+    }
+
+    #[Route('/api/user/{id}/profile', name: 'api_user_profile', methods: ['GET'])]
+    public function getUserProfile(int $id, UserRepository $userRepo): JsonResponse
+    {
+        $user = $userRepo->find($id);
+        if (!$user) return new JsonResponse(['error' => 'Usuario no encontrado'], 404);
+
+        return new JsonResponse([
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
+            'fotoPerfil' => $user->getFotoPerfil(),
+            'biografia' => $user->getBiografia(),
+            'ciudad' => $user->getCiudad()
+        ]);
+    }
+
+    #[Route('/chat/conversations', name: 'app_chat_conversations', methods: ['GET'])]
+    public function getConversations(EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) return new JsonResponse([]);
+
+        // Buscamos todos los usuarios con los que el usuario actual ha intercambiado mensajes
+        $qb = $em->createQueryBuilder();
+        $qb->select('u.id, u.username, u.fotoPerfil')
+            ->from('App\Entity\User', 'u')
+            ->innerJoin('App\Entity\Mensaje', 'm', 'WITH', '(m.autor = u AND m.receptor = :me) OR (m.receptor = u AND m.autor = :me)')
+            ->where('u.id != :me')
+            ->setParameter('me', $user->getId())
+            ->groupBy('u.id')
+            ->orderBy('MAX(m.fechaCreacion)', 'DESC'); // Ordenados por el último mensaje
+
+        $users = $qb->getQuery()->getResult();
+
+        return new JsonResponse($users);
     }
 }

@@ -56,7 +56,8 @@ class Mensaje
             'id' => $this->id,
             'contenido' => $this->contenido,
             'autor' => $this->autor ? $this->autor->getUsername() : 'Anónimo',
-            'autorId' => $this->autor ? $this->autor->getId() : null,
+            'autorId' => $this->autor ? $this->autor->getId() : null,       // AÑADIDO
+            'autorFoto' => $this->autor ? $this->autor->getFotoPerfil() : null, // AÑADIDO
             'fecha' => $this->fechaCreacion ? $this->fechaCreacion->format('H:i') : date('H:i'),
             'fechaCreacion' => $this->fechaCreacion ? $this->fechaCreacion->format('d/m/Y H:i') : null, // <-- ADDED FULL DATE
             'salaId' => $this->sala ? $this->sala->getId() : null,

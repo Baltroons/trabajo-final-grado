@@ -28,6 +28,24 @@ final class SalaController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Verificar duplicado por nombre + creador + tiempo (últimos 10 segundos)
+            $recentDuplicate = $entityManager->getRepository(Sala::class)->findOneBy([
+                'creador' => $this->getUser(),
+                'nombre' => $form->get('nombre')->getData()
+            ], ['id' => 'DESC']);
+
+            if ($recentDuplicate &&
+                (time() - $recentDuplicate->getFechaCreacion()->getTimestamp()) < 10) {
+                // Es un duplicado reciente, devolver el existente
+                return new JsonResponse([
+                    'success' => true,
+                    'sala_id' => $recentDuplicate->getId(),
+                    'sala_nombre' => $recentDuplicate->getNombre(),
+                    'redirect_url' => $this->generateUrl('app_sala_show', ['id' => $recentDuplicate->getId()]),
+                    'duplicate' => true
+                ]);
+            }
+
             $sala->setCreador($this->getUser());
 
             if (!$sala->getToken()) {
@@ -37,14 +55,12 @@ final class SalaController extends AbstractController
             $entityManager->persist($sala);
             $entityManager->flush();
 
-            if ($request->isXmlHttpRequest() || str_contains($request->headers->get('Accept'), 'application/json')) {
-                return new JsonResponse([
-                    'success' => true,
-                    'sala_id' => $sala->getId(),
-                    'sala_nombre' => $sala->getNombre(),
-                    'redirect_url' => $this->generateUrl('app_sala_show', ['id' => $sala->getId()])
-                ]);
-            }
+            return new JsonResponse([
+                'success' => true,
+                'sala_id' => $sala->getId(),
+                'sala_nombre' => $sala->getNombre(),
+                'redirect_url' => $this->generateUrl('app_sala_show', ['id' => $sala->getId()])
+            ]);
         }
 
         return new JsonResponse([
