@@ -139,13 +139,18 @@
                                         </div>
                                     {% endif %}
 
-                                    {# SE AÑADE LA INTEGRACIÓN CON EL MODAL DEL BASE A TRAVÉS DE openPreview() #}
-                                    <button onclick="window.openPreview('{{ fileUrl }}', '{{ tipoPreview }}', '{{ archivo.nombreOriginal|e('js') }}', '{{ archivo.subidoPor.username|e('js') }}')" class="absolute inset-0 bg-emerald-600/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm z-10 cursor-pointer border-none outline-none">
+                                    {# SE AÑADE LA INTEGRACIÓN CON EL MODAL USANDO FILTROS 'is defined' #}
+                                    <button onclick="window.openPreview('{{ fileUrl }}', '{{ tipoPreview }}', '{{ archivo.nombreOriginal|e('js') }}', '{{ archivo.subidoPor.username|e('js') }}', '{{ archivo.fechaCreacion is defined ? archivo.fechaCreacion|date('d/m/Y H:i') : '' }}', {{ archivo.tamano is defined ? archivo.tamano : 'null' }})" class="absolute inset-0 bg-emerald-600/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm z-10 cursor-pointer border-none outline-none">
                                         <div class="flex flex-col items-center text-white">
                                             <svg class="w-8 h-8 mb-1 transform scale-50 group-hover:scale-100 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             <span class="text-[10px] font-bold uppercase tracking-widest">Ver Previa</span>
                                         </div>
                                     </button>
+                                </div>
+
+                                <div class="p-3 bg-white dark:bg-darkCard border-t border-gray-50 dark:border-white/5 z-20">
+                                    <p class="font-bold text-xs text-gray-800 dark:text-white truncate" title="{{ archivo.nombreOriginal }}">{{ archivo.nombreOriginal }}</p>
+                                    <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-1">Por {{ archivo.subidoPor.username }}</p>
                                 </div>
 
                                 <div class="p-3 bg-white dark:bg-darkCard border-t border-gray-50 dark:border-white/5 z-20">
@@ -279,6 +284,15 @@
             // ====================================================================
             // 1. FUNCIONES GLOBALES PARA HTML (Pestañas y Modales)
             // ====================================================================
+
+            // --- NUEVA FUNCIÓN: Detectar YouTube ---
+            function extractYouTubeId(text) {
+                if (!text) return null;
+                const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+                const match = text.match(regex);
+                return match ? match[1] : null;
+            }
+
             function openTab(tabName) {
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
                 document.querySelectorAll('button[id^="tab-"]').forEach(b => {
@@ -415,6 +429,25 @@
                         const alignClass = isMe ? 'justify-end' : 'justify-start';
                         const bubbleClass = isMe ? 'bg-emerald-600 text-white bubble-me' : 'bg-white border border-gray-100 bubble-others text-gray-800 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700';
 
+                        const contenidoTexto = data.contenido || data.mensaje || '';
+
+                        // --- YouTube Detection ---
+                        let youtubeHtml = '';
+                        const ytId = extractYouTubeId(contenidoTexto);
+                        if (ytId) {
+                            const ytEmbedUrl = `https://www.youtube.com/embed/${ytId}`;
+                            const ytThumb = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+                            const fileIndex = window.registerFileInCarousel ? window.registerFileInCarousel(ytEmbedUrl, 'youtube', 'Video de YouTube', data.autor || 'Sistema', data.fechaCreacion || '', null, ytId) : -1;
+
+                            youtubeHtml = `
+                            <div class="mt-2 group relative cursor-pointer overflow-hidden rounded-lg border border-black/10 dark:border-white/10 bg-white/10" onclick="openCarousel(${fileIndex})">
+                                <img src="${ytThumb}" class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300">
+                                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity">
+                                    <svg class="w-12 h-12 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>`;
+                        }
+
                         let archivoHtml = '';
                         if (data.archivoUrl) {
                             const url = data.archivoUrl;
@@ -426,7 +459,6 @@
                             if (isImg) fileType = 'image';
                             else if (isPdf) fileType = 'pdf';
 
-                            // Copiamos la misma lógica exacta del chat lateral: pre-registramos al cargar
                             const fileIndex = window.registerFileInCarousel ? window.registerFileInCarousel(url, fileType, data.archivoNombre || url.split('/').pop(), data.autor || 'Sistema', data.fechaCreacion || '', data.archivoTamano || null) : -1;
 
                             if (isImg) {
@@ -446,17 +478,19 @@
                                 </div>
                             </div>`;
                             } else {
+                                // --- MODIFICADO: Archivos genéricos abren previsualización ---
                                 archivoHtml = `
-                            <a href="${url}" download class="mt-2 flex items-center gap-3 p-3 rounded-xl border ${isMe ? 'bg-emerald-700/50 border-emerald-400' : 'bg-gray-100 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600'} hover:bg-opacity-80 transition-all">
+                            <div class="mt-2 flex items-center gap-3 p-3 rounded-xl cursor-pointer border ${isMe ? 'bg-emerald-700/50 border-emerald-400' : 'bg-gray-100 dark:bg-gray-800/80 border-gray-200 dark:border-gray-600'} hover:opacity-80 transition-all" onclick="openCarousel(${fileIndex})">
                                 <div class="bg-blue-500 p-2 rounded-lg text-white">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                                 </div>
-                                <span class="text-[11px] font-bold truncate">${data.archivoNombre || 'Archivo'}</span>
-                            </a>`;
+                                <div class="overflow-hidden">
+                                    <p class="text-[11px] font-bold truncate">${data.archivoNombre || 'Archivo'}</p>
+                                    <p class="text-[9px] opacity-70 uppercase font-black tracking-tighter">Click para ver / Descargar</p>
+                                </div>
+                            </div>`;
                             }
                         }
-
-                        const contenidoTexto = data.contenido || data.mensaje || '';
 
                         const html = `
                 <div class="flex ${alignClass} message-anim mb-4">
@@ -465,7 +499,8 @@
                             <span class="text-[9px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">${data.autor}</span>
                         </div>
                         <div class="px-5 py-3 rounded-[1.5rem] shadow-sm ${bubbleClass} text-sm break-words">
-                            ${contenidoTexto}
+                            ${contenidoTexto ? `<p class="whitespace-pre-wrap break-words">${contenidoTexto}</p>` : ''}
+                            ${youtubeHtml}
                             ${archivoHtml}
                         </div>
                     </div>
@@ -527,7 +562,10 @@
                                 appendMessage({
                                     autor: data.autor,
                                     contenido: data.mensaje || data.contenido,
-                                    archivoUrl: data.archivoUrl
+                                    archivoUrl: data.archivoUrl,
+                                    archivoNombre: data.archivoNombre || null,
+                                    archivoTamano: data.archivoTamano || null,
+                                    fechaCreacion: data.fechaCreacion || null
                                 });
                             }
 
@@ -562,25 +600,24 @@
                             });
                     });
                 }
+
                 // ====================================================================
                 // 3. INTERCEPCIÓN DE FORMULARIOS CON SWEETALERT2
                 // ====================================================================
 
-                // Delegación de eventos para interceptar los formularios
                 document.addEventListener('submit', async function(e) {
                     const form = e.target;
 
-                    // --- SALIR DE LA SALA ---
                     if (form.classList.contains('js-leave-form')) {
-                        e.preventDefault(); // Detenemos el envío normal
+                        e.preventDefault();
 
                         const result = await Swal.fire({
                             title: '¿Salir de la sala?',
                             text: "Perderás el acceso al muro y a los archivos compartidos.",
                             icon: 'warning',
                             showCancelButton: true,
-                            confirmButtonColor: '#10b981', // Emerald
-                            cancelButtonColor: '#6b7280', // Gray
+                            confirmButtonColor: '#10b981',
+                            cancelButtonColor: '#6b7280',
                             confirmButtonText: 'Sí, salir',
                             cancelButtonText: 'Cancelar',
                             background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
@@ -588,23 +625,22 @@
                         });
 
                         if (result.isConfirmed) {
-                            form.submit(); // Si confirma, enviamos el formulario
+                            form.submit();
                         }
                     }
 
-                    // --- EXPULSAR A UN MIEMBRO (CORREGIDO: True -> true) ---
                     if (form.classList.contains('js-kick-form')) {
-                        e.preventDefault(); // Detenemos el envío normal
+                        e.preventDefault();
 
                         const username = form.dataset.username || 'este usuario';
 
                         const result = await Swal.fire({
                             title: `¿Expulsar a ${username}?`,
                             text: "Este usuario perderá el acceso a la sala inmediatamente.",
-                            icon: 'warning', // Cambiado a warning, visualmente es mejor para confirmaciones
-                            showCancelButton: true, // <--- AQUÍ ESTABA EL ERROR (True -> true)
-                            confirmButtonColor: '#ef4444', // Red
-                            cancelButtonColor: '#6b7280', // Gray
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            cancelButtonColor: '#6b7280',
                             confirmButtonText: 'Sí, expulsar',
                             cancelButtonText: 'Cancelar',
                             background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
@@ -612,21 +648,20 @@
                         });
 
                         if (result.isConfirmed) {
-                            form.submit(); // Si confirma, enviamos el formulario
+                            form.submit();
                         }
                     }
 
-                    // --- ELIMINAR LA SALA COMPLETA ---
                     if (form.classList.contains('js-delete-form')) {
-                        e.preventDefault(); // Detenemos el envío normal
+                        e.preventDefault();
 
                         const result = await Swal.fire({
                             title: '¿Eliminar esta sala permanentemente?',
                             text: "¡Esta acción no se puede deshacer! Se borrarán todos los mensajes y archivos compartidos.",
                             icon: 'error',
                             showCancelButton: true,
-                            confirmButtonColor: '#ef4444', // Red
-                            cancelButtonColor: '#6b7280', // Gray
+                            confirmButtonColor: '#ef4444',
+                            cancelButtonColor: '#6b7280',
                             confirmButtonText: 'Sí, eliminar',
                             cancelButtonText: 'Cancelar',
                             background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
@@ -634,7 +669,7 @@
                         });
 
                         if (result.isConfirmed) {
-                            form.submit(); // Si confirma, enviamos el formulario
+                            form.submit();
                         }
                     }
                 });
