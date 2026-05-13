@@ -66,6 +66,22 @@
         body.dark.swal2-shown {
             height: 100vh !important;
         }
+
+        /* FIX: Chat lateral - evitar overflow en mensajes largos */
+        #chat-messages-container {
+            overflow-x: hidden;
+        }
+
+        #chat-messages-container .break-words {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        #chat-messages-container .max-w-[85%] {
+            max-width: 85%;
+            min-width: 0; /* Permitir shrink */
+        }
     </style>
 </head>
 
@@ -1148,17 +1164,17 @@
                 : `<span class="text-[10px] text-gray-400 dark:text-gray-500 font-bold mb-1 px-1 uppercase">${safeAuthor}</span>`;
 
             div.innerHTML = `
-                    ${!isMe ? avatarHtml : ''}
-                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[85%]">
-                        ${usernameHtml}
-                        <div class="px-4 py-3 text-sm ${bubbleClasses}">
-                            ${safeContent ? `<p class="whitespace-pre-wrap break-words">${safeContent}</p>` : ''}
-                            ${youtubeHtml}
-                            ${fileHtml}
-                        </div>
+                ${!isMe ? avatarHtml : ''}
+                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[85%]">
+                    ${usernameHtml}
+                    <div class="px-4 py-3 text-sm ${bubbleClasses} max-w-full overflow-hidden">
+                        ${safeContent ? `<p class="whitespace-pre-wrap break-words overflow-wrap-anywhere">${safeContent}</p>` : ''}
+                        ${youtubeHtml}
+                        ${fileHtml}
                     </div>
-                    ${isMe ? avatarHtml : ''}
-                `;
+                </div>
+                ${isMe ? avatarHtml : ''}
+            `;
 
             chatContainer?.appendChild(div);
 
