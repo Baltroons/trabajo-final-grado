@@ -91,139 +91,69 @@
 <audio id="notification-sound" src="{{ asset('sounds/notificacion_pop.mp3') }}" preload="auto"></audio>
 
 {# --- NAVBAR --- #}
-
 <nav class="bg-emerald-800 dark:bg-emerald-950 shadow-md z-50 shrink-0 relative border-b border-transparent dark:border-emerald-900">
-
     <div class="w-full px-6 md:px-10">
-
         <div class="flex justify-between h-16 items-center">
-
-
-
             {# LOGO #}
-
             <a href="{{ path('app_home') }}" class="flex items-center gap-2 text-white font-bold text-xl hover:text-emerald-200 transition-colors">
-
                 <img src="{{ asset('images/logo.png') }}" alt="BrainHub Logo" class="w-8 h-8 object-contain">
-
                 <span>BrainHub</span>
-
             </a>
-
-
-
             {# ACCIONES DERECHA #}
-
             <div class="flex items-center space-x-2 md:space-x-4 h-full">
-
-
-
                 {# BOTÓN TOGGLE MODO OSCURO/CLARO #}
-
                 <button onclick="toggleTheme()" class="p-2 rounded-xl bg-emerald-700/50 dark:bg-emerald-900/80 text-emerald-100 hover:text-white transition-all outline-none flex items-center justify-center">
-
                     <svg id="theme-sun" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9h-1m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
-
                     </svg>
-
                     <svg id="theme-moon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-
                     </svg>
-
                 </button>
 
-
-
                 {% if app.user %}
-
                     {# CAMPANA DE NOTIFICACIONES #}
-
                     <div class="relative flex items-center h-full">
-
                         <button id="notifMenuBtn" class="relative p-2 rounded-xl text-emerald-100 hover:text-white hover:bg-emerald-700/30 transition-all outline-none flex items-center justify-center">
-
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-
                             </svg>
-
                             <span id="global-notif-badge" class="hidden absolute top-2 right-2.5 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-emerald-800"></span>
-
                         </button>
-
-
 
                         {# DROPDOWN NOTIFICACIONES - Corregido con top-full #}
-
                         <div id="notifDropdown" class="dropdown-menu hidden absolute right-0 top-full mt-2 w-72 bg-white dark:bg-darkCard rounded-2xl shadow-2xl border border-gray-100 dark:border-darkBorder py-2 z-[100] animate-fade-in">
-
                             <div class="px-4 py-2 border-b border-gray-50 dark:border-darkBorder">
-
                                 <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">Notificaciones</span>
-
                             </div>
-
                             <div id="notif-list" class="max-h-64 overflow-y-auto">
-
                                 <p class="text-xs text-gray-400 text-center py-4">No tienes notificaciones nuevas.</p>
-
                             </div>
-
                         </div>
-
                     </div>
-
-
 
                     {# PERFIL DE USUARIO #}
-
                     <div class="relative flex items-center h-full">
-
                         <button id="userMenuBtn" class="flex items-center outline-none hover:opacity-80 transition-opacity">
-
                             <div class="h-10 w-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-black border-2 border-emerald-300 dark:border-emerald-700 shadow-sm uppercase text-sm overflow-hidden">
-
                                 {% if app.user.fotoPerfil %}
-
                                     <img src="{{ asset('uploads/profiles/' ~ app.user.fotoPerfil) }}" class="w-full h-full object-cover" alt="Perfil">
-
                                 {% else %}
-
                                     {{ app.user.username|first }}
-
                                 {% endif %}
-
                             </div>
-
                         </button>
 
-
-
                         {# DROPDOWN USUARIO - Corregido con top-full #}
-
                         <div id="userDropdown" class="dropdown-menu hidden absolute right-0 top-full mt-2 w-48 bg-white dark:bg-darkCard rounded-2xl shadow-2xl border border-gray-100 dark:border-darkBorder py-2 z-[100] animate-fade-in">
-
                             <div class="px-4 py-2 border-b border-gray-50 dark:border-darkBorder mb-1">
-
                                 <p class="text-sm font-bold text-gray-800 dark:text-white">{{ app.user.username }}</p>
-
                             </div>
-
                             <a href="{{ path('app_profile_edit') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Mi Perfil</a>
-
                             <a href="{{ path('app_logout') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Cerrar Sesión</a>
-
                         </div>
-
                     </div>
-
                 {% endif %}
-
             </div>
         </div>
     </div>
@@ -320,7 +250,7 @@
             &copy; {{ "now"|date("Y") }} <span class="text-emerald-400 dark:text-emerald-500 font-bold">BrainHub</span> - Sistema de Estudio Colaborativo
         </div>
         <div class="flex gap-4 text-emerald-400/40 dark:text-emerald-500/40">
-            <span>Versión 2.0</span>
+            <span>Versión 2.2</span>
             <span class="flex items-center gap-1">
                     <span class="h-1.5 w-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full animate-pulse"></span>
                     Servidor en línea
@@ -354,6 +284,13 @@
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                 <input type="text" name="_username" class="w-full px-6 py-4 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Usuario" required>
                 <input type="password" name="_password" class="w-full px-6 py-4 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Contraseña" required>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center gap-2 text-xs text-gray-400 cursor-pointer group select-none">
+                        <input type="checkbox" id="login-remember-me"
+                               class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-gray-900 cursor-pointer transition-colors">
+                        <span class="group-hover:text-emerald-400 transition-colors">Recuérdame en este dispositivo</span>
+                    </label>
+                </div>
                 <button type="submit" class="w-full bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-emerald-900/20">Entrar ahora</button>
             </form>
             <div class="text-center mt-6">
@@ -382,7 +319,6 @@
 
             <form id="register-form" action="{{ path('app_register') }}" method="post" class="space-y-4" novalidate>
                 <input type="hidden" name="registration_form[_token]" value="{{ csrf_token('registration_form') }}">
-                <input type="hidden" name="registration_form[agreeTerms]" value="1">
                 <div class="relative">
                     <input type="text" id="reg-username" name="registration_form[username]" class="w-full px-5 py-3.5 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all pr-10" placeholder="Nombre de usuario" required>
                     <div id="user-check-spinner" class="hidden absolute right-4 top-4">
@@ -402,9 +338,16 @@
                     <input type="password" id="reg-confirm-password" class="w-full px-5 py-3.5 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Confirmar" required>
                 </div>
 
-                <div class="flex items-center gap-2 text-[10px] text-gray-400">
-                    <input type="checkbox" name="registration_form[agreeTerms]" required class="rounded border-gray-600 bg-gray-700 text-emerald-600 focus:ring-offset-gray-900">
-                    <span>Acepto los términos de uso</span>
+                <div class="flex items-start gap-2 text-[10px] text-gray-400 mt-2">
+                    <input type="checkbox" id="reg-terms-checkbox" name="registration_form[agreeTerms]" required
+                           class="mt-0.5 rounded border-gray-600 bg-gray-700 text-emerald-600 focus:ring-offset-gray-900 cursor-pointer">
+                    <span class="cursor-pointer" onclick="document.getElementById('reg-terms-checkbox').click()">
+                    He leído y acepto los
+                    <button type="button" onclick="event.stopPropagation(); showTermsModal()"
+                            class="text-emerald-400 font-bold hover:text-emerald-300 underline transition-colors">
+                        Términos y Condiciones de Uso
+                    </button>
+                </span>
                 </div>
 
                 <button type="submit" id="reg-submit-btn" class="w-full bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg transform hover:scale-[1.01]">Registrarme</button>
@@ -490,10 +433,98 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // ====================================================================
+// SISTEMA DE MENSAJES ENTRE PÁGINAS (SessionStorage)
+// ====================================================================
+        (function showCrossPageMessage() {
+            const msg = sessionStorage.getItem('brainhub_welcome');
+            if (!msg) return;
+
+            try {
+                const data = JSON.parse(msg);
+                const isDark = document.documentElement.classList.contains('dark');
+
+                setTimeout(() => {
+                    Swal.fire({
+                        icon: data.type || 'success',
+                        title: data.title || 'Éxito',
+                        text: data.text || '',
+                        confirmButtonColor: '#10b981',
+                        background: isDark ? '#1e293b' : '#ffffff',
+                        color: isDark ? '#f3f4f6' : '#1f2937',
+                        customClass: { popup: 'rounded-2xl shadow-xl border border-emerald-500/20' },
+                        timer: data.type === 'success' ? 4000 : null,
+                        timerProgressBar: true,
+                        toast: data.type === 'success',
+                        position: data.type === 'success' ? 'top-end' : 'center',
+                        showConfirmButton: data.type !== 'success'
+                    });
+
+                    sessionStorage.removeItem('brainhub_welcome');
+                }, 500); // Pequeño delay para asegurar que la página cargó completamente
+
+            } catch (e) {
+                console.warn('Error al procesar mensaje de bienvenida:', e);
+                sessionStorage.removeItem('brainhub_welcome');
+            }
+        })();
+
         // ✅ CONFIGURACIÓN GLOBAL - Evita que SweetAlert2 rompa tu layout flex
         Swal.mixin({
             heightAuto: false  // ← CLAVE: Mantiene tu height original
         });
+
+        // ====================================================================
+// SISTEMA "RECUÉRDAME" PARA LOGIN
+// ====================================================================
+        (function initRememberMe() {
+            const rememberKey = 'brainhub_last_user';
+            const usernameInput = document.querySelector('#login-form input[name="_username"]');
+            const rememberCheckbox = document.getElementById('login-remember-me');
+
+            if (!usernameInput || !rememberCheckbox) return;
+
+            // RECUPERAR usuario guardado al cargar
+            const savedUser = localStorage.getItem(rememberKey);
+            if (savedUser) {
+                usernameInput.value = savedUser;
+                rememberCheckbox.checked = true;
+
+                // Efecto visual sutil para indicar que está precargado
+                usernameInput.classList.add('ring-2', 'ring-emerald-500/50');
+                setTimeout(() => usernameInput.classList.remove('ring-2', 'ring-emerald-500/50'), 2000);
+            }
+
+            // GUARDAR usuario cuando se marca/desmarca el checkbox
+            rememberCheckbox.addEventListener('change', () => {
+                if (rememberCheckbox.checked) {
+                    localStorage.setItem(rememberKey, usernameInput.value);
+                } else {
+                    localStorage.removeItem(rememberKey);
+                }
+            });
+
+            // ACTUALIZAR usuario guardado mientras escribe (si está marcado)
+            usernameInput.addEventListener('input', () => {
+                if (rememberCheckbox.checked) {
+                    localStorage.setItem(rememberKey, usernameInput.value);
+                }
+            });
+
+            // GUARDAR al hacer submit exitoso (opcional: limpiar si logout)
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', () => {
+                    if (rememberCheckbox.checked && usernameInput.value.trim()) {
+                        localStorage.setItem(rememberKey, usernameInput.value.trim());
+                        console.log('✅ Usuario guardado:', usernameInput.value.trim());
+                    } else if (!rememberCheckbox.checked) {
+                        localStorage.removeItem(rememberKey);
+                        console.log('🗑️ "Recuérdame" desactivado - usuario eliminado');
+                    }
+                });
+            }
+        })();
 
         // --- ESTADO DEL Carrusel ---
         let currentChatFiles = [];
@@ -770,10 +801,28 @@
             if(spinner) spinner.classList.remove('hidden');
             hideFormError('reg-error-msg');
             try {
-                const response = await fetch(`/check-availability?${type}=${encodeURIComponent(value)}`);
+                // Agregar timestamp para evitar cache
+                const response = await fetch(`/check-availability?${type}=${encodeURIComponent(value)}&_t=${Date.now()}`, {
+                    cache: 'no-store'
+                });
                 if (response.ok && response.headers.get("content-type")?.includes("application/json")) {
                     const data = await response.json();
-                    if (!data.available) showFormError('reg-error-msg', `El ${type === 'username' ? 'usuario' : 'email'} ya está en uso.`);
+                    if (!data.available) {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: '⚠️ No disponible',
+                            text: `El ${type === 'username' ? 'usuario' : 'email'} ya está en uso.`,
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 4000,
+                            timerProgressBar: true,
+                            background: isDark ? '#1f2937' : '#ffffff',
+                            color: isDark ? '#f3f4f6' : '#1f2937',
+                            customClass: { popup: 'rounded-2xl shadow-xl border border-amber-500/30' }
+                        });
+                    }
                 }
             } catch (e) {
                 console.warn(`Endpoint /check-availability no encontrado.`);
@@ -794,15 +843,111 @@
 
         document.getElementById('register-form')?.addEventListener('submit', async function(e) {
             e.preventDefault();
-            hideFormError('reg-error-msg');
 
-            const email = document.getElementById('reg-email').value;
+            // ============================================================
+            // NUEVO: Validar campos VACÍOS primero
+            // ============================================================
+            const usernameVal = document.getElementById('reg-username').value.trim();
+            const emailVal = document.getElementById('reg-email').value.trim();
             const pass = document.getElementById('reg-password').value;
             const confirm = document.getElementById('reg-confirm-password').value;
+            const isDark = document.documentElement.classList.contains('dark');
 
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showFormError('reg-error-msg', 'Formato de correo inválido.');
-            if (!/^(?=.*[A-Z])(?=.*\d).{8,}$/.test(pass)) return showFormError('reg-error-msg', 'Contraseña: 8+ caracteres, 1 mayúscula y 1 número.');
-            if (pass !== confirm) return showFormError('reg-error-msg', 'Las contraseñas no coinciden.');
+            if (!usernameVal) {
+                Swal.fire({
+                    icon: 'warning', title: '👤 Usuario requerido',
+                    text: 'El nombre de usuario no puede estar vacío.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-amber-500/30' }
+                });
+                document.getElementById('reg-username').focus();
+                return;
+            }
+
+            if (!emailVal) {
+                Swal.fire({
+                    icon: 'warning', title: '📧 Email requerido',
+                    text: 'El correo electrónico no puede estar vacío.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-amber-500/30' }
+                });
+                document.getElementById('reg-email').focus();
+                return;
+            }
+
+            if (!pass) {
+                Swal.fire({
+                    icon: 'warning', title: '🔒 Contraseña requerida',
+                    text: 'La contraseña no puede estar vacía.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-amber-500/30' }
+                });
+                document.getElementById('reg-password').focus();
+                return;
+            }
+
+            // VALIDACIÓN: Términos y condiciones OBLIGATORIOS
+            const termsCheckbox = document.getElementById('reg-terms-checkbox');
+            const termsWarning = document.getElementById('terms-warning');
+
+            if (!termsCheckbox || !termsCheckbox.checked) {
+                if (termsWarning) {
+                    termsWarning.classList.remove('hidden');
+                    setTimeout(() => termsWarning.classList.add('hidden'), 3000);
+                }
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: '⚖️ Términos requeridos',
+                    text: 'Debe aceptar los Términos y Condiciones para crear una cuenta.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3500,
+                    timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff',
+                    color: isDark ? '#f3f4f6' : '#1f2937',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-amber-500/30' }
+                });
+                return; // Detener el envío
+            }
+            hideFormError('reg-error-msg');
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+                const isDark = document.documentElement.classList.contains('dark');
+                Swal.fire({
+                    icon: 'error', title: '📧 Correo inválido', text: 'Formato de correo electrónico no válido.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                });
+                return;
+            }
+
+            if (!/^(?=.*[A-Z])(?=.*\d).{8,}$/.test(pass)) {
+                const isDark = document.documentElement.classList.contains('dark');
+                Swal.fire({
+                    icon: 'error', title: '🔒 Contraseña débil', text: 'Mínimo 8 caracteres, 1 mayúscula y 1 número.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                });
+                return;
+            }
+
+            if (pass !== confirm) {
+                const isDark = document.documentElement.classList.contains('dark');
+                Swal.fire({
+                    icon: 'error', title: '⚠️ Contraseñas distintas', text: 'Las contraseñas no coinciden.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f297',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                });
+                return;
+            }
 
             const btn = document.getElementById('reg-submit-btn');
             const originalText = btn.innerText;
@@ -814,13 +959,145 @@
                 const response = await fetch(this.action, { method: 'POST', body: searchParams, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
 
                 if (response.redirected) {
-                    Swal.fire({ icon: 'success', title: '¡Éxito!', text: 'Cuenta creada.', confirmButtonColor: '#065f46' });
+                    // Guardamos mensaje en sessionStorage para mostrarlo en la siguiente vista
+                    sessionStorage.setItem('brainhub_welcome', JSON.stringify({
+                        type: 'success',
+                        title: '🎉 ¡Bienvenido a BrainHub!',
+                        text: 'Tu cuenta ha sido creada correctamente. Empieza a colaborar ahora mismo.'
+                    }));
                     window.location.href = response.url;
                     return;
                 }
-                showFormError('reg-error-msg', 'Error de validación. Es posible que el usuario ya exista.');
+
+                // ============================================================
+                // INTELIGENCIA: Detectar SIEMPRE qué campo causó el error
+                // ============================================================
+                const isDark = document.documentElement.classList.contains('dark');
+                const usernameVal = document.getElementById('reg-username').value.trim().toLowerCase();
+                const emailVal = document.getElementById('reg-email').value.trim().toLowerCase();
+
+                // Intentamos obtener información del servidor (si devuelve HTML con errores)
+                let serverErrorMsg = '';
+                try {
+                    const responseText = await response.text();
+
+                    // Buscar patrones comunes de error en Symfony/formularios
+                    if (responseText.includes('username') && responseText.includes('already') ||
+                        responseText.includes('Username') && responseText.includes('taken')) {
+                        serverErrorMsg = 'username';
+                    } else if (responseText.includes('email') && responseText.includes('already') ||
+                        responseText.includes('Email') && responseText.includes('taken')) {
+                        serverErrorMsg = 'email';
+                    }
+                } catch (parseErr) {
+                    console.log('No se pudo parsear respuesta del servidor');
+                }
+
+                // Si el servidor nos dio info específica, la usamos
+                if (serverErrorMsg === 'username') {
+                    Swal.fire({
+                        icon: 'error', title: '👤 Usuario no disponible',
+                        text: `El nombre de usuario "${usernameVal}" ya está registrado. Prueba con otro.`,
+                        toast: true, position: 'top-end', showConfirmButton: false, timer: 4500, timerProgressBar: true,
+                        background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                        customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                    });
+                    document.getElementById('reg-username').focus();
+                    document.getElementById('reg-username').classList.add('ring-2', 'ring-red-500');
+                    setTimeout(() => document.getElementById('reg-username').classList.remove('ring-2', 'ring-red-500'), 3000);
+                    return;
+                }
+
+                if (serverErrorMsg === 'email') {
+                    Swal.fire({
+                        icon: 'error', title: '📧 Email ya registrado',
+                        text: `El correo "${emailVal}" ya tiene una cuenta asociada. ¿Olvidaste tu contraseña?`,
+                        toast: true, position: 'top-end', showConfirmButton: false, timer: 4500, timerProgressBar: true,
+                        background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                        customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                    });
+                    document.getElementById('reg-email').focus();
+                    document.getElementById('reg-email').classList.add('ring-2', 'ring-red-500');
+                    setTimeout(() => document.getElementById('reg-email').classList.remove('ring-2', 'ring-red-500'), 3000);
+                    return;
+                }
+
+                // ============================================================
+                // PLAN B: Verificación client-side (checkAvailability en tiempo real)
+                // Si no tenemos info del servidor, verificamos nosotros
+                // ============================================================
+
+                // Mostramos loading mientras verificamos
+                const tempToast = Swal.fire({
+                    title: 'Verificando disponibilidad...',
+                    html: '<div class="flex justify-center"><div class="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div></div>',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    background: isDark ? '#1e293b' : '#ffffff'
+                });
+
+                // Verificar username (con anti-cache)
+                const userCheck = await fetch(`/check-availability?username=${encodeURIComponent(usernameVal)}&_t=${Date.now()}`, {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                const userData = await userCheck.json();
+
+                if (!userData.available) {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'error', title: '👤 Usuario en uso',
+                        text: `El nombre "${usernameVal}" ya existe. Elige otro.`,
+                        toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
+                        background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                        customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                    });
+                    document.getElementById('reg-username').focus();
+                    document.getElementById('reg-username').value = ''; // LIMPIAR CAMPO
+                    return;
+                }
+
+                // Verificar email (con anti-cache)
+                const emailCheck = await fetch(`/check-availability?email=${encodeURIComponent(emailVal)}&_t=${Date.now()}`, {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                const emailData = await emailCheck.json();
+
+                if (!emailData.available) {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'error', title: '📧 Email registrado',
+                        text: `El correo "${emailVal}" ya está en uso. Usa otro o recupera tu acceso.`,
+                        toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
+                        background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                        customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                    });
+                    document.getElementById('reg-email').focus();
+                    document.getElementById('reg-email').value = ''; // LIMPIAR CAMPO
+                    return;
+                }
+
+                // Si todo parece OK pero igual falló, mostramos error genérico pero más amigable
+                Swal.close();
+                Swal.fire({
+                    icon: 'warning', title: '⚠️ No se pudo crear la cuenta',
+                    text: 'Ha ocurrido un error inesperado. Verifica que todos los datos son correctos e intenta nuevamente.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 4500, timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-amber-500/30' }
+                });
+
             } catch (err) {
-                showFormError('reg-error-msg', 'Error al contactar con el servidor.');
+                const isDark = document.documentElement.classList.contains('dark');
+                Swal.fire({
+                    icon: 'error', title: '🌐 Error de conexión',
+                    text: 'No pudimos conectar con el servidor. Revisa tu internet e intenta de nuevo.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                });
             } finally {
                 btn.disabled = false;
                 btn.innerText = originalText;
@@ -841,12 +1118,31 @@
                 const response = await fetch(this.action, { method: 'POST', body: searchParams, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
 
                 if (response.url.endsWith('/login')) {
-                    showFormError('login-error-msg', 'Usuario o contraseña incorrectos.');
+                    const isDark = document.documentElement.classList.contains('dark');
+                    Swal.fire({
+                        icon: 'error',
+                        title: '❌ Error de acceso',
+                        text: 'Usuario o contraseña incorrectos.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true,
+                        background: isDark ? '#1f2937' : '#ffffff',
+                        color: isDark ? '#f3f4f6' : '#1f2937',
+                        customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                    });
                 } else {
                     window.location.reload();
                 }
             } catch (err) {
-                showFormError('login-error-msg', 'Error de conexión.');
+                const isDark = document.documentElement.classList.contains('dark');
+                Swal.fire({
+                    icon: 'error', title: '🌐 Sin conexión', text: 'Error de conexión con el servidor.',
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
+                    customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
+                });
             } finally {
                 btn.disabled = false;
                 btn.innerText = originalText;
@@ -1297,8 +1593,43 @@
             });
         }
 
+        window.showTermsModal = function() {
+            const isDark = document.documentElement.classList.contains('dark');
+            Swal.fire({
+                title: '📜 Términos y Condiciones de Uso',
+                html: `
+            <div style="text-align: left; max-height: 60vh; overflow-y: auto; font-size: 0.9rem; line-height: 1.6;">
+                <h4 style="color: #10b981; margin-bottom: 10px;">1. ACEPTACIÓN DE TÉRMINOS</h4>
+                <p>Al acceder y utilizar BrainHub ("el Servicio"), usted acepta estar sujeto a estos Términos de Servicio. Si no está de acuerdo con alguna parte de los términos, entonces no puede acceder al Servicio.</p>
+
+                <h4 style="color: #10b981; margin: 15px 0 10px;">2. USO PERMITIDO</h4>
+                <p>Puede usar el Servicio únicamente para fines legítimos de estudio colaborativo. Está prohibido:</p>
+                <ul style="margin-left: 20px; margin-bottom: 10px;">
+                    <li>Compartir contenido inapropiado o ilegal</li>
+                    <li>Acoso a otros usuarios</li>
+                    <li>Intentos de hackeo o acceso no autorizado</li>
+                </ul>
+
+                <h4 style="color: #10b981; margin: 15px 0 10px;">3. PRIVACIDAD</h4>
+                <p>Su información personal será tratada conforme a nuestra política de privacidad. No compartimos datos con terceros sin su consentimiento.</p>
+
+                <h4 style="color: #10b981; margin: 15px 0 10px;">4. PROPIEDAD INTELECTUAL</h4>
+                <p>Los archivos que comparta en las salas son de su responsabilidad. BrainHub no se hace responsable del contenido subido por los usuarios.</p>
+
+                <h4 style="color: #10b981; margin: 15px 0 10px;">5. MODIFICACIONES</h4>
+                <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado del Servicio después de cambios constituye su aceptación.</p>
+            </div>
+        `,
+                icon: 'info',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#10b981',
+                width: '600px',
+                background: isDark ? '#1e293b' : '#ffffff',
+                color: isDark ? '#f3f4f6' : '#1f2937',
+                customClass: { popup: 'rounded-2xl' }
+            });
+        };
+
         initTheme();
     });
-
-
 </script>
