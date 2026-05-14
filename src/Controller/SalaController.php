@@ -23,50 +23,84 @@ final class SalaController extends AbstractController
     #[Route('/new-ajax', name: 'app_sala_new_ajax', methods: ['POST'])]
     public function newAjax(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $sala = new Sala();
-        $form = $this->createForm(SalaType::class, $sala);
-        $form->handleRequest($request);
+        try {
+            $sala = new Sala();
+            $form = $this->createForm(SalaType::class, $sala);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Verificar duplicado por nombre + creador + tiempo (últimos 10 segundos)
-            $recentDuplicate = $entityManager->getRepository(Sala::class)->findOneBy([
-                'creador' => $this->getUser(),
-                'nombre' => $form->get('nombre')->getData()
-            ], ['id' => 'DESC']);
+            // =====================================================
+            // ✅ NUEVO: Manejar errores de validación como JSON
+            // =====================================================
 
-            if ($recentDuplicate &&
-                (time() - $recentDuplicate->getFechaCreacion()->getTimestamp()) < 10) {
-                // Es un duplicado reciente, devolver el existente
+            if ($form->isSubmitted() && !$form->isValid()) {
+                // Recopilar todos los errores de validación
+                $errors = [];
+                foreach ($form->getErrors(true, true) as $error) {
+                    $errors[] = $error->getMessage();
+                }
+
+                // Devolver SIEMPRE JSON (nunca HTML)
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => implode(', ', $errors),
+                    'errors' => $errors
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Si el formulario es válido, continuar
+            if ($form->isSubmitted() && $form->isValid()) {
+
+                // Verificar duplicado por nombre + creador + tiempo (últimos 10 segundos)
+                $recentDuplicate = $entityManager->getRepository(Sala::class)->findOneBy([
+                    'creador' => $this->getUser(),
+                    'nombre' => $form->get('nombre')->getData()
+                ], ['id' => 'DESC']);
+
+                if ($recentDuplicate &&
+                    (time() - $recentDuplicate->getFechaCreacion()->getTimestamp()) < 10) {
+                    // Es un duplicado reciente, devolver el existente
+                    return new JsonResponse([
+                        'success' => true,
+                        'sala_id' => $recentDuplicate->getId(),
+                        'sala_nombre' => $recentDuplicate->getNombre(),
+                        'redirect_url' => $this->generateUrl('app_sala_show', ['id' => $recentDuplicate->getId()]),
+                        'duplicate' => true
+                    ]);
+                }
+
+                $sala->setCreador($this->getUser());
+
+                if (!$sala->getToken()) {
+                    $sala->setToken(bin2hex(random_bytes(15)));
+                }
+
+                $entityManager->persist($sala);
+                $entityManager->flush();
+
                 return new JsonResponse([
                     'success' => true,
-                    'sala_id' => $recentDuplicate->getId(),
-                    'sala_nombre' => $recentDuplicate->getNombre(),
-                    'redirect_url' => $this->generateUrl('app_sala_show', ['id' => $recentDuplicate->getId()]),
-                    'duplicate' => true
+                    'sala_id' => $sala->getId(),
+                    'sala_nombre' => $sala->getNombre(),
+                    'redirect_url' => $this->generateUrl('app_sala_show', ['id' => $sala->getId()])
                 ]);
             }
 
-            $sala->setCreador($this->getUser());
+            // Si el formulario no se envió correctamente
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Formulario no enviado correctamente'
+            ], Response::HTTP_BAD_REQUEST);
 
-            if (!$sala->getToken()) {
-                $sala->setToken(bin2hex(random_bytes(15)));
-            }
-
-            $entityManager->persist($sala);
-            $entityManager->flush();
+        } catch (\Exception $e) {
+            // =====================================================
+            // ✅ CRÍPTICO: Capturar CUALQUIER error y devolver JSON
+            // =====================================================
 
             return new JsonResponse([
-                'success' => true,
-                'sala_id' => $sala->getId(),
-                'sala_nombre' => $sala->getNombre(),
-                'redirect_url' => $this->generateUrl('app_sala_show', ['id' => $sala->getId()])
-            ]);
+                'success' => false,
+                'message' => 'Error interno: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        return new JsonResponse([
-            'success' => false,
-            'message' => 'Error en la validación del formulario.'
-        ], Response::HTTP_BAD_REQUEST);
     }
 
     #[Route('/{id}/edit-ajax', name: 'app_sala_edit_ajax', methods: ['POST'])]

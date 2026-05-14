@@ -71,6 +71,140 @@
                     </div>
                 </div>
 
+                {# ============================================ #}
+                {# 📝 SECCIÓN CAMBIO DE CONTRASEÑA #}
+                {# ============================================ #}
+                <div class="mt-10 pt-6 border-t-2 border-dashed border-gray-200 dark:border-gray-700">
+                    <div class="mb-5">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            Cambiar Contraseña
+                        </h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-7">
+                            Deja vacío si no deseas cambiarla
+                        </p>
+                    </div>
+
+                    <div class="space-y-4 pl-1">
+
+                        {# 🔐 CONTRASEÑA ACTUAL #}
+                        <div>
+                            <label for="password_actual" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                Contraseña Actual
+                            </label>
+                            <div class="relative">
+                                <input type="password"
+                                       name="password_actual"
+                                       id="password_actual"
+                                       placeholder="••••••••"
+                                       autocomplete="current-password"
+                                       class="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-[#2a303f] border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm text-gray-900 dark:text-white transition-all placeholder-gray-400 dark:placeholder-gray-500">
+
+                                {# Botón Ojo - MISMA FUNCIÓN QUE BASE.HTML.TWIG #}
+                                <button type="button"
+                                        onclick="togglePassword('password_actual', 'eye-password-actual')"
+                                        class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors focus:outline-none">
+                                    <svg id="eye-password-actual" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        {# 🆕 NUEVA CONTRASEÑA #}
+                        <div>
+                            <label for="nueva_password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                Nueva Contraseña
+                            </label>
+                            <div class="relative">
+                                <input type="password"
+                                       name="nueva_password"
+                                       id="nueva_password"
+                                       placeholder="Mínimo 8 caracteres"
+                                       autocomplete="new-password"
+                                       minlength="8"
+                                       class="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-[#2a303f] border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm text-gray-900 dark:text-white transition-all placeholder-gray-400 dark:placeholder-gray-500">
+
+                                <button type="button"
+                                        onclick="togglePassword('nueva_password', 'eye-nueva-password')"
+                                        class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors focus:outline-none">
+                                    <svg id="eye-nueva-password" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {# ================================ #}
+                            {# 💪 MEDIDOR DE FUERZA MEJORADO   #}
+                            {# ================================ #}
+                            <div id="password-strength-container" class="mt-3 hidden">
+                                <div class="flex gap-1.5 mb-1.5">
+                                    <div id="str-bar-1" class="h-1.5 flex-1 rounded-full bg-gray-200 dark:bg-gray-700 transition-all duration-300 ease-out"></div>
+                                    <div id="str-bar-2" class="h-1.5 flex-1 rounded-full bg-gray-200 dark:bg-gray-700 transition-all duration-300 ease-out"></div>
+                                    <div id="str-bar-3" class="h-1.5 flex-1 rounded-full bg-gray-200 dark:bg-gray-700 transition-all duration-300 ease-out"></div>
+                                    <div id="str-bar-4" class="h-1.5 flex-1 rounded-full bg-gray-200 dark:bg-gray-700 transition-all duration-300 ease-out"></div>
+                                </div>
+
+                                <div class="flex justify-between items-center">
+                                    <span id="strength-text" class="text-[11px] font-bold uppercase tracking-wider transition-colors duration-300"></span>
+
+                                    {# Lista de requisitos animada #}
+                                    <div id="req-list" class="flex gap-2 text-[10px]">
+                        <span id="req-length" class="flex items-center gap-0.5 text-gray-400 dark:text-gray-500 transition-colors">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            8+
+                        </span>
+                                        <span id="req-upper" class="flex items-center gap-0.5 text-gray-400 dark:text-gray-500 transition-colors">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            A-Z
+                        </span>
+                                        <span id="req-number" class="flex items-center gap-0.5 text-gray-400 dark:text-gray-500 transition-colors">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            0-9
+                        </span>
+                                        <span id="req-special" class="flex items-center gap-0.5 text-gray-400 dark:text-gray-500 transition-colors">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            !@#
+                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# ✅ CONFIRMAR CONTRASEÑA #}
+                        <div>
+                            <label for="confirmar_password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                Confirmar Nueva Contraseña
+                            </label>
+                            <div class="relative">
+                                <input type="password"
+                                       name="confirmar_password"
+                                       id="confirmar_password"
+                                       placeholder="Repite la nueva contraseña"
+                                       autocomplete="new-password"
+                                       class="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-[#2a303f] border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm text-gray-900 dark:text-white transition-all placeholder-gray-400 dark:placeholder-gray-500">
+
+                                <button type="button"
+                                        onclick="togglePassword('confirmar_password', 'eye-confirmar-password')"
+                                        class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors focus:outline-none">
+                                    <svg id="eye-confirmar-password" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {# 💬 Mensaje de validación en tiempo real #}
+                            <p id="match-message" class="hidden mt-1.5 text-xs font-medium flex items-center gap-1.5 transition-all"></p>
+                        </div>
+
+                    </div>
+                </div>
+
                 {# Botones de acción #}
                 <div class="flex flex-col gap-3 pt-4">
                     <button type="submit"
@@ -86,7 +220,6 @@
         </div>
     </div>
 
-    {# SCRIPT UNIFICADO: PREVISUALIZACIÓN + SWEETALERT CON FLASHES #}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // ====================================================================
@@ -107,6 +240,413 @@
                     }
                 });
             }
+
+            // ====================================================================
+            // 📊 SISTEMA DE FUERZA DE CONTRASEÑA AVANZADO
+            // ====================================================================
+
+            const newPasswordInput = document.getElementById('nueva_password');
+            const confirmPasswordInput = document.getElementById('confirmar_password');
+            const strengthContainer = document.getElementById('password-strength-container');
+            const matchMessage = document.getElementById('match-message');
+
+            // Configuración de niveles de fuerza
+            const strengthLevels = {
+                0: { label: '', color: '', bars: 0 },
+                1: { label: 'Muy débil', color: 'bg-red-500', textColor: 'text-red-500 dark:text-red-400', bars: 1 },
+                2: { label: 'Débil', color: 'bg-orange-500', textColor: 'text-orange-500 dark:text-orange-400', bars: 2 },
+                3: { label: 'Regular', color: 'bg-yellow-500', textColor: 'text-yellow-500 dark:text-yellow-400', bars: 3 },
+                4: { label: 'Fuerte', color: 'bg-emerald-500', textColor: 'text-emerald-500 dark:text-emerald-400', bars: 4 },
+                5: { label: 'Muy fuerte 🔒', color: 'bg-green-600', textColor: 'text-green-600 dark:text-green-400', bars: 4 }
+            };
+
+            /**
+             * Calcula la fuerza de la contraseña (0-5)
+             */
+            function calculateStrength(password) {
+                let score = 0;
+                if (!password || password.length === 0) return 0;
+
+                // Longitud
+                if (password.length >= 8) score++;
+                if (password.length >= 12) score++;
+
+                // Complejidad
+                if (/[A-Z]/.test(password)) score++;
+                if (/[0-9]/.test(password)) score++;
+                if (/[^A-Za-z0-9]/.test(password)) score++;
+
+                return Math.min(score, 5);
+            }
+
+            /**
+             * Actualiza visualización del medidor
+             */
+            function updateStrengthUI(score, password) {
+                const level = strengthLevels[score];
+                const strengthText = document.getElementById('strength-text');
+
+                if (score > 0) {
+                    strengthContainer?.classList.remove('hidden');
+                } else {
+                    strengthContainer?.classList.add('hidden');
+                }
+
+                for (let i = 1; i <= 4; i++) {
+                    const bar = document.getElementById(`str-bar-${i}`);
+                    if (bar) {
+                        bar.className = i <= level.bars
+                            ? `h-1.5 flex-1 rounded-full ${level.color} transition-all duration-300 ease-out`
+                            : 'h-1.5 flex-1 rounded-full bg-gray-200 dark:bg-gray-700 transition-all duration-300 ease-out';
+                    }
+                }
+
+                if (strengthText) {
+                    strengthText.textContent = level.label;
+                    strengthText.className = `text-[11px] font-bold uppercase tracking-wider transition-colors duration-300 ${level.textColor}`;
+                }
+
+                updateRequirements(password);
+            }
+
+            /**
+             * Actualiza indicadores de requisitos (checkmarks verdes)
+             */
+            function updateRequirements(password) {
+                const updates = [
+                    { id: 'req-length', test: password.length >= 8 },
+                    { id: 'req-upper', test: /[A-Z]/.test(password) },
+                    { id: 'req-number', test: /[0-9]/.test(password) },
+                    { id: 'req-special', test: /[^A-Za-z0-9]/.test(password) }
+                ];
+
+                updates.forEach(({ id, test }) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+
+                    if (test && password.length > 0) {
+                        el.classList.remove('text-gray-400', 'dark:text-gray-500');
+                        el.classList.add('text-emerald-500', 'dark:text-emerald-400');
+                        el.querySelector('svg')?.classList.add('scale-110');
+                    } else {
+                        el.classList.add('text-gray-400', 'dark:text-gray-500');
+                        el.classList.remove('text-emerald-500', 'dark:text-emerald-400');
+                        el.querySelector('svg')?.classList.remove('scale-110');
+                    }
+                });
+            }
+
+            /**
+             * Validación de coincidencia en tiempo real
+             * @returns {boolean} true si coinciden o está vacío, false si no coinciden
+             */
+            function validateMatch() {
+                const newPassword = newPasswordInput?.value;
+                const confirmPwd = confirmPasswordInput?.value;
+
+                if (!matchMessage) return true;
+
+                if (!confirmPwd || confirmPwd.length === 0) {
+                    matchMessage.classList.add('hidden');
+                    confirmPasswordInput?.classList.remove(
+                        'border-red-500', 'border-green-500',
+                        'ring-2', 'ring-red-200', 'ring-green-200'
+                    );
+                    return true;
+                }
+
+                matchMessage.classList.remove('hidden');
+
+                if (newPassword === confirmPwd) {
+                    matchMessage.innerHTML = `
+                    <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Las contraseñas coinciden ✓</span>
+                `;
+                    matchMessage.className = 'mt-1.5 text-xs font-medium flex items-center gap-1.5 transition-all animate-fade-in';
+                    confirmPasswordInput?.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+                    confirmPasswordInput?.classList.add('border-green-500', 'ring-2', 'ring-green-200');
+                    return true;
+                } else {
+                    matchMessage.innerHTML = `
+                    <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-red-600 dark:text-red-400 font-semibold">No coinciden ✗</span>
+                `;
+                    matchMessage.className = 'mt-1.5 text-xs font-medium flex items-center gap-1.5 transition-all animate-fade-in';
+                    confirmPasswordInput?.classList.remove('border-green-500', 'ring-2', 'ring-green-200');
+                    confirmPasswordInput?.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+                    return false;
+                }
+            }
+
+            // Event Listeners para inputs de contraseña
+            if (newPasswordInput) {
+                newPasswordInput.addEventListener('input', (e) => {
+                    const password = e.target.value;
+                    updateStrengthUI(calculateStrength(password), password);
+                    validateMatch();
+                });
+
+                newPasswordInput.addEventListener('focus', () => {
+                    if (newPasswordInput.value.length > 0) {
+                        strengthContainer?.classList.remove('hidden');
+                    }
+                });
+            }
+
+            if (confirmPasswordInput) {
+                confirmPasswordInput.addEventListener('input', validateMatch);
+            }
+
+            // ====================================================================
+            // 🚀 ENVÍO AJAX DEL FORMULARIO (SIN RECARGAR PÁGINA)
+            // ====================================================================
+            const form = document.querySelector('form[action="{{ path('app_profile_edit') }}"]');
+            const submitBtn = form?.querySelector('button[type="submit"]');
+
+            // Helper para detectar modo oscuro (igual que base.html.twig)
+            const isDark = () => document.documentElement.classList.contains('dark');
+
+            /**
+             * Muestra un toast lateral estilizado (igual que base.html.twig)
+             * @param {'success'|'error'|'warning'} type - Tipo de icono
+             * @param {string} title - Título del toast
+             * @param {string} text - Mensaje descriptivo
+             */
+            function showToast(type, title, text) {
+                const iconMap = {
+                    success: 'success',
+                    error: 'error',
+                    warning: 'warning'
+                };
+
+                const borderColors = {
+                    success: 'border-emerald-500/30',
+                    error: 'border-red-500/30',
+                    warning: 'border-amber-500/30'
+                };
+
+                Swal.fire({
+                    icon: iconMap[type] || 'info',
+                    title: title,
+                    text: text,
+                    toast: true,
+                    position: 'top-end',           // ← TOAST LATERAL DERECHA
+                    showConfirmButton: false,
+                    timer: type === 'error' ? 4500 : 3500,
+                    timerProgressBar: true,
+                    background: isDark() ? '#1f2937' : '#ffffff',
+                    color: isDark() ? '#f3f4f6' : '#1f2937',
+                    customClass: {
+                        popup: `rounded-2xl shadow-xl border ${borderColors[type] || ''}`
+                    },
+                    didOpen: (toast) => {
+                        // Comportamiento igual que notificaciones de chat
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
+            }
+
+            if (form && submitBtn) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // 🔒 PREVENIR ENVÍO TRADICIONAL
+
+                    const pwdActual = document.getElementById('password_actual')?.value;
+                    const newPwd = document.getElementById('nueva_password')?.value;
+                    const confirmPwd = document.getElementById('confirmar_password')?.value;
+
+                    console.log('🚀 [AJAX] Iniciando envío del perfil...');
+
+                    // ====================================================================
+                    // VALIDACIÓN CLIENT-SIDE (Primera capa - instantánea)
+                    // ====================================================================
+
+                    // Caso 1: Quiere cambiar contraseña pero no llenó todos los campos
+                    if (pwdActual && pwdActual.trim().length > 0) {
+
+                        // 1a. Nueva contraseña vacía
+                        if (!newPwd || newPwd.trim().length === 0) {
+                            showToast('warning', '⚠️ Contraseña faltante', 'Debes ingresar la nueva contraseña.');
+                            document.getElementById('nueva_password')?.focus();
+                            return;
+                        }
+
+                        // 1b. No coinciden (BLOQUEO TOTAL)
+                        if (newPwd !== confirmPwd) {
+                            // Animación shake
+                            const confirmField = document.getElementById('confirmar_password');
+                            confirmField?.classList.add('animate-shake', 'border-red-500', 'ring-2', 'ring-red-200');
+                            setTimeout(() => confirmField?.classList.remove('animate-shake'), 500);
+
+                            showToast('error', '❌ No coinciden', 'Las contraseñas nuevas son diferentes.');
+
+                            setTimeout(() => confirmField?.focus(), 100);
+                            return;
+                        }
+
+                        // 1c. Requisitos mínimos (8+ chars Y al menos 1 número)
+                        const hasMinLength = newPwd.length >= 8;
+                        const hasNumber = /[0-9]/.test(newPwd);
+
+                        if (!hasMinLength || !hasNumber) {
+                            let errorMsg = 'La contraseña debe tener:\n';
+                            if (!hasMinLength) errorMsg += '• Al menos 8 caracteres\n';
+                            if (!hasNumber) errorMsg += '• Al menos 1 número (0-9)';
+
+                            showToast('warning', '🔒 Requisitos incumplidos', errorMsg);
+                            document.getElementById('nueva_password')?.focus();
+                            return;
+                        }
+                    }
+
+                    // ====================================================================
+                    // ENVÍO VIA FETCH (AJAX) - SIN RECARGAR PÁGINA
+                    // ====================================================================
+
+                    // Deshabilitar botón y mostrar estado de carga
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `
+                    <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Guardando...
+                `;
+
+                    // Preparar FormData (incluye archivo de foto si existe)
+                    const formData = new FormData(form);
+
+                    // Log para debug
+                    console.log('📤 [AJAX] Enviando datos al servidor...');
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        // NO usamos headers JSON porque estamos enviando FormData (multipart)
+                    })
+                        .then(async response => {
+                            console.log(`📥 [AJAX] Respuesta recibida: ${response.status}`);
+
+                            // Restaurar botón inmediatamente
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+
+                            // Verificar si la respuesta es una redirección (éxito en Symfony)
+                            if (response.redirected) {
+                                // ✅ ÉXITO - El servidor redirigió (normalmente a la misma página)
+                                console.log('✅ [AJAX] Perfil actualizado correctamente (redirect)');
+
+                                showToast('success', '✅ ¡Perfil actualizado!', 'Tus cambios han sido guardados.');
+
+                                // Opcional: Recargar datos del servidor después de 1.5s para ver cambios
+                                setTimeout(() => {
+                                    window.location.reload(); // Recarga suave solo si quieres ver foto actualizada
+                                }, 1500);
+
+                                return;
+                            }
+
+                            // Intentar parsear respuesta como texto para buscar errores
+                            const responseText = await response.text();
+
+                            // ====================================================================
+                            // DETECCIÓN DE ERRORES DEL SERVIDOR (Flash Messages)
+                            // ====================================================================
+
+                            // Buscar patrones de error conocidos en la respuesta HTML/texto
+                            if (responseText.includes('incorrecta') || responseText.includes('actual')) {
+                                // ❌ ERROR: Contraseña actual incorrecta
+                                console.log('❌ [ERROR] Servidor: Contraseña actual incorrecta');
+
+                                // Limpiar campo de contraseña actual
+                                document.getElementById('password_actual').value = '';
+
+                                // Focus al campo problemático
+                                setTimeout(() => {
+                                    document.getElementById('password_actual')?.focus();
+                                    document.getElementById('password_actual')?.classList.add('ring-2', 'ring-red-500');
+                                    setTimeout(() => {
+                                        document.getElementById('password_actual')?.classList.remove('ring-2', 'ring-red-500');
+                                    }, 2000);
+                                }, 100);
+
+                                showToast('error', '🔐 Contraseña incorrecta', 'La contraseña actual que ingresaste no es correcta.');
+                                return;
+                            }
+
+                            if (responseText.includes('caracteres') || responseText.includes('cumpl')) {
+                                // ❌ ERROR: Requisitos de contraseña no cumplidos
+                                console.log('❌ [ERROR] Servidor: Requisitos no cumplidos');
+
+                                showToast('warning', '⚠️ Contraseña muy débil', 'Mínimo 8 caracteres y al menos 1 número.');
+                                document.getElementById('nueva_password')?.focus();
+                                return;
+                            }
+
+                            if (responseText.includes('coincid') || responseText.includes('diferent')) {
+                                // ❌ ERROR: Contraseñas no coinciden
+                                console.log('❌ [ERROR] Servidor: No coinciden');
+
+                                showToast('error', '❌ No coinciden', 'Las contraseñas nuevas deben ser idénticas.');
+                                document.getElementById('confirmar_password')?.focus();
+                                return;
+                            }
+
+                            // Si llegamos aquí y no hubo redirect, asumimos éxito también
+                            // (algunas configuraciones de Symfony no redirigen)
+                            if (response.ok) {
+                                console.log('✅ [AJAX] Respuesta OK sin redirect');
+                                showToast('success', '✅ ¡Guardado!', 'Tu perfil ha sido actualizado.');
+                                setTimeout(() => window.location.reload(), 1500);
+                            } else {
+                                console.warn('⚠️ [AJAX] Respuesta inesperada:', responseText.substring(0, 200));
+                                showToast('warning', '⚠️ Aviso', 'No se pudo verificar la actualización. Recarga la página.');
+                            }
+
+                        })
+                        .catch(error => {
+                            console.error('❌ [AJAX] Error de conexión:', error);
+
+                            // Restaurar botón
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+
+                            showToast('error', '🌐 Error de conexión', 'No se pudo conectar con el servidor. Revisa tu internet.');
+                        });
+                });
+            }
+
+            // ====================================================================
+            // 🎨 CSS ADICIONAL PARA ANIMACIONES
+            // ====================================================================
+            const style = document.createElement('style');
+            style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+                20%, 40%, 60%, 80% { transform: translateX(4px); }
+            }
+            .animate-shake {
+                animation: shake 0.5s ease-in-out;
+            }
+
+            /* Spinner personalizado para botón */
+            .animate-spin {
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+            document.head.appendChild(style);
+
+            console.log('✅ Sistema de edición de perfil AJAX cargado');
         });
     </script>
 {% endblock %}

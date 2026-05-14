@@ -463,8 +463,8 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // ====================================================================
-// SISTEMA DE MENSAJES ENTRE PÁGINAS (SessionStorage)
-// ====================================================================
+        // SISTEMA DE MENSAJES ENTRE PÁGINAS (SessionStorage)
+        // ====================================================================
         (function showCrossPageMessage() {
             const msg = sessionStorage.getItem('brainhub_welcome');
             if (!msg) return;
@@ -1522,26 +1522,165 @@
             if(chatInput) chatInput.placeholder = "Escribe un mensaje...";
         };
 
+        /**
+         * FUNCIÓN ENVIAR MENSAJE - Versión única con DEBUG y TRACKING
+         * Esta función reemplaza a todas las anteriores
+         */
         const sendMessage = () => {
-            if(!chatInput) return;
+            console.log('🚀 [DEBUG] sendMessage() llamada');
+
+            if(!chatInput) {
+                console.error('❌ [DEBUG] chatInput no encontrado');
+                return;
+            }
+
             const text = chatInput.value.trim();
             const file = fileInput?.files[0];
 
-            if (!text && !file) return;
+            console.log('📝 [DEBUG] Datos del mensaje:', {
+                texto: text,
+                tieneArchivo: !!file,
+                archivoNombre: file?.name || null,
+                chatTipo: chatContext.type,
+                chatId: chatContext.id,
+                chatName: chatContext.name
+            });
+
+            if (!text && !file) {
+                console.warn('⚠️ [DEBUG] Mensaje vacío sin archivo, abortando');
+                return;
+            }
 
             const formData = new FormData();
             if (text) formData.append('mensaje', text);
             if (file) formData.append('archivo', file);
-            if (chatContext.type === 'sala') formData.append('salaId', chatContext.id);
-            else formData.append('receptorId', chatContext.id);
 
-            fetch('{{ path("app_chat_send") }}', { method: 'POST', body: formData })
-                .catch(err => console.error("Error", err));
+            // ✅ CRÍTICO: Verificar que SIEMPRE enviemos uno de los dos
+            if (chatContext.type === 'sala') {
+                formData.append('salaId', chatContext.id);
+                console.log('📌 [DEBUG] Enviando a SALA ID:', chatContext.id);
+            } else if (chatContext.type === 'user') {
+                formData.append('receptorId', chatContext.id);
+                console.log('👤 [DEBUG] Enviando a USUARIO ID:', chatContext.id);
+            } else {
+                console.error('❌ [ERROR] chatContext.type no es "sala" ni "user":', chatContext.type);
+                return;
+            }
 
-            chatInput.value = '';
-            clearFile();
-            clearUnreadSeparator();
+            // Mostrar estado de carga visual
+            const sendBtn = document.getElementById('send-chat-btn');
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 0 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>';
+            }
+
+            // URL del endpoint (verificar que sea correcta)
+            const url = '{{ path("app_chat_send") }}';
+            console.log('🌐 [DEBUG] Enviando a:', url);
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    console.log('📥 [DEBUG] Respuesta HTTP:', response.status, response.statusText);
+
+                    // Restaurar botón inmediatamente
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>';
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    return response.json().then(data => {
+                        console.log('✅ [DEBUG] Respuesta del servidor:', data);
+
+                        // ✅ Actualizar estadísticas después de enviar
+                        setTimeout(() => {
+                            if (typeof window.updateDashboardStats === 'function') {
+                                window.updateDashboardStats().then(metrics => {
+                                    console.log('📊 [DEBUG] Métricas actualizadas tras enviar mensaje:', metrics);
+                                }).catch(e => console.error('Error actualizando métricas:', e));
+                            }
+                        }, 300); // Reducido de 500ms a 300ms
+
+                        // Incrementar contador local inmediatamente (optimista)
+                        if (window.dashboardMetrics && window.dashboardMetrics.mensajes_hoy !== undefined) {
+                            window.dashboardMetrics.mensajes_hoy++;
+                            console.log('📈 [DEBUG] Contador local mensajes hoy:', window.dashboardMetrics.mensajes_hoy);
+
+                            // Intentar actualizar elemento visual si existe
+                            const metricElement = document.querySelector('[data-metric="mensajes-hoy"]');
+                            if (metricElement) {
+                                metricElement.textContent = window.dashboardMetrics.mensajes_hoy;
+                                metricElement.style.transform = 'scale(1.2)';
+                                metricElement.style.color = '#10b981';
+                                setTimeout(() => {
+                                    metricElement.style.transform = 'scale(1)';
+                                    metricElement.style.color = '';
+                                }, 300);
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('❌ [ERROR] Error enviando mensaje:', error);
+                    console.error('📍 Stack trace:', error.stack);
+
+                    // Restaurar botón incluso si hay error
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>';
+                    }
+
+                    // Mostrar error visual al usuario (opcional)
+                    if (typeof Swal !== 'undefined') {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al enviar',
+                            text: 'No se pudo enviar el mensaje. Revisa F12 > Console.',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 4000,
+                            background: isDark ? '#1f2937' : '#ffffff',
+                            color: isDark ? '#f3f4f6' : '#1f2937'
+                        });
+                    }
+                })
+                .finally(() => {
+                    // ✅ SIEMPRE limpiar input, independientemente del resultado
+                    console.log('🧹 [DEBUG] Limpiando input y archivos');
+                    chatInput.value = '';
+                    clearFile();
+                    clearUnreadSeparator();
+                });
         };
+
+// Asegurar que el evento click esté vinculado a esta NUEVA función
+        document.addEventListener('DOMContentLoaded', () => {
+            const sendBtn = document.getElementById('send-chat-btn');
+            if (sendBtn) {
+                // Remover listeners anteriores (por si acaso)
+                const newBtn = sendBtn.cloneNode(true);
+                sendBtn.parentNode.replaceChild(newBtn, sendBtn);
+
+                // Añadir listener nuevo
+                sendBtn.addEventListener('click', sendMessage);
+            }
+
+            // También para Enter
+            if (chatInput) {
+                chatInput.removeEventListener('keypress'); // Quitar viejo
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') sendMessage();
+                });
+            }
+        });
 
         document.getElementById('send-chat-btn')?.addEventListener('click', sendMessage);
         chatInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
@@ -1703,4 +1842,84 @@
 
         initTheme();
     });
+
+    // ====================================================================
+    // SISTEMA DE ACTUALIZACIÓN EN TIEMPO REAL PARA ESTADÍSTICAS
+    // ====================================================================
+
+    // Variable global para almacenar métricas actuales
+    window.dashboardMetrics = {
+        mensajes_hoy: 0,
+        salas_activas: 0,
+        lastUpdate: null
+    };
+
+    /**
+     * Actualiza las estadísticas del dashboard sin recargar página
+     */
+    window.updateDashboardStats = async function() {
+        try {
+            const response = await fetch('/api/dashboard/metrics', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (!response.ok) throw new Error('Error fetching metrics');
+
+            const data = await response.json();
+
+            // Actualizar variables globales
+            window.dashboardMetrics = data;
+            window.dashboardMetrics.lastUpdate = new Date();
+
+            // Actualizar DOM si los elementos existen
+            updateMetricElement('metric-mensajes-hoy', data.mensajes_hoy);
+            updateMetricElement('metric-salas-activas', data.salas_activas_hoy);
+            updateMetricElement('metric-salas-participadas', data.salas_participadas_hoy);
+            updateMetricElement('metric-racha', data.racha_dias);
+
+            console.log('📊 Métricas actualizadas:', data);
+            return data;
+        } catch (error) {
+            console.error('Error updating dashboard stats:', error);
+            return null;
+        }
+    };
+
+    /**
+     * Helper para actualizar elemento del DOM con animación
+     */
+    function updateMetricElement(elementId, newValue) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        const oldValue = parseInt(el.textContent) || 0;
+
+        if (oldValue !== newValue) {
+            // Animación de cambio
+            el.style.transform = 'scale(1.2)';
+            el.style.color = '#10b981'; // Verde temporalmente
+            el.textContent = newValue;
+
+            setTimeout(() => {
+                el.style.transform = 'scale(1)';
+                el.style.color = '';
+            }, 300);
+        }
+    }
+
+    // Auto-actualizar estadísticas cada 60 segundos
+    setInterval(() => {
+        if (document.visibilityState === 'visible') {
+            window.updateDashboardStats();
+        }
+    }, 60000);
+
+    // Actualizar cuando la página gana foco
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            window.updateDashboardStats();
+        }
+    });
+
+    console.log('✅ Sistema de estadísticas en tiempo real cargado');
 </script>

@@ -71,6 +71,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $ciudad = null;
 
+    /** @var Collection<int, UserSession> */
+    #[ORM\OneToMany(targetEntity: UserSession::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $sessions;
+
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?UserStreak $streak = null;
+
     public function __construct()
     {
         $this->salasCreadas = new ArrayCollection();
@@ -78,6 +85,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->mensajesEnviados = new ArrayCollection();
         $this->mensajesRecibidos = new ArrayCollection();
         $this->archivos = new ArrayCollection();
+        $this->sessions = new ArrayCollection();
     }
 
     // --- MÉTODOS BÁSICOS ---
@@ -168,6 +176,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if (!$this->archivos->contains($archivo)) {
             $this->archivos->add($archivo);
             $archivo->setSubidoPor($this);
+        }
+        return $this;
+    }
+
+    public function getSessions(): Collection { return $this->sessions; }
+    public function addSession(UserSession $session): static {
+        if (!$this->sessions->contains($session)) {
+            $this->sessions->add($session);
+            $session->setUser($this);
+        }
+        return $this;
+    }
+
+    public function getStreak(): ?UserStreak { return $this->streak; }
+    public function setStreak(?UserStreak $streak): static {
+        $this->streak = $streak;
+        if ($streak && $streak->getUser() !== $this) {
+            $streak->setUser($this);
         }
         return $this;
     }

@@ -9,17 +9,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class ProfileController extends AbstractController
 {
     #[Route('/perfil/editar', name: 'app_profile_edit')]
-    public function editar(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
-    {
+    public function editar(
+        Request $request,
+        EntityManagerInterface $em,
+        SluggerInterface $slugger,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response {
         /** @var User $user */
         $user = $this->getUser();
         if (!$user) return $this->redirectToRoute('app_login');
 
         if ($request->isMethod('POST')) {
+            // --- ACTUALIZAR DATOS DEL PERFIL ---
             $user->setUsername($request->request->get('username'));
             $user->setBiografia($request->request->get('biografia'));
             $user->setCiudad($request->request->get('ciudad'));
@@ -38,13 +44,48 @@ class ProfileController extends AbstractController
                     );
                     $user->setFotoPerfil($newFilename);
                 } catch (\Exception $e) {
-                    $this->addFlash('error', 'Error al subir la imagen.');
+                    // Error silencioso o podrías usar flash message
+                }
+            }
+
+            // --- CAMBIO DE CONTRASEÑA (Solo si se llena el campo actual) ---
+            $passwordActual = $request->request->get('password_actual');
+            $nuevaPassword = $request->request->get('nueva_password');
+            $confirmarPassword = $request->request->get('confirmar_password');
+
+            $passwordChanged = false;
+
+            if (!empty($passwordActual)) {
+                // Validar contraseña actual
+                if (!$passwordHasher->isPasswordValid($user, $passwordActual)) {
+                    $this->addFlash('error', '❌ La contraseña actual es incorrecta.');
+                }
+                elseif (empty($nuevaPassword)) {
+                    $this->addFlash('error', '⚠️ La nueva contraseña no puede estar vacía.');
+                }
+                elseif ($nuevaPassword !== $confirmarPassword) {
+                    $this->addFlash('error', '⚠️ Las nuevas contraseñas no coinciden.');
+                }
+                elseif (strlen($nuevaPassword) < 8) {
+                    $this->addFlash('error', '⚠️ La contraseña debe tener al menos 8 caracteres.');
+                }
+                else {
+                    // ✅ Todo correcto - Actualizar contraseña
+                    $hashedPassword = $passwordHasher->hashPassword($user, $nuevaPassword);
+                    $user->setPassword($hashedPassword);
+                    $passwordChanged = true;
                 }
             }
 
             $em->flush();
 
-            $this->addFlash('success', '¡Perfil actualizado correctamente!');
+            // Mensaje de éxito apropiado
+            if ($passwordChanged) {
+                $this->addFlash('success', '🔒 ¡Contraseña actualizada correctamente!');
+            } elseif (empty($passwordActual)) {
+                $this->addFlash('success', '✅ ¡Perfil actualizado correctamente!');
+            }
+
             return $this->redirectToRoute('app_profile_edit');
         }
 
