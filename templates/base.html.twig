@@ -283,7 +283,16 @@
             <form id="login-form" action="{{ path('app_login') }}" method="post" class="space-y-4">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                 <input type="text" name="_username" class="w-full px-6 py-4 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Usuario" required>
-                <input type="password" name="_password" class="w-full px-6 py-4 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Contraseña" required>
+                <!-- Input de contraseña con botón de visibilidad -->
+                <div class="relative">
+                    <input type="password" id="login-password" name="_password" class="w-full px-6 py-4 pr-12 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Contraseña" required>
+                    <button type="button" onclick="togglePassword('login-password', 'login-eye-icon')" class="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-white transition-colors focus:outline-none">
+                        <svg id="login-eye-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
                 <div class="flex items-center justify-between mb-4">
                     <label class="flex items-center gap-2 text-xs text-gray-400 cursor-pointer group select-none">
                         <input type="checkbox" id="login-remember-me"
@@ -334,9 +343,29 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="password" id="reg-password" name="registration_form[plainPassword]" class="w-full px-5 py-3.5 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Contraseña" required>
-                    <input type="password" id="reg-confirm-password" class="w-full px-5 py-3.5 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Confirmar" required>
+                    <!-- Contraseña Registro -->
+                    <div class="relative">
+                        <input type="password" id="reg-password" name="registration_form[plainPassword]" class="w-full px-5 py-3.5 pr-10 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Contraseña" required>
+                        <button type="button" onclick="togglePassword('reg-password', 'reg-eye-icon')" class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-white transition-colors focus:outline-none">
+                            <svg id="reg-eye-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Confirmar Contraseña Registro -->
+                    <div class="relative">
+                        <input type="password" id="reg-confirm-password" class="w-full px-5 py-3.5 pr-10 bg-[#2a303f] border border-gray-700 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none text-sm transition-all" placeholder="Confirmar" required>
+                        <button type="button" onclick="togglePassword('reg-confirm-password', 'reg-confirm-eye-icon')" class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-white transition-colors focus:outline-none">
+                            <svg id="reg-confirm-eye-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
+
 
                 <div class="flex items-start gap-2 text-[10px] text-gray-400 mt-2">
                     <input type="checkbox" id="reg-terms-checkbox" name="registration_form[agreeTerms]" required
@@ -1549,19 +1578,61 @@
         const toggleMenu = (btnId, menuId) => {
             document.getElementById(btnId)?.addEventListener('click', (e) => {
                 e.stopPropagation();
-                document.getElementById(menuId)?.classList.toggle('hidden');
-                if(btnId === 'notifMenuBtn') document.getElementById('global-notif-badge')?.classList.add('hidden');
+
+                const userDropdown = document.getElementById('userDropdown');
+                const notifDropdown = document.getElementById('notifDropdown');
+                const targetMenu = document.getElementById(menuId);
+
+                // Si vamos a abrir uno, cerramos el otro primero
+                if (targetMenu.classList.contains('hidden')) {
+                    userDropdown?.classList.add('hidden');
+                    notifDropdown?.classList.add('hidden');
+                    targetMenu.classList.remove('hidden');
+
+                    // Ocultar badge si abrimos notificaciones
+                    if(btnId === 'notifMenuBtn') {
+                        document.getElementById('global-notif-badge')?.classList.add('hidden');
+                    }
+                } else {
+                    // Si ya estaba abierto, lo cerramos
+                    targetMenu.classList.add('hidden');
+                }
             });
         };
+
         toggleMenu('userMenuBtn', 'userDropdown');
         toggleMenu('notifMenuBtn', 'notifDropdown');
 
-        document.addEventListener('click', () => {
-            document.getElementById('userDropdown')?.classList.add('hidden');
-            document.getElementById('notifDropdown')?.classList.add('hidden');
-        });
-
         {% endif %}
+
+        // Evento global de clic para cerrar ambos si se clica fuera
+        document.addEventListener('click', (e) => {
+            const userDropdown = document.getElementById('userDropdown');
+            const notifDropdown = document.getElementById('notifDropdown');
+            const userBtn = document.getElementById('userMenuBtn');
+            const notifBtn = document.getElementById('notifMenuBtn');
+
+            if (userDropdown && !userDropdown.contains(e.target) && !userBtn?.contains(e.target)) {
+                userDropdown.classList.add('hidden');
+            }
+            if (notifDropdown && !notifDropdown.contains(e.target) && !notifBtn?.contains(e.target)) {
+                notifDropdown.classList.add('hidden');
+            }
+        });
+        // Añade esto para las contraseñas de los modales
+        window.togglePassword = function(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />`;
+            } else {
+                input.type = 'password';
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+            }
+        };
 
         const flashMessages = {
             {% for label, messages in app.flashes %}
@@ -1596,14 +1667,14 @@
         window.showTermsModal = function() {
             const isDark = document.documentElement.classList.contains('dark');
             Swal.fire({
-                title: '📜 Términos y Condiciones de Uso',
+                title: 'Términos y Condiciones de Uso',
                 html: `
             <div style="text-align: left; max-height: 60vh; overflow-y: auto; font-size: 0.9rem; line-height: 1.6;">
                 <h4 style="color: #10b981; margin-bottom: 10px;">1. ACEPTACIÓN DE TÉRMINOS</h4>
-                <p>Al acceder y utilizar BrainHub ("el Servicio"), usted acepta estar sujeto a estos Términos de Servicio. Si no está de acuerdo con alguna parte de los términos, entonces no puede acceder al Servicio.</p>
+                <p>Al acceder y utilizar BrainHub , usted acepta estar sujeto a estos Términos de Servicio. Si no está de acuerdo con alguna parte de los términos, entonces no puede acceder a BrainHub.</p>
 
                 <h4 style="color: #10b981; margin: 15px 0 10px;">2. USO PERMITIDO</h4>
-                <p>Puede usar el Servicio únicamente para fines legítimos de estudio colaborativo. Está prohibido:</p>
+                <p>Puede usar BrainHub únicamente para fines legítimos de estudio colaborativo. Está prohibido:</p>
                 <ul style="margin-left: 20px; margin-bottom: 10px;">
                     <li>Compartir contenido inapropiado o ilegal</li>
                     <li>Acoso a otros usuarios</li>
@@ -1617,7 +1688,7 @@
                 <p>Los archivos que comparta en las salas son de su responsabilidad. BrainHub no se hace responsable del contenido subido por los usuarios.</p>
 
                 <h4 style="color: #10b981; margin: 15px 0 10px;">5. MODIFICACIONES</h4>
-                <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado del Servicio después de cambios constituye su aceptación.</p>
+                <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. El uso continuado de BrainHub después de cambios constituye su aceptación.</p>
             </div>
         `,
                 icon: 'info',

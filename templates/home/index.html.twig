@@ -45,8 +45,8 @@
                 </div>
 
                 {# =====================================================================
-   DASHBOARD ANALÍTICO MEJORADO - OPCIÓN 1: MÉTRICAS DE ENGAGEMENT
-   ===================================================================== #}
+                   DASHBOARD ANALÍTICO MEJORADO - OPCIÓN 1: MÉTRICAS DE ENGAGEMENT
+                   ===================================================================== #}
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
                     {# 1. SALAS ACTIVAS HOY #}
@@ -65,10 +65,10 @@
                             <p class="text-3xl font-black text-gray-800 dark:text-white">{{ salas_activas_hoy|default(24) }}</p>
                             <p class="text-xs text-gray-400 mt-2">de {{ salas_totales|default(salas|length) }} totales</p>
                         </div>
-                        {# Mini barra de progreso #}
+                        {# Mini barra de progreso
                         <div class="mt-4 w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2 overflow-hidden">
                             <div class="bg-gradient-to-r from-emerald-400 to-emerald-600 h-full rounded-full transition-all duration-500" style="width: {{ (salas_activas_hoy|default(24) / salas_totales|default(salas|length)) * 100 }}%"></div>
-                        </div>
+                        </div> #}
                     </div>
 
                     {# 2. TIEMPO DE ESTUDIO HOY #}
