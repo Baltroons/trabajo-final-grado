@@ -1,0 +1,18 @@
+p{
+    background-color: aquamarine;
+    font-size: large;
+    text-align: justify;
+}
+h1{
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    text-align: center;
+}
+.contenedor{
+    display: flex;
+    gap: 20px;
+}
+.caja{
+    flex: 1;
+    border: 1px solid brown;
+    padding: 10px;;
+}

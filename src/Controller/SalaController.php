@@ -106,26 +106,34 @@ final class SalaController extends AbstractController
     #[Route('/{id}/edit-ajax', name: 'app_sala_edit_ajax', methods: ['POST'])]
     public function editAjax(Request $request, Sala $sala, EntityManagerInterface $entityManager): JsonResponse
     {
+        // 1. Verificar permisos
         if ($this->getUser() !== $sala->getCreador()) {
             return new JsonResponse([
                 'status' => 'error',
                 'message' => 'No tienes permisos para editar esta sala.'
-            ], 403);
+            ], Response::HTTP_FORBIDDEN);
         }
 
+        // 2. Obtener datos (adaptado al nombre del campo en HTML)
         $nuevoNombre = $request->request->get('nombre');
         $nuevaDescripcion = $request->request->get('descripcion');
 
-        if (!empty($nuevoNombre)) {
-            $sala->setNombre($nuevoNombre);
+        // Debug temporal (quitar después de probar)
+        // return new JsonResponse(['debug' => $request->request->all()]);
+
+        // 3. Validar y actualizar
+        if (!empty(trim($nuevoNombre ?? ''))) {
+            $sala->setNombre(trim($nuevoNombre));
         }
 
-        if ($nuevaDescripcion !== null) {
+        $sala->setDescripcion($nuevaDescripcion === null ? '' : trim($nuevaDescripcion));
+        if ($nuevaDescripcion !== null && $nuevaDescripcion !== '') {
             $sala->setDescripcion($nuevaDescripcion);
         }
 
         $entityManager->flush();
 
+        // 4. Respuesta exitosa
         return new JsonResponse([
             'status' => 'success',
             'data' => [
