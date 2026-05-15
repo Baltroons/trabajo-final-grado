@@ -82,6 +82,57 @@
             max-width: 85%;
             min-width: 0; /* Permitir shrink */
         }
+
+        /* ====================================================================
+            ESTILOS PARA TARJETA DE PERFIL CON POSICIONAMIENTO INTELIGENTE
+        ==================================================================== */
+
+        #user-profile-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Animación cuando aparece desde abajo */
+        #user-profile-card.slide-down {
+            animation: slideInFromBottom 0.2s ease-out forwards;
+        }
+
+        /* Animación cuando aparece desde arriba */
+        #user-profile-card.slide-up {
+            animation: slideInFromTop 0.2s ease-out forwards;
+        }
+
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Estilo visual sutil para indicar que el título de sala es clicable */
+        #active-chat-title:hover {
+            cursor: pointer;
+        }
+
+        /* Sombra mejorada para la tarjeta cuando está cerca de los bordes */
+        #user-profile-card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2),
+            0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
@@ -207,9 +258,18 @@
 
                 <div id="active-chat-window" class="hidden absolute inset-0 bg-white dark:bg-darkCard flex flex-col z-20">
                     <div class="p-4 border-b border-gray-200 dark:border-darkBorder flex items-center gap-3 bg-white dark:bg-darkCard shadow-sm z-10 shrink-0">
-                        <button onclick="closeChat()" class="p-2 bg-gray-50 dark:bg-darkBg hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-500 dark:text-gray-400 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-                        <div>
-                            <h3 id="active-chat-title" class="font-black text-gray-800 dark:text-white text-base leading-tight"></h3>
+                        <button onclick="closeChat()" class="p-2 bg-gray-50 dark:bg-darkBg hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-500 dark:text-gray-400 transition-colors shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+
+                        {# CONTENEDOR CLICKEABLE PARA REDIRIGIR A LA SALA #}
+                        <div id="chat-header-sala-info"
+                             class="flex-grow cursor-pointer min-w-0"
+                             onclick="if(typeof window.goToSalaFromChat === 'function') window.goToSalaFromChat(event)"
+                             title="Click para ver la sala completa">
+                            <h3 id="active-chat-title" class="font-black text-gray-800 dark:text-white text-base leading-tight hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors truncate"></h3>
                             <span id="active-chat-subtitle" class="text-[10px] text-emerald-500 dark:text-emerald-400 font-bold uppercase tracking-wide"></span>
                         </div>
                     </div>
@@ -504,8 +564,8 @@
         });
 
         // ====================================================================
-// SISTEMA "RECUÉRDAME" PARA LOGIN
-// ====================================================================
+        // SISTEMA "RECUÉRDAME" PARA LOGIN
+        // ====================================================================
         (function initRememberMe() {
             const rememberKey = 'brainhub_last_user';
             const usernameInput = document.querySelector('#login-form input[name="_username"]');
@@ -546,10 +606,8 @@
                 loginForm.addEventListener('submit', () => {
                     if (rememberCheckbox.checked && usernameInput.value.trim()) {
                         localStorage.setItem(rememberKey, usernameInput.value.trim());
-                        console.log('✅ Usuario guardado:', usernameInput.value.trim());
                     } else if (!rememberCheckbox.checked) {
                         localStorage.removeItem(rememberKey);
-                        console.log('🗑️ "Recuérdame" desactivado - usuario eliminado');
                     }
                 });
             }
@@ -738,15 +796,99 @@
             if (typeof globalEventSource !== 'undefined' && globalEventSource) globalEventSource.close();
         });
 
+        // ====================================================================
+        // FUNCIÓN GLOBAL: Redirigir a la vista de la sala desde el chat lateral
+        // IMPORTANTE: Debe estar FUERA del DOMContentLoaded para ser global
+        // ====================================================================
+        window.goToSalaFromChat = function(event) {
+            // Prevenir comportamiento default si viene de evento
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            // Verificar que tenemos contexto de sala
+            if (typeof chatContext === 'undefined') {
+                console.warn('[goToSalaFromChat] No hay chatContext definido');
+                return;
+            }
+
+            // Solo funciona para salas (no para chats privados)
+            if (chatContext.type === 'sala' && chatContext.id) {
+                console.log(`[goToSalaFromChat] Redirigiendo a sala ID: ${chatContext.id}`);
+
+                // Construir URL usando la ruta de Symfony
+                const salaUrl = `/sala/${chatContext.id}`;
+
+                // Redirigir
+                window.location.href = salaUrl;
+            } else {
+                console.log('[goToSalaFromChat] No es una sala, ignorando click');
+            }
+        };
+
         // --- LÓGICA DE LA TARJETA DE PERFIL ---
         window.showProfileCard = function(userId, username, event) {
             event.stopPropagation();
             const card = document.getElementById('user-profile-card');
             const rect = event.target.getBoundingClientRect();
 
-            // Posicionar tarjeta
-            card.style.top = `${rect.bottom + 5}px`;
-            card.style.left = `${Math.min(rect.left, window.innerWidth - 280)}px`;
+            // ====================================================================
+            // MEJORA: Calcular posición inteligente para evitar que se corte
+            // ====================================================================
+            const cardHeight = 220; // Altura aproximada de la tarjeta
+            const cardWidth = 256; // Ancho de la tarjeta (w-64)
+            const offset = 8; // Espacio entre el avatar y la tarjeta
+
+            // Espacio disponible debajo del elemento
+            const spaceBelow = window.innerHeight - rect.bottom - offset; // -20 para margen de seguridad
+            // Espacio disponible encima del elemento
+            const spaceAbove = rect.top - offset; // -20 para margen de seguridad
+
+            let topPosition;
+            let shouldPositionAbove = false;
+
+            // Decidir si poner arriba o abajo
+            if (spaceBelow < cardHeight && spaceAbove > spaceBelow) {
+                // No hay espacio abajo pero sí arriba → PONER ARRIBA
+                topPosition = rect.top - cardHeight - offset;
+                shouldPositionAbove = true;
+            } else if (spaceBelow >= cardHeight) {
+                // Hay espacio suficiente abajo → PONER ABAJO (comportamiento normal)
+                topPosition = rect.bottom + offset;
+                shouldPositionAbove = false;
+            } else {
+                // No hay espacio ni arriba ni abajo → Poner donde haya más espacio
+                if (spaceAbove > spaceBelow) {
+                    topPosition = Math.max(offset, rect.top - cardHeight - offset);
+                    shouldPositionAbove = true;
+                } else {
+                    topPosition = rect.bottom + offset;
+                    shouldPositionAbove = false;
+                }
+            }
+
+            // Asegurar que no se salga por los bordes verticales
+            topPosition = Math.max(offset, Math.min(topPosition, window.innerHeight - cardHeight - offset));
+
+            // Calcular posición horizontal (centrar respecto al elemento si es posible)
+            let leftPosition = rect.left;
+
+            // Ajustar si se sale por la derecha
+            if (leftPosition + cardWidth > window.innerWidth - offset) {
+                leftPosition = window.innerWidth - cardWidth - offset;
+            }
+
+            // Asegurar que no se sale por la izquierda
+            leftPosition = Math.max(offset, leftPosition);
+
+            // Aplicar posiciones calculadas
+            card.style.top = `${topPosition}px`;
+            card.style.left = `${leftPosition}px`;
+
+            // Agregar clase para animación suave según dirección
+            card.classList.remove('slide-up', 'slide-down');
+            card.classList.add(shouldPositionAbove ? 'slide-up' : 'slide-down');
 
             document.getElementById('profile-card-username').innerText = username;
             document.getElementById('profile-card-avatar').src = `https://ui-avatars.com/api/?name=${username}&background=random`;
@@ -766,7 +908,7 @@
                     document.getElementById('profile-card-avatar').src = data.fotoPerfil ? `/uploads/profiles/${data.fotoPerfil}` : `https://ui-avatars.com/api/?name=${data.username}&background=random`;
                     document.getElementById('profile-card-bio').innerText = data.biografia || 'Sin biografía';
                 });
-        }
+        };
 
         window.startPrivateChat = function(userId, username) {
             // Abrir sidebar si está cerrado
@@ -840,7 +982,7 @@
                         const isDark = document.documentElement.classList.contains('dark');
                         Swal.fire({
                             icon: 'warning',
-                            title: '⚠️ No disponible',
+                            title: 'No disponible',
                             text: `El ${type === 'username' ? 'usuario' : 'email'} ya está en uso.`,
                             toast: true,
                             position: 'top-end',
@@ -884,7 +1026,7 @@
 
             if (!usernameVal) {
                 Swal.fire({
-                    icon: 'warning', title: '👤 Usuario requerido',
+                    icon: 'warning', title: 'Usuario requerido',
                     text: 'El nombre de usuario no puede estar vacío.',
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
                     background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
@@ -896,7 +1038,7 @@
 
             if (!emailVal) {
                 Swal.fire({
-                    icon: 'warning', title: '📧 Email requerido',
+                    icon: 'warning', title: 'Email requerido',
                     text: 'El correo electrónico no puede estar vacío.',
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
                     background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
@@ -908,7 +1050,7 @@
 
             if (!pass) {
                 Swal.fire({
-                    icon: 'warning', title: '🔒 Contraseña requerida',
+                    icon: 'warning', title: 'Contraseña requerida',
                     text: 'La contraseña no puede estar vacía.',
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
                     background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
@@ -930,7 +1072,7 @@
 
                 Swal.fire({
                     icon: 'warning',
-                    title: '⚖️ Términos requeridos',
+                    title: 'Términos requeridos',
                     text: 'Debe aceptar los Términos y Condiciones para crear una cuenta.',
                     toast: true,
                     position: 'top-end',
@@ -948,7 +1090,7 @@
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
                 const isDark = document.documentElement.classList.contains('dark');
                 Swal.fire({
-                    icon: 'error', title: '📧 Correo inválido', text: 'Formato de correo electrónico no válido.',
+                    icon: 'error', title: 'Correo inválido', text: 'Formato de correo electrónico no válido.',
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
                     background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
                     customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
@@ -959,7 +1101,7 @@
             if (!/^(?=.*[A-Z])(?=.*\d).{8,}$/.test(pass)) {
                 const isDark = document.documentElement.classList.contains('dark');
                 Swal.fire({
-                    icon: 'error', title: '🔒 Contraseña débil', text: 'Mínimo 8 caracteres, 1 mayúscula y 1 número.',
+                    icon: 'error', title: 'Contraseña débil', text: 'Mínimo 8 caracteres, 1 mayúscula y 1 número.',
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
                     background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
                     customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
@@ -970,9 +1112,9 @@
             if (pass !== confirm) {
                 const isDark = document.documentElement.classList.contains('dark');
                 Swal.fire({
-                    icon: 'error', title: '⚠️ Contraseñas distintas', text: 'Las contraseñas no coinciden.',
+                    icon: 'error', title: 'Contraseñas distintas', text: 'Las contraseñas no coinciden.',
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
-                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f297',
+                    background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
                     customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
                 });
                 return;
@@ -991,7 +1133,7 @@
                     // Guardamos mensaje en sessionStorage para mostrarlo en la siguiente vista
                     sessionStorage.setItem('brainhub_welcome', JSON.stringify({
                         type: 'success',
-                        title: '🎉 ¡Bienvenido a BrainHub!',
+                        title: '¡Bienvenido a BrainHub!',
                         text: 'Tu cuenta ha sido creada correctamente. Empieza a colaborar ahora mismo.'
                     }));
                     window.location.href = response.url;
@@ -1025,7 +1167,7 @@
                 // Si el servidor nos dio info específica, la usamos
                 if (serverErrorMsg === 'username') {
                     Swal.fire({
-                        icon: 'error', title: '👤 Usuario no disponible',
+                        icon: 'error', title: 'Usuario no disponible',
                         text: `El nombre de usuario "${usernameVal}" ya está registrado. Prueba con otro.`,
                         toast: true, position: 'top-end', showConfirmButton: false, timer: 4500, timerProgressBar: true,
                         background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
@@ -1039,7 +1181,7 @@
 
                 if (serverErrorMsg === 'email') {
                     Swal.fire({
-                        icon: 'error', title: '📧 Email ya registrado',
+                        icon: 'error', title: 'Email ya registrado',
                         text: `El correo "${emailVal}" ya tiene una cuenta asociada. ¿Olvidaste tu contraseña?`,
                         toast: true, position: 'top-end', showConfirmButton: false, timer: 4500, timerProgressBar: true,
                         background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
@@ -1076,7 +1218,7 @@
                 if (!userData.available) {
                     Swal.close();
                     Swal.fire({
-                        icon: 'error', title: '👤 Usuario en uso',
+                        icon: 'error', title: 'Usuario en uso',
                         text: `El nombre "${usernameVal}" ya existe. Elige otro.`,
                         toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
                         background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
@@ -1097,7 +1239,7 @@
                 if (!emailData.available) {
                     Swal.close();
                     Swal.fire({
-                        icon: 'error', title: '📧 Email registrado',
+                        icon: 'error', title: 'Email registrado',
                         text: `El correo "${emailVal}" ya está en uso. Usa otro o recupera tu acceso.`,
                         toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
                         background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
@@ -1121,7 +1263,7 @@
             } catch (err) {
                 const isDark = document.documentElement.classList.contains('dark');
                 Swal.fire({
-                    icon: 'error', title: '🌐 Error de conexión',
+                    icon: 'error', title: 'Error de conexión',
                     text: 'No pudimos conectar con el servidor. Revisa tu internet e intenta de nuevo.',
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
                     background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
@@ -1150,7 +1292,7 @@
                     const isDark = document.documentElement.classList.contains('dark');
                     Swal.fire({
                         icon: 'error',
-                        title: '❌ Error de acceso',
+                        title: 'Error de acceso',
                         text: 'Usuario o contraseña incorrectos.',
                         toast: true,
                         position: 'top-end',
@@ -1167,7 +1309,7 @@
             } catch (err) {
                 const isDark = document.documentElement.classList.contains('dark');
                 Swal.fire({
-                    icon: 'error', title: '🌐 Sin conexión', text: 'Error de conexión con el servidor.',
+                    icon: 'error', title: 'Sin conexión', text: 'Error de conexión con el servidor.',
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 4000, timerProgressBar: true,
                     background: isDark ? '#1f2937' : '#ffffff', color: isDark ? '#f3f4f6' : '#1f2937',
                     customClass: { popup: 'rounded-2xl shadow-xl border border-red-500/30' }
@@ -1321,6 +1463,23 @@
             chatContext = { type, id, name };
             document.getElementById('active-chat-title').innerText = name;
             document.getElementById('active-chat-subtitle').innerText = type === 'sala' ? 'Canal de Sala' : 'Mensaje Directo';
+            // Mostrar/ocultar icono de enlace según tipo de chat
+            const iconLinkSala = document.getElementById('icon-link-sala');
+            const headerSalaInfo = document.getElementById('chat-header-sala-info');
+
+            if (iconLinkSala && headerSalaInfo) {
+                if (type === 'sala') {
+                    // Es una sala → mostrar icono y habilitar cursor pointer
+                    iconLinkSala.classList.remove('hidden');
+                    headerSalaInfo.style.cursor = 'pointer';
+                    headerSalaInfo.setAttribute('title', 'Click para ver la sala completa');
+                } else {
+                    // Es chat privado → ocultar icono y cursor normal
+                    iconLinkSala.classList.add('hidden');
+                    headerSalaInfo.style.cursor = 'default';
+                    headerSalaInfo.removeAttribute('title');
+                }
+            }
             activeChatWindow.classList.remove('hidden');
 
             chatContainer.innerHTML = '<div class="flex justify-center items-center h-full"><span class="text-sm text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest animate-pulse">Cargando...</span></div>';
@@ -1527,27 +1686,15 @@
          * Esta función reemplaza a todas las anteriores
          */
         const sendMessage = () => {
-            console.log('🚀 [DEBUG] sendMessage() llamada');
 
             if(!chatInput) {
-                console.error('❌ [DEBUG] chatInput no encontrado');
                 return;
             }
 
             const text = chatInput.value.trim();
             const file = fileInput?.files[0];
 
-            console.log('📝 [DEBUG] Datos del mensaje:', {
-                texto: text,
-                tieneArchivo: !!file,
-                archivoNombre: file?.name || null,
-                chatTipo: chatContext.type,
-                chatId: chatContext.id,
-                chatName: chatContext.name
-            });
-
             if (!text && !file) {
-                console.warn('⚠️ [DEBUG] Mensaje vacío sin archivo, abortando');
                 return;
             }
 
@@ -1555,15 +1702,12 @@
             if (text) formData.append('mensaje', text);
             if (file) formData.append('archivo', file);
 
-            // ✅ CRÍTICO: Verificar que SIEMPRE enviemos uno de los dos
+            // Verificar que SIEMPRE enviemos uno de los dos
             if (chatContext.type === 'sala') {
                 formData.append('salaId', chatContext.id);
-                console.log('📌 [DEBUG] Enviando a SALA ID:', chatContext.id);
             } else if (chatContext.type === 'user') {
                 formData.append('receptorId', chatContext.id);
-                console.log('👤 [DEBUG] Enviando a USUARIO ID:', chatContext.id);
             } else {
-                console.error('❌ [ERROR] chatContext.type no es "sala" ni "user":', chatContext.type);
                 return;
             }
 
@@ -1576,14 +1720,12 @@
 
             // URL del endpoint (verificar que sea correcta)
             const url = '{{ path("app_chat_send") }}';
-            console.log('🌐 [DEBUG] Enviando a:', url);
 
             fetch(url, {
                 method: 'POST',
                 body: formData
             })
                 .then(response => {
-                    console.log('📥 [DEBUG] Respuesta HTTP:', response.status, response.statusText);
 
                     // Restaurar botón inmediatamente
                     if (sendBtn) {
@@ -1596,13 +1738,12 @@
                     }
 
                     return response.json().then(data => {
-                        console.log('✅ [DEBUG] Respuesta del servidor:', data);
 
-                        // ✅ Actualizar estadísticas después de enviar
+                        // Actualizar estadísticas después de enviar
                         setTimeout(() => {
                             if (typeof window.updateDashboardStats === 'function') {
                                 window.updateDashboardStats().then(metrics => {
-                                    console.log('📊 [DEBUG] Métricas actualizadas tras enviar mensaje:', metrics);
+                                    console.log(' [DEBUG] Métricas actualizadas tras enviar mensaje:', metrics);
                                 }).catch(e => console.error('Error actualizando métricas:', e));
                             }
                         }, 300); // Reducido de 500ms a 300ms
@@ -1610,7 +1751,6 @@
                         // Incrementar contador local inmediatamente (optimista)
                         if (window.dashboardMetrics && window.dashboardMetrics.mensajes_hoy !== undefined) {
                             window.dashboardMetrics.mensajes_hoy++;
-                            console.log('📈 [DEBUG] Contador local mensajes hoy:', window.dashboardMetrics.mensajes_hoy);
 
                             // Intentar actualizar elemento visual si existe
                             const metricElement = document.querySelector('[data-metric="mensajes-hoy"]');
@@ -1627,8 +1767,6 @@
                     });
                 })
                 .catch(error => {
-                    console.error('❌ [ERROR] Error enviando mensaje:', error);
-                    console.error('📍 Stack trace:', error.stack);
 
                     // Restaurar botón incluso si hay error
                     if (sendBtn) {
@@ -1653,8 +1791,7 @@
                     }
                 })
                 .finally(() => {
-                    // ✅ SIEMPRE limpiar input, independientemente del resultado
-                    console.log('🧹 [DEBUG] Limpiando input y archivos');
+                    //  SIEMPRE limpiar input, independientemente del resultado
                     chatInput.value = '';
                     clearFile();
                     clearUnreadSeparator();
@@ -1876,8 +2013,6 @@
             updateMetricElement('metric-salas-activas', data.salas_activas_hoy);
             updateMetricElement('metric-salas-participadas', data.salas_participadas_hoy);
             updateMetricElement('metric-racha', data.racha_dias);
-
-            console.log('📊 Métricas actualizadas:', data);
             return data;
         } catch (error) {
             console.error('Error updating dashboard stats:', error);
@@ -1920,6 +2055,4 @@
             window.updateDashboardStats();
         }
     });
-
-    console.log('✅ Sistema de estadísticas en tiempo real cargado');
 </script>

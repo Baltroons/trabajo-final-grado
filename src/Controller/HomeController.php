@@ -111,7 +111,7 @@ class HomeController extends AbstractController
             $salaId = $request->request->get('salaId');
             $sala = $salaId ? $this->getDoctrine()->getRepository(Sala::class)->find($salaId) : null;
 
-            $session = $analyticsService->startStudySession($sola);
+            $session = $analyticsService->startStudySession($sala);
 
             return $this->json([
                 'success' => true,
